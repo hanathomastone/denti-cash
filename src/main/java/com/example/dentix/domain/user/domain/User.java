@@ -16,8 +16,7 @@ import java.util.Date;
 public class User extends TimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "userId")
-    private Long id;
+    private Long userId;
 
     @Column(length = 45, nullable = false)
     private String userLoginId;
