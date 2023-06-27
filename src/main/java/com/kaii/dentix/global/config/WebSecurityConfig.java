@@ -1,0 +1,63 @@
+package com.kaii.dentix.global.config;
+
+import com.kaii.dentix.domain.jwt.JwtAuthenticationFilter;
+import com.kaii.dentix.domain.jwt.JwtTokenUtil;
+import com.kaii.dentix.domain.user.application.UserLoginService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import static org.springframework.security.config.Customizer.withDefaults;
+
+@Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class WebSecurityConfig {
+    
+    private final JwtTokenUtil jwtTokenUtil;
+
+    private final UserLoginService userLoginService;
+
+    public static String[] EXCLUDE_URLS = {
+        "/static/docs/*", // restdocs
+        "/resources/edu/thumbnail/*",
+        "/corps",
+        "/signUp",
+        "/test/",
+        "/service-agreement/list", "/verify"
+    };
+
+    /**
+     *  비밀번호 암호화
+     */
+    @Bean
+    public PasswordEncoder PasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public SecurityFilterChain configure(HttpSecurity http) throws Exception {
+
+        http.httpBasic(AbstractHttpConfigurer::disable) // rest api 만을 고려하여 기본 설정은 해제하겠습니다.
+            .cors(withDefaults())
+            .csrf(AbstractHttpConfigurer::disable) // csrf 보안 토큰 disable 처리
+            .sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 토큰 기반 인증이므로 세션 역시 사용하지 않습니다.
+            .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests // 권한 설정
+                    .requestMatchers(EXCLUDE_URLS).permitAll()
+                    .anyRequest().hasAnyRole("USER")
+            )
+            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenUtil, userLoginService), UsernamePasswordAuthenticationFilter.class);
+        return http.build();
+    }
+    
+}
