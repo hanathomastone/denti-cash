@@ -5,7 +5,7 @@ plugins {
     id 'org.asciidoctor.jvm.convert' version '3.3.2'
 }
 
-group = 'com.example'
+group = 'com.kaii'
 version = '0.0.1-SNAPSHOT'
 
 java {
@@ -16,6 +16,7 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+    asciidoctorExtensions
 }
 
 repositories {
@@ -24,6 +25,18 @@ repositories {
 
 ext {
     set('snippetsDir', file("build/generated-snippets"))
+}
+
+asciidoctor {
+    dependsOn test
+}
+
+bootJar {
+    dependsOn asciidoctor
+    from ("${asciidoctor.outputDir}/html5") {
+        into 'static/docs'
+    }
+    from('./.platform') { into '.platform' }
 }
 
 dependencies {
@@ -67,6 +80,12 @@ dependencies {
 
     // jdk 11 이상 xml bind
     implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+
+    // spring rest docs
+    testImplementation('junit:junit:4.13')
+    asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
 }
 
