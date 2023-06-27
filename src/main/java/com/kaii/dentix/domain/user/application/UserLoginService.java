@@ -75,7 +75,9 @@ public class UserLoginService {
     public UserVerifyDto userVerify(UserVerifyRequest request){
 
         Patient patient = patientRepository.findByPatientPhoneNumberAndPatientName(request.getPatientPhoneNumber(), request.getPatientName())
-                .orElseThrow(() -> new NotFoundDataException("patient"));
+                .orElseThrow(() -> new NotFoundDataException("존재하지 않는 회원입니다."));
+
+        if (userRepository.findByPatientId(patient.getPatientId()).isPresent()) throw new AlreadyDataException("이미 가입한 사용자입니다.");
 
         // 서비스 이용 동의
         List<ServiceAgreementDto> serviceAgreementList = serviceAgreementService.serviceAgreementList();
@@ -106,29 +108,29 @@ public class UserLoginService {
 
         User user = new User();
 
-        patientRepository.findById(request.getPatientId()).orElseThrow(() -> new NotFoundDataException("patient"));
+        patientRepository.findById(request.getPatientId()).orElseThrow(() -> new NotFoundDataException("존재하지 않는 회원입니다."));
 
         if (userRepository.findByPatientId(request.getPatientId()).isPresent()) throw new AlreadyDataException("이미 가입한 사용자입니다.");
 
-        String accessToken = jwtTokenUtil.createToken(user, TokenType.AccessToken);
-        String refreshToken = jwtTokenUtil.createToken(user, TokenType.RefreshToken);
+        if (!findPwdQuestionRepository.findById(request.getFindPwdQuestionId()).isPresent()) throw new NotFoundDataException("존재하지 않는 질문입니다.");
 
-        if (!findPwdQuestionRepository.findById(request.getFindPwdQuestionId()).isPresent()) throw new NotFoundDataException("question");
-
-        user = userRepository.save(User.builder()
+        user = userRepository.save(user.builder()
             .userLoginId(request.getUserLoginId())
             .userName(request.getUserName())
             .userGender(request.getUserGender())
             .userBirth(request.getUserBirth())
-            .userLastLoginDate(new Date())
             .userPassword(passwordEncoder.encode(request.getUserPassword()))
             .findPwdQuestionId(request.getFindPwdQuestionId())
             .findPwdAnswer(request.getFindPwdAnswer())
-            .userRefreshToken(refreshToken)
             .patientId(request.getPatientId())
         .build());
 
         Long userId = user.getUserId();
+
+        String accessToken = jwtTokenUtil.createToken(user, TokenType.AccessToken);
+        String refreshToken = jwtTokenUtil.createToken(user, TokenType.RefreshToken);
+
+        user.updateLogin(refreshToken);
 
         // 서비스 이용 동의
         List<ServiceAgreementDto> serviceAgreementList = serviceAgreementService.serviceAgreementList();

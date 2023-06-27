@@ -51,4 +51,12 @@ public class User extends TimeEntity {
 
     private Long patientId;
 
+    /**
+     * RefreshToken, 최근 로그인 일자 업데이트
+     */
+    public void updateLogin(String refreshToken) {
+        this.userRefreshToken = refreshToken;
+        this.userLastLoginDate = new Date();
+    }
+
 }

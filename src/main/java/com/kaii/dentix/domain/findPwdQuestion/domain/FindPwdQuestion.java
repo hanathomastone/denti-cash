@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter @Builder
 @AllArgsConstructor @NoArgsConstructor
-@Table(name = "find_pwd_question")
+@Table(name = "findPwdQuestion")
 public class FindPwdQuestion extends TimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
