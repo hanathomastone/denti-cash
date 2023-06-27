@@ -77,8 +77,6 @@ public class UserLoginService {
         Patient patient = patientRepository.findByPatientPhoneNumberAndPatientName(request.getPatientPhoneNumber(), request.getPatientName())
                 .orElseThrow(() -> new NotFoundDataException("patient"));
 
-        if (userRepository.findByPatientId(patient.getPatientId()).isPresent()) throw new AlreadyDataException("이미 가입한 사용자입니다.");
-
         // 서비스 이용 동의
         List<ServiceAgreementDto> serviceAgreementList = serviceAgreementService.serviceAgreementList();
         if (serviceAgreementList.size() != request.getUserServiceAgreementRequest().size())
@@ -109,6 +107,8 @@ public class UserLoginService {
         User user = new User();
 
         patientRepository.findById(request.getPatientId()).orElseThrow(() -> new NotFoundDataException("patient"));
+
+        if (userRepository.findByPatientId(request.getPatientId()).isPresent()) throw new AlreadyDataException("이미 가입한 사용자입니다.");
 
         String accessToken = jwtTokenUtil.createToken(user, TokenType.AccessToken);
         String refreshToken = jwtTokenUtil.createToken(user, TokenType.RefreshToken);
