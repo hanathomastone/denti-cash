@@ -3,7 +3,6 @@ package com.kaii.dentix.domain.user.application;
 import com.kaii.dentix.domain.findPwdQuestion.dao.FindPwdQuestionRepository;
 import com.kaii.dentix.domain.jwt.JwtTokenUtil;
 import com.kaii.dentix.domain.jwt.TokenType;
-import com.kaii.dentix.domain.type.UserRole;
 import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.domain.patient.dao.PatientRepository;
 import com.kaii.dentix.domain.patient.domain.Patient;
@@ -44,29 +43,8 @@ public class UserLoginService {
 
     private final FindPwdQuestionRepository findPwdQuestionRepository;
 
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    /**
-     *  비밀번호 암호화
-     */
-    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-
-    /**
-     * UserRole 확인
-     */
-    public boolean isUnauthorized(String token, TokenType tokenType) {
-
-        Long userId = jwtTokenUtil.getUserId(token, tokenType);
-        UserRole roles = jwtTokenUtil.getRoles(token, tokenType);
-
-        switch (roles) {
-            case ROLE_USER:
-                User user = userRepository.findById(userId).orElse(null);
-                return user == null;
-            default:
-                return true;
-        }
-    }
 
     /**
      *  사용자 회원 확인

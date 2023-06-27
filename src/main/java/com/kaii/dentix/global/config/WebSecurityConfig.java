@@ -2,7 +2,6 @@ package com.kaii.dentix.global.config;
 
 import com.kaii.dentix.domain.jwt.JwtAuthenticationFilter;
 import com.kaii.dentix.domain.jwt.JwtTokenUtil;
-import com.kaii.dentix.domain.user.application.UserLoginService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,8 +23,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class WebSecurityConfig {
     
     private final JwtTokenUtil jwtTokenUtil;
-
-    private final UserLoginService userLoginService;
 
     public static String[] EXCLUDE_URLS = {
         "/static/docs/*", // restdocs
@@ -55,7 +52,7 @@ public class WebSecurityConfig {
                     .requestMatchers(EXCLUDE_URLS).permitAll()
                     .anyRequest().hasAnyRole("USER")
             )
-            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenUtil, userLoginService), UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenUtil), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
     

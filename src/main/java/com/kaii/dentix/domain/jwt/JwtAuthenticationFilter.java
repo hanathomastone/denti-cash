@@ -1,6 +1,5 @@
 package com.kaii.dentix.domain.jwt;
 
-import com.kaii.dentix.domain.user.application.UserLoginService;
 import com.kaii.dentix.global.common.error.ErrorResponse;
 import com.kaii.dentix.global.common.error.exception.TokenExpiredException;
 import com.kaii.dentix.global.common.response.ResponseMessage;
@@ -28,8 +27,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtil jwtTokenUtil;
 
-    private final UserLoginService userLoginService;
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info(" ::: JwtAuthenticationFilter ::: ");
@@ -49,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 if (StringUtils.isBlank(accessToken)) throw new TokenExpiredException();
                 if (jwtTokenUtil.isExpired(accessToken, TokenType.AccessToken)) throw new TokenExpiredException();
-                if (userLoginService.isUnauthorized(accessToken, TokenType.AccessToken)) throw new TokenExpiredException();
+                if (jwtTokenUtil.isUnauthorized(accessToken, TokenType.AccessToken)) throw new TokenExpiredException();
 
                 // 토큰이 유효하면 토큰으로부터 유저 정보를 받아옵니다.
                 Authentication authentication = jwtTokenUtil.getAuthentication(accessToken, TokenType.AccessToken);

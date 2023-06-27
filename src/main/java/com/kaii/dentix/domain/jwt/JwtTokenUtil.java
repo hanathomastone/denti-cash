@@ -1,12 +1,14 @@
 package com.kaii.dentix.domain.jwt;
 
 import com.kaii.dentix.domain.type.UserRole;
+import com.kaii.dentix.domain.user.dao.UserRepository;
 import com.kaii.dentix.domain.user.domain.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class JwtTokenUtil {
 
     @Value("${jwt.accessTokenKey}")
@@ -25,6 +28,8 @@ public class JwtTokenUtil {
 
     @Value("${jwt.refreshTokenKey}")
     private String refreshTokenKey;
+
+    private final UserRepository userRepository;
 
     // 객체 초기화, secretKey를 Base64로 인코딩한다.
     @PostConstruct
@@ -99,5 +104,22 @@ public class JwtTokenUtil {
 
     public UserRole getRoles(String token, TokenType tokenType) {
         return UserRole.valueOf(String.valueOf(this.getClaims(token, tokenType).get("roles")));
+    }
+
+    /**
+     * UserRole 확인
+     */
+    public boolean isUnauthorized(String token, TokenType tokenType) {
+
+        Long userId = this.getUserId(token, tokenType);
+        UserRole roles = this.getRoles(token, tokenType);
+
+        switch (roles) {
+            case ROLE_USER:
+                User user = userRepository.findById(userId).orElse(null);
+                return user == null;
+            default:
+                return true;
+        }
     }
 }
