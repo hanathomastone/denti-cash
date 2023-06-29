@@ -1,0 +1,74 @@
+ifndef::snippets[]
+:snippets: build/generated-snippets
+endif::[]
+ifndef::doc[]
+:doc: src/docs/asciidoc
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+:operation-http-request-title: Example Request
+:operation-http-response-title: Example Response
+ifndef::snippets-custom[]
+:snippets-custom: ../../../src/docs/custom
+
+
+
+[[title]]
+= DTX API 문서
+
+include::{doc}/common.adoc[]
+
+
+[[verify]]
+== 1. 회원 인증
+회원가입을 위한 회원 인증 API
+
+회원 인증 API 에서 `서비스 이용 동의` 는 올바른 요청인지만 검사합니다.
+
+사용자 서비스 이용 동의 여부 데이터는 회원가입 API 에서 저장합니다.
+
+
+*[회원 인증 실패]*
+
+- 병원 환자 테이블에 존재하지 않는 사용자 : 416 Not found Data
+- 이미 가입된 사용자 : 422 AlreadyDataException
+- 서비스 이용 동의 불일치, 누락 : 417 ValidationException
+- 서비스 이용 필수 동의 '미동의' : 400 BadRequestApiException
+
+=== Http
+include::{snippets}/verify/http-request.adoc[]
+=== Request
+include::{snippets}/verify/request-fields.adoc[]
+=== Response
+include::{snippets}/verify/response-fields.adoc[]
+include::{snippets}/verify/response-body.adoc[]
+
+
+
+
+[[signUp]]
+== 2. 회원가입
+
+사용자 회원가입 API
+
+회원 인증 API 성공 시 return 된 `patientId` 를 담아서 요청합니다.
+
+*[회원가입 실패]*
+
+- 병원 환자 테이블에 존재하지 않는 사용자 : 416 Not found Data
+- 이미 가입된 사용자 : 422 AlreadyDataException
+- 존재하지 않는 비밀번호 찾기 질문 : 416 Not found Data
+- 서비스 이용 동의 불일치, 누락 : 417 ValidationException
+- 서비스 이용 필수 동의 '미동의' : 400 BadRequestApiException
+
+=== Http
+include::{snippets}/signUp/http-request.adoc[]
+=== Request
+include::{snippets}/signUp/request-fields.adoc[]
+=== Response
+include::{snippets}/signUp/response-fields.adoc[]
+include::{snippets}/signUp/response-body.adoc[]

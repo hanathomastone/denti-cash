@@ -49,7 +49,7 @@ public class UserLoginService {
     /**
      *  사용자 회원 확인
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public UserVerifyDto userVerify(UserVerifyRequest request){
 
         Patient patient = patientRepository.findByPatientPhoneNumberAndPatientName(request.getPatientPhoneNumber(), request.getPatientName())
@@ -143,6 +143,7 @@ public class UserLoginService {
                 .userLoginId(request.getUserLoginId())
                 .userName(request.getUserName())
                 .userGender(request.getUserGender())
+                .userBirth(request.getUserBirth())
                 .build();
     }
 

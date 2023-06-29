@@ -18,7 +18,7 @@ public class DocumentOptionalGenerator {
         return setFormat("Y: Yes, N: No");
     }
 
-    public static Attributes.Attribute userGenderFormat() {
+    public static Attributes.Attribute genderFormat() {
         return setFormat("M: 남성, W: 여성");
     }
 

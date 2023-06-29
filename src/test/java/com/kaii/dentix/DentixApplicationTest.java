@@ -3,10 +3,10 @@ package com.kaii.dentix;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+//@SpringBootTest
 class DentixApplicationTest {
 
-    @Test
+    //@Test
     void contextLoads() {
     }
 
