@@ -49,8 +49,6 @@ include::{snippets}/verify/response-fields.adoc[]
 include::{snippets}/verify/response-body.adoc[]
 
 
-
-
 [[signUp]]
 == 2. 회원가입
 
@@ -62,6 +60,7 @@ include::{snippets}/verify/response-body.adoc[]
 
 - 병원 환자 테이블에 존재하지 않는 사용자 : "존재하지 않는 회원입니다."
 - 이미 가입된 사용자 : "이미 가입한 사용자입니다."
+- 이미 존재하는 아이디 : "이미 사용 중인 아이디입니다."
 - 존재하지 않는 비밀번호 찾기 질문 : "존재하지 않는 질문입니다."
 - 서비스 이용 동의 불일치, 누락 : "서비스 동의 개수 불일치"
 - 서비스 이용 동의 누락 : "동의 항목 누락"
@@ -74,3 +73,19 @@ include::{snippets}/signUp/request-fields.adoc[]
 === Response
 include::{snippets}/signUp/response-fields.adoc[]
 include::{snippets}/signUp/response-body.adoc[]
+
+[[loginIdCheck]]
+== 3. 아이디 중복 확인
+회원가입 시, 아이디 중복 확인을 위한 API
+
+*[아이디 중복 확인 실패]*
+
+- 이미 존재하는 아이디 : "이미 사용 중인 아이디입니다."
+
+=== Http
+include::{snippets}/loginId-check/http-request.adoc[]
+=== Request
+include::{snippets}/loginId-check/response-fields.adoc[]
+=== Response
+include::{snippets}/loginId-check/response-fields.adoc[]
+include::{snippets}/loginId-check/response-body.adoc[]

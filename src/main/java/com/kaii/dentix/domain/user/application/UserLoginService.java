@@ -156,7 +156,7 @@ public class UserLoginService {
     public void loginIdCheck(String userLoginId){
 
         if (userRepository.findByUserLoginId(userLoginId).isPresent()){
-            throw new AlreadyDataException("이미 사용중인 아이디입니다.");
+            throw new AlreadyDataException("이미 사용 중인 아이디입니다.");
         }
 
     }

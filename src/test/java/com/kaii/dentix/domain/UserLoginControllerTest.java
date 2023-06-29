@@ -233,7 +233,7 @@ public class UserLoginControllerTest extends ControllerTest{
                 .andDo(document("loginId-check",
                         getDocumentRequest(),
                         getDocumentResponse(),
-                        requestParameters (
+                        queryParameters(
                                 parameterWithName("userLoginId").description("사용자 아이디")
                         ),
                         responseFields(
