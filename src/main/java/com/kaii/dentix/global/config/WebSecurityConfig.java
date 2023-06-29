@@ -28,7 +28,7 @@ public class WebSecurityConfig {
         "/corps",
         "/signUp",
         "/test/",
-        "/service-agreement/list", "/verify"
+        "/service-agreement/list", "/verify", "/loginId-check"
     };
 
     /**

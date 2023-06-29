@@ -5,11 +5,12 @@ import com.kaii.dentix.domain.user.dto.request.UserSignUpRequest;
 import com.kaii.dentix.domain.user.dto.request.UserVerifyRequest;
 import com.kaii.dentix.domain.user.dto.response.UserSignUpResponse;
 import com.kaii.dentix.domain.user.dto.response.UserVerifyResponse;
+import com.kaii.dentix.global.common.response.SuccessResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,6 +34,15 @@ public class UserLoginController {
     public UserSignUpResponse userSignUp(@Valid @RequestBody UserSignUpRequest request){
         UserSignUpResponse userSignUpResponse = new UserSignUpResponse(userLoginService.userSignUp(request));
         return userSignUpResponse;
+    }
+
+    /**
+     *  아이디 중복 확인
+     */
+    @GetMapping(value = "/loginId-check", name = "아이디 중복 확인")
+    public SuccessResponse loginIdCheck(@RequestParam @NotBlank @Size(min = 4, max = 12) String userLoginId){
+        userLoginService.loginIdCheck(userLoginId);
+        return new SuccessResponse();
     }
 
 }
