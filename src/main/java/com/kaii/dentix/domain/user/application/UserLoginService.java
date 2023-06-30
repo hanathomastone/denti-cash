@@ -170,10 +170,10 @@ public class UserLoginService {
     public UserLoginDto userLogin(UserLoginRequest request){
 
         User user = userRepository.findByUserLoginId(request.getUserLoginId())
-                .orElseThrow(() -> new NotFoundDataException("회원 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new UnauthorizedException("아이디 혹은 비밀번호가 올바르지 않습니다."));
 
         if (!passwordEncoder.matches(request.getUserPassword(), user.getUserPassword())){
-            throw new NotFoundDataException("회원 정보를 찾을 수 없습니다.");
+            throw new UnauthorizedException("아이디 혹은 비밀번호가 올바르지 않습니다.");
         }
 
         String accessToken = jwtTokenUtil.createToken(user, TokenType.AccessToken);
