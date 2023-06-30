@@ -20,7 +20,6 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -39,7 +38,6 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -85,7 +83,6 @@ public class UserLoginControllerTest extends ControllerTest{
      *  사용자 회원 확인
      */
     @Test
-    @WithMockUser
     public void userVerify() throws Exception{
 
         // given
@@ -107,7 +104,6 @@ public class UserLoginControllerTest extends ControllerTest{
                 RestDocumentationRequestBuilders.post("/verify")
                         .content(objectMapper.writeValueAsString(userVerifyRequest))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf())
         );
 
         // then
@@ -139,7 +135,6 @@ public class UserLoginControllerTest extends ControllerTest{
      *  사용자 회원가입
      */
     @Test
-    @WithMockUser
     public void userSignUp() throws Exception{
 
         // given
@@ -167,7 +162,6 @@ public class UserLoginControllerTest extends ControllerTest{
                 RestDocumentationRequestBuilders.post("/signUp")
                         .content(objectMapper.writeValueAsString(userSignUpRequest))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf())
         );
 
         // then
@@ -213,7 +207,6 @@ public class UserLoginControllerTest extends ControllerTest{
      *  아이디 중복 확인
      */
     @Test
-    @WithMockUser
     public void loginIdCheck() throws Exception{
 
         // given
