@@ -1,8 +1,10 @@
 package com.kaii.dentix.domain.user.controller;
 
 import com.kaii.dentix.domain.user.application.UserLoginService;
+import com.kaii.dentix.domain.user.dto.request.UserLoginRequest;
 import com.kaii.dentix.domain.user.dto.request.UserSignUpRequest;
 import com.kaii.dentix.domain.user.dto.request.UserVerifyRequest;
+import com.kaii.dentix.domain.user.dto.response.UserLoginResponse;
 import com.kaii.dentix.domain.user.dto.response.UserSignUpResponse;
 import com.kaii.dentix.domain.user.dto.response.UserVerifyResponse;
 import com.kaii.dentix.global.common.response.SuccessResponse;
@@ -44,6 +46,15 @@ public class UserLoginController {
     public SuccessResponse loginIdCheck(@RequestParam @NotBlank @Size(min = 4, max = 12) String userLoginId){
         userLoginService.loginIdCheck(userLoginId);
         return new SuccessResponse();
+    }
+
+    /**
+     *  사용자 로그인
+     */
+    @PostMapping(name = "사용자 로그인")
+    public UserLoginResponse userLogin(@Valid @RequestBody UserLoginRequest request){
+        UserLoginResponse userLoginResponse = new UserLoginResponse(userLoginService.userLogin(request));
+        return userLoginResponse;
     }
 
 }

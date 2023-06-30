@@ -43,7 +43,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnauthorizedException.class)
     @ResponseStatus(HttpStatus.OK)
     public ErrorResponse UnauthorizedException(HttpServletRequest request, UnauthorizedException e) {
-        return ErrorResponse.of(HttpStatus.UNAUTHORIZED, ResponseMessage.UNAUTHORIZED_MSG);
+        return ErrorResponse.of(HttpStatus.UNAUTHORIZED, ResponseMessage.UNAUTHORIZED_MSG.replace("{Msg}", e.getMessage()));
     }
     
     /**

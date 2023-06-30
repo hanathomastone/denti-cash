@@ -26,7 +26,7 @@ public class WebSecurityConfig {
         "/static/docs/*", // restdocs
         "/resources/edu/thumbnail/*",
         "/corps",
-        "/login/*",
+        "/login/*", "/login",
         "/test/",
         "/service-agreement/list"
     };

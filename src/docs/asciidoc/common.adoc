@@ -36,7 +36,7 @@
 | 잘못된 요청
 
 | 401
-| Authentication failed
+| Authentication failed {Msg}
 | 인증 실패
 
 | 403

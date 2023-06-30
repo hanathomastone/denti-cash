@@ -6,8 +6,10 @@ import com.kaii.dentix.domain.type.GenderType;
 import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.domain.user.application.UserLoginService;
 import com.kaii.dentix.domain.user.controller.UserLoginController;
+import com.kaii.dentix.domain.user.dto.UserLoginDto;
 import com.kaii.dentix.domain.user.dto.UserSignUpDto;
 import com.kaii.dentix.domain.user.dto.UserVerifyDto;
+import com.kaii.dentix.domain.user.dto.request.UserLoginRequest;
 import com.kaii.dentix.domain.user.dto.request.UserSignUpRequest;
 import com.kaii.dentix.domain.user.dto.request.UserVerifyRequest;
 import com.kaii.dentix.domain.userServiceAgreement.dto.request.UserServiceAgreementRequest;
@@ -38,6 +40,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -75,6 +78,15 @@ public class UserLoginControllerTest extends ControllerTest{
                 .userName("김덴티")
                 .userBirth("20000701")
                 .userGender(GenderType.W)
+                .build();
+    }
+
+    private UserLoginDto userLoginDto(){
+        return UserLoginDto.builder()
+                .accessToken("Access Token")
+                .refreshToken("Refresh Token")
+                .userId(1L)
+                .userLoginId("dentix123")
                 .build();
     }
 
@@ -236,6 +248,55 @@ public class UserLoginControllerTest extends ControllerTest{
                 ));
 
         verify(userLoginService).loginIdCheck(any(String.class));
+
+    }
+
+    /**
+     *  사용자 로그인
+     */
+    @Test
+    public void userLogin() throws Exception{
+
+        // given
+        given(userLoginService.userLogin(any(UserLoginRequest.class))).willReturn(userLoginDto());
+
+        UserLoginRequest userLoginRequest = UserLoginRequest.builder()
+                .userLoginId("dentix123")
+                .userPassword("password")
+                .build();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                RestDocumentationRequestBuilders.post("/login")
+                        .content(objectMapper.writeValueAsString(userLoginRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user("user").roles("USER"))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("rt").value(200))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andDo(document("login",
+                        getDocumentRequest(),
+                        getDocumentResponse(),
+                        requestFields(
+                                fieldWithPath("userLoginId").type(JsonFieldType.STRING).description("사용자 아이디"),
+                                fieldWithPath("userPassword").type(JsonFieldType.STRING).description("사용자 비밀번호")
+                        ),
+                        responseFields(
+                                fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
+                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
+                                fieldWithPath("userLoginDto").type(JsonFieldType.OBJECT).description("사용자 회원가입 정보"),
+                                fieldWithPath("userLoginDto.accessToken").type(JsonFieldType.STRING).description("Access Token"),
+                                fieldWithPath("userLoginDto.refreshToken").type(JsonFieldType.STRING).description("Refresh Token"),
+                                fieldWithPath("userLoginDto.userId").type(JsonFieldType.NUMBER).description("사용자 고유 번호"),
+                                fieldWithPath("userLoginDto.userLoginId").type(JsonFieldType.STRING).description("사용자 아이디")
+                        )
+                ));
+
+        verify(userLoginService).userLogin(any(UserLoginRequest.class));
+
 
     }
 
