@@ -101,7 +101,7 @@ public class UserLoginControllerTest extends ControllerTest{
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.post("/verify")
+                RestDocumentationRequestBuilders.post("/login/verify")
                         .content(objectMapper.writeValueAsString(userVerifyRequest))
                         .contentType(MediaType.APPLICATION_JSON)
         );
@@ -110,7 +110,7 @@ public class UserLoginControllerTest extends ControllerTest{
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("rt").value(200))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andDo(document("verify",
+                .andDo(document("login/verify",
                         getDocumentRequest(),
                         getDocumentResponse(),
                         requestFields(
@@ -159,7 +159,7 @@ public class UserLoginControllerTest extends ControllerTest{
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.post("/signUp")
+                RestDocumentationRequestBuilders.post("/login/signUp")
                         .content(objectMapper.writeValueAsString(userSignUpRequest))
                         .contentType(MediaType.APPLICATION_JSON)
         );
@@ -168,7 +168,7 @@ public class UserLoginControllerTest extends ControllerTest{
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("rt").value(200))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andDo(document("signUp",
+                .andDo(document("login/signUp",
                         getDocumentRequest(),
                         getDocumentResponse(),
                         requestFields(
@@ -214,7 +214,7 @@ public class UserLoginControllerTest extends ControllerTest{
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.get("/loginId-check?userLoginId={userLoginId}", "dentix123")
+                RestDocumentationRequestBuilders.get("/login/loginId-check?userLoginId={userLoginId}", "dentix123")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
         );
@@ -223,7 +223,7 @@ public class UserLoginControllerTest extends ControllerTest{
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("rt").value(200))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andDo(document("loginId-check",
+                .andDo(document("login/loginId-check",
                         getDocumentRequest(),
                         getDocumentResponse(),
                         queryParameters(
