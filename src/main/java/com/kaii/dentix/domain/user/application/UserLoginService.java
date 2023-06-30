@@ -170,7 +170,7 @@ public class UserLoginService {
     public UserLoginDto userLogin(UserLoginRequest request){
 
         User user = userRepository.findByUserLoginId(request.getUserLoginId())
-                .orElseThrow(() -> new NotFoundDataException("존재하지 않는 아이디입니다."));
+                .orElseThrow(() -> new NotFoundDataException("회원 정보를 찾을 수 없습니다."));
 
         if (!passwordEncoder.matches(request.getUserPassword(), user.getUserPassword())){
             throw new UnauthorizedException("아이디와 비밀번호가 일치하지 않습니다.");
