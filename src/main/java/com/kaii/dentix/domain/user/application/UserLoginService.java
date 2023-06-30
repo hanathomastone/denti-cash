@@ -173,7 +173,7 @@ public class UserLoginService {
                 .orElseThrow(() -> new NotFoundDataException("회원 정보를 찾을 수 없습니다."));
 
         if (!passwordEncoder.matches(request.getUserPassword(), user.getUserPassword())){
-            throw new UnauthorizedException("아이디와 비밀번호가 일치하지 않습니다.");
+            throw new NotFoundDataException("회원 정보를 찾을 수 없습니다.");
         }
 
         String accessToken = jwtTokenUtil.createToken(user, TokenType.AccessToken);
