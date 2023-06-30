@@ -26,9 +26,9 @@ public class WebSecurityConfig {
         "/static/docs/*", // restdocs
         "/resources/edu/thumbnail/*",
         "/corps",
-        "/signUp",
+        "/login/*",
         "/test/",
-        "/service-agreement/list", "/verify"
+        "/service-agreement/list"
     };
 
     /**

@@ -20,7 +20,6 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -33,11 +32,12 @@ import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentResponse;
 import static com.kaii.dentix.common.DocumentOptionalGenerator.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -78,8 +78,11 @@ public class UserLoginControllerTest extends ControllerTest{
                 .build();
     }
 
+
+    /**
+     *  사용자 회원 확인
+     */
     @Test
-    @WithMockUser
     public void userVerify() throws Exception{
 
         // given
@@ -98,17 +101,16 @@ public class UserLoginControllerTest extends ControllerTest{
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.post("/verify")
+                RestDocumentationRequestBuilders.post("/login/verify")
                         .content(objectMapper.writeValueAsString(userVerifyRequest))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf())
         );
 
         // then
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("rt").value(200))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andDo(document("verify",
+                .andDo(document("login/verify",
                         getDocumentRequest(),
                         getDocumentResponse(),
                         requestFields(
@@ -129,8 +131,10 @@ public class UserLoginControllerTest extends ControllerTest{
         verify(userLoginService).userVerify(any(UserVerifyRequest.class));
     }
 
+    /**
+     *  사용자 회원가입
+     */
     @Test
-    @WithMockUser
     public void userSignUp() throws Exception{
 
         // given
@@ -155,17 +159,16 @@ public class UserLoginControllerTest extends ControllerTest{
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.post("/signUp")
+                RestDocumentationRequestBuilders.post("/login/signUp")
                         .content(objectMapper.writeValueAsString(userSignUpRequest))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf())
         );
 
         // then
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("rt").value(200))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andDo(document("signUp",
+                .andDo(document("login/signUp",
                         getDocumentRequest(),
                         getDocumentResponse(),
                         requestFields(
@@ -197,6 +200,42 @@ public class UserLoginControllerTest extends ControllerTest{
                 ));
 
         verify(userLoginService).userSignUp(any(UserSignUpRequest.class));
+
+    }
+
+    /**
+     *  아이디 중복 확인
+     */
+    @Test
+    public void loginIdCheck() throws Exception{
+
+        // given
+        doNothing().when(userLoginService).loginIdCheck(any(String.class));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                RestDocumentationRequestBuilders.get("/login/loginId-check?userLoginId={userLoginId}", "dentix123")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("rt").value(200))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andDo(document("login/loginId-check",
+                        getDocumentRequest(),
+                        getDocumentResponse(),
+                        queryParameters(
+                                parameterWithName("userLoginId").description("사용자 아이디")
+                        ),
+                        responseFields(
+                                fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
+                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지")
+                        )
+                ));
+
+        verify(userLoginService).loginIdCheck(any(String.class));
 
     }
 
