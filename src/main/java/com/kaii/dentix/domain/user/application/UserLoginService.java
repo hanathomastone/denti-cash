@@ -10,8 +10,10 @@ import com.kaii.dentix.domain.serviceAgreement.application.ServiceAgreementServi
 import com.kaii.dentix.domain.serviceAgreement.dto.ServiceAgreementDto;
 import com.kaii.dentix.domain.user.dao.UserRepository;
 import com.kaii.dentix.domain.user.domain.User;
+import com.kaii.dentix.domain.user.dto.UserLoginDto;
 import com.kaii.dentix.domain.user.dto.UserSignUpDto;
 import com.kaii.dentix.domain.user.dto.UserVerifyDto;
+import com.kaii.dentix.domain.user.dto.request.UserLoginRequest;
 import com.kaii.dentix.domain.user.dto.request.UserSignUpRequest;
 import com.kaii.dentix.domain.user.dto.request.UserVerifyRequest;
 import com.kaii.dentix.domain.userServiceAgreement.dao.UserServiceAgreementRepository;
@@ -158,6 +160,33 @@ public class UserLoginService {
         if (userRepository.findByUserLoginId(userLoginId).isPresent()){
             throw new AlreadyDataException("이미 사용 중인 아이디입니다.");
         }
+
+    }
+
+    /**
+     *  사용자 로그인
+     */
+    @Transactional
+    public UserLoginDto userLogin(UserLoginRequest request){
+
+        User user = userRepository.findByUserLoginId(request.getUserLoginId())
+                .orElseThrow(() -> new NotFoundDataException("존재하지 않는 아이디입니다."));
+
+        if (!passwordEncoder.matches(request.getUserPassword(), user.getUserPassword())){
+            throw new UnauthorizedException("아이디와 비밀번호가 일치하지 않습니다.");
+        }
+
+        String accessToken = jwtTokenUtil.createToken(user, TokenType.AccessToken);
+        String refreshToken = jwtTokenUtil.createToken(user, TokenType.RefreshToken);
+
+        user.updateLogin(refreshToken);
+
+        return UserLoginDto.builder()
+                .userId(user.getUserId())
+                .userLoginId(user.getUserLoginId())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
 
     }
 

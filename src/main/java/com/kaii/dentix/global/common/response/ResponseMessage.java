@@ -6,7 +6,7 @@ public class ResponseMessage {
 
     public static final String BAD_REQUEST_MSG = "Bad request";
 
-    public static final String UNAUTHORIZED_MSG = "Authentication failed";
+    public static final String UNAUTHORIZED_MSG = "Authentication failed {Msg}";
 
     public static final String FORBIDDEN_MSG = "Permission error";
 
