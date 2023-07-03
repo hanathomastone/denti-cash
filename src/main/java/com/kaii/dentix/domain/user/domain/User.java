@@ -51,6 +51,18 @@ public class User extends TimeEntity {
 
     private Long patientId;
 
+    @Column(length = 45)
+    private String userDeviceModel;
+
+    @Column(length = 45)
+    private String userDeviceManufacturer;
+
+    @Column(length = 45)
+    private String userOsVersion;
+
+    private String userDeviceToken;
+
+
     /**
      * RefreshToken, 최근 로그인 일자 업데이트
      */

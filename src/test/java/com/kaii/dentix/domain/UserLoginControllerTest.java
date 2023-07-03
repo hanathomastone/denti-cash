@@ -13,6 +13,7 @@ import com.kaii.dentix.domain.user.dto.request.UserLoginRequest;
 import com.kaii.dentix.domain.user.dto.request.UserSignUpRequest;
 import com.kaii.dentix.domain.user.dto.request.UserVerifyRequest;
 import com.kaii.dentix.domain.userServiceAgreement.dto.request.UserServiceAgreementRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -150,7 +151,7 @@ public class UserLoginControllerTest extends ControllerTest{
     public void userSignUp() throws Exception{
 
         // given
-        given(userLoginService.userSignUp(any(UserSignUpRequest.class))).willReturn(userSignUpDto());
+        given(userLoginService.userSignUp(any(HttpServletRequest.class), any(UserSignUpRequest.class))).willReturn(userSignUpDto());
 
         UserSignUpRequest userSignUpRequest = UserSignUpRequest.builder()
                 .patientId(1L)
@@ -167,6 +168,10 @@ public class UserLoginControllerTest extends ControllerTest{
                 .userBirth("20000701")
                 .findPwdQuestionId(1L)
                 .findPwdAnswer("초록색")
+                .userDeviceModel("iPhone 14 Pro")
+                .userDeviceManufacturer("APPLE")
+                .userOsVersion("1.1")
+                .userDeviceToken("DeviceToken")
                 .build();
 
         // when
@@ -194,7 +199,11 @@ public class UserLoginControllerTest extends ControllerTest{
                                 fieldWithPath("userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별"),
                                 fieldWithPath("userBirth").type(JsonFieldType.STRING).attributes(userBirthFormat()).description("사용자 생년월일"),
                                 fieldWithPath("findPwdQuestionId").type(JsonFieldType.NUMBER).description("사용자 비밀번호 찾기 질문"),
-                                fieldWithPath("findPwdAnswer").type(JsonFieldType.STRING).description("사용자 비밀번호 찾기 답변")
+                                fieldWithPath("findPwdAnswer").type(JsonFieldType.STRING).description("사용자 비밀번호 찾기 답변"),
+                                fieldWithPath("userDeviceModel").type(JsonFieldType.STRING).optional().description("사용자 기기 모델"),
+                                fieldWithPath("userDeviceManufacturer").type(JsonFieldType.STRING).optional().description("사용자 기기 제조사"),
+                                fieldWithPath("userOsVersion").type(JsonFieldType.STRING).optional().description("사용자 기기 OS 버전"),
+                                fieldWithPath("userDeviceToken").type(JsonFieldType.STRING).optional().description("사용자 기기 푸시토큰")
                         ),
                         responseFields(
                                 fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
@@ -211,7 +220,7 @@ public class UserLoginControllerTest extends ControllerTest{
                         )
                 ));
 
-        verify(userLoginService).userSignUp(any(UserSignUpRequest.class));
+        verify(userLoginService).userSignUp(any(HttpServletRequest.class), any(UserSignUpRequest.class));
 
     }
 
@@ -258,11 +267,15 @@ public class UserLoginControllerTest extends ControllerTest{
     public void userLogin() throws Exception{
 
         // given
-        given(userLoginService.userLogin(any(UserLoginRequest.class))).willReturn(userLoginDto());
+        given(userLoginService.userLogin(any(HttpServletRequest.class), any(UserLoginRequest.class))).willReturn(userLoginDto());
 
         UserLoginRequest userLoginRequest = UserLoginRequest.builder()
                 .userLoginId("dentix123")
                 .userPassword("password")
+                .userDeviceModel("iPhone 14 Pro")
+                .userDeviceManufacturer("APPLE")
+                .userOsVersion("1.1")
+                .userDeviceToken("DeviceToken")
                 .build();
 
         // when
@@ -282,7 +295,11 @@ public class UserLoginControllerTest extends ControllerTest{
                         getDocumentResponse(),
                         requestFields(
                                 fieldWithPath("userLoginId").type(JsonFieldType.STRING).description("사용자 아이디"),
-                                fieldWithPath("userPassword").type(JsonFieldType.STRING).description("사용자 비밀번호")
+                                fieldWithPath("userPassword").type(JsonFieldType.STRING).description("사용자 비밀번호"),
+                                fieldWithPath("userDeviceModel").type(JsonFieldType.STRING).optional().description("사용자 기기 모델"),
+                                fieldWithPath("userDeviceManufacturer").type(JsonFieldType.STRING).optional().description("사용자 기기 제조사"),
+                                fieldWithPath("userOsVersion").type(JsonFieldType.STRING).optional().description("사용자 기기 OS 버전"),
+                                fieldWithPath("userDeviceToken").type(JsonFieldType.STRING).optional().description("사용자 기기 푸시토큰")
                         ),
                         responseFields(
                                 fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
@@ -295,7 +312,7 @@ public class UserLoginControllerTest extends ControllerTest{
                         )
                 ));
 
-        verify(userLoginService).userLogin(any(UserLoginRequest.class));
+        verify(userLoginService).userLogin(any(HttpServletRequest.class), any(UserLoginRequest.class));
 
 
     }

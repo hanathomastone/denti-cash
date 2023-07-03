@@ -16,4 +16,9 @@ public class UserLoginRequest {
     @NotBlank
     private String userPassword;
 
+    private String userDeviceModel;
+    private String userDeviceManufacturer;
+    private String userOsVersion;
+    private String userDeviceToken;
+
 }

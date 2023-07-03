@@ -8,6 +8,7 @@ import com.kaii.dentix.domain.user.dto.response.UserLoginResponse;
 import com.kaii.dentix.domain.user.dto.response.UserSignUpResponse;
 import com.kaii.dentix.domain.user.dto.response.UserVerifyResponse;
 import com.kaii.dentix.global.common.response.SuccessResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -34,8 +35,8 @@ public class UserLoginController {
      * 사용자 회원가입
      */
     @PostMapping(value = "/signUp", name = "사용자 회원가입")
-    public UserSignUpResponse userSignUp(@Valid @RequestBody UserSignUpRequest request){
-        UserSignUpResponse userSignUpResponse = new UserSignUpResponse(userLoginService.userSignUp(request));
+    public UserSignUpResponse userSignUp(HttpServletRequest httpServletRequest, @Valid @RequestBody UserSignUpRequest request){
+        UserSignUpResponse userSignUpResponse = new UserSignUpResponse(userLoginService.userSignUp(httpServletRequest, request));
         return userSignUpResponse;
     }
 
@@ -52,8 +53,8 @@ public class UserLoginController {
      *  사용자 로그인
      */
     @PostMapping(name = "사용자 로그인")
-    public UserLoginResponse userLogin(@Valid @RequestBody UserLoginRequest request){
-        UserLoginResponse userLoginResponse = new UserLoginResponse(userLoginService.userLogin(request));
+    public UserLoginResponse userLogin(HttpServletRequest httpServletRequest, @Valid @RequestBody UserLoginRequest request){
+        UserLoginResponse userLoginResponse = new UserLoginResponse(userLoginService.userLogin(httpServletRequest, request));
         return userLoginResponse;
     }
 
