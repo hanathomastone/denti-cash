@@ -16,11 +16,14 @@ import com.kaii.dentix.domain.user.dto.UserVerifyDto;
 import com.kaii.dentix.domain.user.dto.request.UserLoginRequest;
 import com.kaii.dentix.domain.user.dto.request.UserSignUpRequest;
 import com.kaii.dentix.domain.user.dto.request.UserVerifyRequest;
+import com.kaii.dentix.domain.user.event.UserModifyDeviceInfoEvent;
 import com.kaii.dentix.domain.userServiceAgreement.dao.UserServiceAgreementRepository;
 import com.kaii.dentix.domain.userServiceAgreement.domain.UserServiceAgreement;
 import com.kaii.dentix.domain.userServiceAgreement.dto.request.UserServiceAgreementRequest;
 import com.kaii.dentix.global.common.error.exception.*;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +49,8 @@ public class UserLoginService {
     private final FindPwdQuestionRepository findPwdQuestionRepository;
 
     private final BCryptPasswordEncoder passwordEncoder;
+
+    private final ApplicationEventPublisher publisher;
 
 
     /**
@@ -84,7 +89,7 @@ public class UserLoginService {
      *  사용자 회원가입
      */
     @Transactional
-    public UserSignUpDto userSignUp(UserSignUpRequest request){
+    public UserSignUpDto userSignUp(HttpServletRequest httpServletRequest, UserSignUpRequest request){
 
         User user = new User();
 
@@ -139,6 +144,15 @@ public class UserLoginService {
                     .build());
         });
 
+        publisher.publishEvent(new UserModifyDeviceInfoEvent(
+                user.getUserId(),
+                httpServletRequest,
+                request.getUserDeviceModel(),
+                request.getUserDeviceManufacturer(),
+                request.getUserOsVersion(),
+                request.getUserDeviceToken()
+        ));
+
         return UserSignUpDto.builder()
                 .patientId(request.getPatientId())
                 .userId(user.getUserId())
@@ -167,7 +181,7 @@ public class UserLoginService {
      *  사용자 로그인
      */
     @Transactional
-    public UserLoginDto userLogin(UserLoginRequest request){
+    public UserLoginDto userLogin(HttpServletRequest httpServletRequest, UserLoginRequest request){
 
         User user = userRepository.findByUserLoginId(request.getUserLoginId())
                 .orElseThrow(() -> new UnauthorizedException("아이디 혹은 비밀번호가 올바르지 않습니다."));
@@ -180,6 +194,15 @@ public class UserLoginService {
         String refreshToken = jwtTokenUtil.createToken(user, TokenType.RefreshToken);
 
         user.updateLogin(refreshToken);
+
+        publisher.publishEvent(new UserModifyDeviceInfoEvent(
+                user.getUserId(),
+                httpServletRequest,
+                request.getUserDeviceModel(),
+                request.getUserDeviceManufacturer(),
+                request.getUserOsVersion(),
+                request.getUserDeviceToken()
+        ));
 
         return UserLoginDto.builder()
                 .userId(user.getUserId())

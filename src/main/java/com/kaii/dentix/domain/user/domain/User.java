@@ -51,12 +51,41 @@ public class User extends TimeEntity {
 
     private Long patientId;
 
+    private Long userDeviceTypeId;
+
+    @Column(length = 45)
+    private String userDeviceModel;
+
+    @Column(length = 45)
+    private String userDeviceManufacturer;
+
+    @Column(length = 45)
+    private String userOsVersion;
+
+    private String userDeviceToken;
+
+    @Column(length = 10)
+    private String userAppVersion;
+
+
     /**
      * RefreshToken, 최근 로그인 일자 업데이트
      */
     public void updateLogin(String refreshToken) {
         this.userRefreshToken = refreshToken;
         this.userLastLoginDate = new Date();
+    }
+
+    /**
+     * 디바이스 정보 업데이트
+     */
+    public void modifyDeviceInfo(Long userDeviceTypeId, String userAppVersion, String userDeviceModel, String userDeviceManufacturer, String userOsVersion, String userDeviceToken) {
+        this.userDeviceTypeId = userDeviceTypeId;
+        this.userAppVersion = userAppVersion;
+        this.userDeviceModel = userDeviceModel;
+        this.userDeviceManufacturer = userDeviceManufacturer;
+        this.userOsVersion = userOsVersion;
+        this.userDeviceToken = userDeviceToken;
     }
 
 }
