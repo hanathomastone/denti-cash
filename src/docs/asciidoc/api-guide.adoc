@@ -126,3 +126,20 @@ include::{snippets}/user/auto-login/request-fields.adoc[]
 === Response
 include::{snippets}/user/auto-login/response-fields.adoc[]
 include::{snippets}/user/auto-login/response-body.adoc[]
+
+[[userFindPassword]]
+== 6. 사용자 비밀번호 찾기
+비밀번호 재설정을 위한 아이디와 질문, 답변을 통한 비밀번호 찾기 API
+
+*[비밀번호 찾기 실패]*
+
+- 존재하지 않는 아이디 : `"존재하지 않는 아이디입니다."`
+- 질문 혹은 답변 불일치 : `"질문 혹은 답변이 일치하지 않습니다."`
+
+=== Http
+include::{snippets}/login/find-password/http-request.adoc[]
+=== Request
+include::{snippets}/login/find-password/request-fields.adoc[]
+=== Response
+include::{snippets}/login/find-password/response-fields.adoc[]
+include::{snippets}/login/find-password/response-body.adoc[]

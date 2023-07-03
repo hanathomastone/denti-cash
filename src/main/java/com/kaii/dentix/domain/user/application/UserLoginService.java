@@ -13,6 +13,7 @@ import com.kaii.dentix.domain.user.domain.User;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
 import com.kaii.dentix.domain.user.dto.UserSignUpDto;
 import com.kaii.dentix.domain.user.dto.UserVerifyDto;
+import com.kaii.dentix.domain.user.dto.request.UserFindPasswordRequest;
 import com.kaii.dentix.domain.user.dto.request.UserLoginRequest;
 import com.kaii.dentix.domain.user.dto.request.UserSignUpRequest;
 import com.kaii.dentix.domain.user.dto.request.UserVerifyRequest;
@@ -210,6 +211,24 @@ public class UserLoginService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+
+    }
+
+    /**
+     *  사용자 비밀번호 찾기
+     */
+    @Transactional
+    public void userFindPassword(UserFindPasswordRequest request){
+
+        User user = userRepository.findByUserLoginId(request.getUserLoginId()).orElseThrow(() -> new NotFoundDataException("존재하지 않는 아이디입니다."));
+
+        if (user.getFindPwdQuestionId().equals(request.getFindPwdQuestionId())){ // 입력받은 질문과 DB 정보가 일치하는 경우
+            if (!user.getFindPwdAnswer().equals(request.getFindPwdAnswer())){ // 입력받은 답변과 DB 정보가 일치하지 않는 경우
+                throw new UnauthorizedException("질문 혹은 답변이 일치하지 않습니다.");
+            }
+        } else { // 입력받은 질문과 DB 정보가 일치하지 않는 경우
+            throw new UnauthorizedException("질문 혹은 답변이 일치하지 않습니다.");
+        }
 
     }
 
