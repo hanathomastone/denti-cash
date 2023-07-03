@@ -6,7 +6,6 @@ import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.controller.UserController;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
 import com.kaii.dentix.domain.user.dto.request.UserAutoLoginRequest;
-import com.kaii.dentix.domain.user.dto.request.UserLoginRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,17 +70,20 @@ public class UserControllerTest extends ControllerTest {
         // given
         given(userService.userAutoLogin(any(HttpServletRequest.class), any(UserAutoLoginRequest.class))).willReturn(userLoginDto());
 
-        UserAutoLoginRequest userAutoLoginRequest = new UserAutoLoginRequest(
-                "iPhone 14 Pro",
-                "APPLE",
-                "1.1",
-                "DeviceToken");
+        UserAutoLoginRequest userAutoLoginRequest = UserAutoLoginRequest.builder()
+                .userDeviceModel("iPhone 14 Pro")
+                .userDeviceManufacturer("APPLE")
+                .userOsVersion("1.1")
+                .userDeviceToken("DeviceToken")
+                .build();
 
         // when
         ResultActions resultActions = mockMvc.perform(
                 RestDocumentationRequestBuilders.put("/user/auto-login")
                         .content(objectMapper.writeValueAsString(userAutoLoginRequest))
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("deviceType", "iOS")
+                        .header("appVersion", 1.1)
                         .header(HttpHeaders.AUTHORIZATION, "user-info.고유경.AccessToken")
                         .with(user("user").roles("USER"))
         );

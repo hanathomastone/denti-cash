@@ -102,7 +102,7 @@ include::{snippets}/login/loginId-check/response-body.adoc[]
 === Http
 include::{snippets}/login/http-request.adoc[]
 === Request
-include::{snippets}/login/request-body.adoc[]
+include::{snippets}/login/request-fields.adoc[]
 === Response
 include::{snippets}/login/response-fields.adoc[]
 include::{snippets}/login/response-body.adoc[]
@@ -117,9 +117,9 @@ include::{snippets}/login/response-body.adoc[]
 - 사용자 조회 불가능 : `"존재하지 않는 사용자입니다."`
 
 === Http
-include::{snippets}/login/http-request.adoc[]
+include::{snippets}/user/auto-login/http-request.adoc[]
 === Request
-include::{snippets}/login/request-body.adoc[]
+include::{snippets}/user/auto-login/request-fields.adoc[]
 === Response
-include::{snippets}/login/response-fields.adoc[]
-include::{snippets}/login/response-body.adoc[]
+include::{snippets}/user/auto-login/response-fields.adoc[]
+include::{snippets}/user/auto-login/response-body.adoc[]

@@ -178,6 +178,8 @@ public class UserLoginControllerTest extends ControllerTest{
         ResultActions resultActions = mockMvc.perform(
                 RestDocumentationRequestBuilders.post("/login/signUp")
                         .content(objectMapper.writeValueAsString(userSignUpRequest))
+                        .header("deviceType", "iOS")
+                        .header("appVersion", 1.1)
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
@@ -283,6 +285,8 @@ public class UserLoginControllerTest extends ControllerTest{
                 RestDocumentationRequestBuilders.post("/login")
                         .content(objectMapper.writeValueAsString(userLoginRequest))
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("deviceType", "iOS")
+                        .header("appVersion", 1.1)
                         .with(user("user").roles("USER"))
         );
 
