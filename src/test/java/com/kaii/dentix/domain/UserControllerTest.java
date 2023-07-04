@@ -5,7 +5,6 @@ import com.kaii.dentix.common.ControllerTest;
 import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.controller.UserController;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
-import com.kaii.dentix.domain.user.dto.UserPasswordVerifyDto;
 import com.kaii.dentix.domain.user.dto.request.UserAutoLoginRequest;
 import com.kaii.dentix.domain.user.dto.request.UserPasswordVerifyRequest;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,6 +27,7 @@ import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentRequest;
 import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentResponse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
@@ -60,12 +60,6 @@ public class UserControllerTest extends ControllerTest {
                 .refreshToken("Refresh Token")
                 .userId(1L)
                 .userLoginId("dentix123")
-                .build();
-    }
-
-    private UserPasswordVerifyDto userPasswordVerifyDto(){
-        return UserPasswordVerifyDto.builder()
-                .userId(1L)
                 .build();
     }
 
@@ -131,7 +125,7 @@ public class UserControllerTest extends ControllerTest {
     public void userPasswordVerify() throws Exception{
 
         // given
-        given(userService.userPasswordVerify(any(HttpServletRequest.class), any(UserPasswordVerifyRequest.class))).willReturn(userPasswordVerifyDto());
+        doNothing().when(userService).userPasswordVerify(any(HttpServletRequest.class), any(UserPasswordVerifyRequest.class));
 
         UserPasswordVerifyRequest userPasswordVerifyRequest = UserPasswordVerifyRequest.builder()
                 .userPassword("password")
@@ -158,9 +152,7 @@ public class UserControllerTest extends ControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
-                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
-                                fieldWithPath("userPasswordVerifyDto").type(JsonFieldType.OBJECT).description("사용자 비밀번호 확인 정보"),
-                                fieldWithPath("userPasswordVerifyDto.userId").type(JsonFieldType.NUMBER).description("사용자 고유 번호")
+                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지")
                         )
                 ));
 

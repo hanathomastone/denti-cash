@@ -7,7 +7,6 @@ import com.kaii.dentix.domain.type.UserRole;
 import com.kaii.dentix.domain.user.dao.UserRepository;
 import com.kaii.dentix.domain.user.domain.User;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
-import com.kaii.dentix.domain.user.dto.UserPasswordVerifyDto;
 import com.kaii.dentix.domain.user.dto.request.UserAutoLoginRequest;
 import com.kaii.dentix.domain.user.dto.request.UserPasswordVerifyRequest;
 import com.kaii.dentix.domain.user.event.UserModifyDeviceInfoEvent;
@@ -122,17 +121,13 @@ public class UserService {
      *  사용자 비밀번호 확인
      */
     @Transactional
-    public UserPasswordVerifyDto userPasswordVerify(HttpServletRequest httpServletRequest, UserPasswordVerifyRequest request){
+    public void userPasswordVerify(HttpServletRequest httpServletRequest, UserPasswordVerifyRequest request){
 
         User user = this.getTokenUser(httpServletRequest);
 
         if (!passwordEncoder.matches(request.getUserPassword(), user.getUserPassword())){
             throw new UnauthorizedException("비밀번호가 일치하지 않습니다.");
         }
-
-        return UserPasswordVerifyDto.builder()
-                .userId(user.getUserId())
-                .build();
 
     }
 
