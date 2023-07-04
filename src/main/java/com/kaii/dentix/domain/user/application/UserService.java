@@ -8,6 +8,7 @@ import com.kaii.dentix.domain.user.dao.UserRepository;
 import com.kaii.dentix.domain.user.domain.User;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
 import com.kaii.dentix.domain.user.dto.request.UserAutoLoginRequest;
+import com.kaii.dentix.domain.user.dto.request.UserInfoModifyPasswordRequest;
 import com.kaii.dentix.domain.user.dto.request.UserPasswordVerifyRequest;
 import com.kaii.dentix.domain.user.event.UserModifyDeviceInfoEvent;
 import com.kaii.dentix.domain.userDeviceType.dao.UserDeviceTypeRepository;
@@ -128,6 +129,18 @@ public class UserService {
         if (!passwordEncoder.matches(request.getUserPassword(), user.getUserPassword())){
             throw new UnauthorizedException("비밀번호가 일치하지 않습니다.");
         }
+
+    }
+
+    /**
+     *  사용자 보안정보수정 - 비밀번호 변경
+     */
+    @Transactional
+    public void userModifyPassword(HttpServletRequest httpServletRequest, UserInfoModifyPasswordRequest request){
+
+        User user = this.getTokenUser(httpServletRequest);
+
+        user.modifyUserPassword(passwordEncoder, request.getUserPassword());
 
     }
 

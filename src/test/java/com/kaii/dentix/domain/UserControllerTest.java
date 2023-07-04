@@ -6,6 +6,8 @@ import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.controller.UserController;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
 import com.kaii.dentix.domain.user.dto.request.UserAutoLoginRequest;
+import com.kaii.dentix.domain.user.dto.request.UserInfoModifyPasswordRequest;
+import com.kaii.dentix.domain.user.dto.request.UserModifyPasswordRequest;
 import com.kaii.dentix.domain.user.dto.request.UserPasswordVerifyRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -157,6 +159,48 @@ public class UserControllerTest extends ControllerTest {
                 ));
 
         verify(userService).userPasswordVerify(any(HttpServletRequest.class), any(UserPasswordVerifyRequest.class));
+
+    }
+
+    /**
+     *  사용자 보안정보수정 - 비밀번호 변경
+     */
+    @Test
+    public void userModifyPassword() throws Exception{
+
+        // given
+        doNothing().when(userService).userModifyPassword(any(HttpServletRequest.class), any(UserInfoModifyPasswordRequest.class));
+
+        UserInfoModifyPasswordRequest userInfoModifyPasswordRequest = UserInfoModifyPasswordRequest.builder()
+                .userPassword("password")
+                .build();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                RestDocumentationRequestBuilders.put("/user/modify-password")
+                        .content(objectMapper.writeValueAsString(userInfoModifyPasswordRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "user-info.고유경.AccessToken")
+                        .with(user("user").roles("USER"))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("rt").value(200))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andDo(document("user/modify-password",
+                        getDocumentRequest(),
+                        getDocumentResponse(),
+                        requestFields(
+                                fieldWithPath("userPassword").type(JsonFieldType.STRING).description("사용자 비밀번호")
+                        ),
+                        responseFields(
+                                fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
+                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지")
+                        )
+                ));
+
+        verify(userService).userModifyPassword(any(HttpServletRequest.class), any(UserInfoModifyPasswordRequest.class));
 
     }
 

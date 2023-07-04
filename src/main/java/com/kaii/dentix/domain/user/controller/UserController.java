@@ -3,6 +3,7 @@ package com.kaii.dentix.domain.user.controller;
 import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
 import com.kaii.dentix.domain.user.dto.request.UserAutoLoginRequest;
+import com.kaii.dentix.domain.user.dto.request.UserInfoModifyPasswordRequest;
 import com.kaii.dentix.domain.user.dto.request.UserPasswordVerifyRequest;
 import com.kaii.dentix.domain.user.dto.response.UserLoginResponse;
 import com.kaii.dentix.global.common.response.SuccessResponse;
@@ -36,6 +37,15 @@ public class UserController {
     @PostMapping(value = "/password-verify", name = "사용자 비밀번호 확인")
     public SuccessResponse userPasswordVerify(HttpServletRequest httpServletRequest, @Valid @RequestBody UserPasswordVerifyRequest request){
         userService.userPasswordVerify(httpServletRequest, request);
+        return new SuccessResponse();
+    }
+
+    /**
+     *  사용자 보안정보수정 - 비밀번호 변경
+     */
+    @PutMapping(value = "/modify-password", name = "사용자 보안정보수정 - 비밀번호 변경")
+    public SuccessResponse userModifyPassword(HttpServletRequest httpServletRequest, @Valid @RequestBody UserInfoModifyPasswordRequest request){
+        userService.userModifyPassword(httpServletRequest, request);
         return new SuccessResponse();
     }
 
