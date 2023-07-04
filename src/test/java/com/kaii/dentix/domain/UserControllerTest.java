@@ -174,7 +174,7 @@ public class UserControllerTest extends ControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.put("/user/modify-password")
+                RestDocumentationRequestBuilders.put("/user/password")
                         .content(objectMapper.writeValueAsString(userInfoModifyPasswordRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, "user-info.고유경.AccessToken")
@@ -185,7 +185,7 @@ public class UserControllerTest extends ControllerTest {
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("rt").value(200))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andDo(document("user/modify-password",
+                .andDo(document("user/password",
                         getDocumentRequest(),
                         getDocumentResponse(),
                         requestFields(
@@ -217,7 +217,7 @@ public class UserControllerTest extends ControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.put("/user/modify-qna")
+                RestDocumentationRequestBuilders.put("/user/qna")
                         .content(objectMapper.writeValueAsString(userInfoModifyQnARequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, "user-info.고유경.AccessToken")
@@ -228,7 +228,7 @@ public class UserControllerTest extends ControllerTest {
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("rt").value(200))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andDo(document("user/modify-qna",
+                .andDo(document("user/qna",
                         getDocumentRequest(),
                         getDocumentResponse(),
                         requestFields(

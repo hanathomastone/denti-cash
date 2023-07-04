@@ -69,7 +69,7 @@ public class UserLoginController {
     /**
      *  사용자 비밀번호 재설정
      */
-    @PutMapping(value = "/modify-password", name = "사용자 비밀번호 재설정")
+    @PutMapping(value = "/password", name = "사용자 비밀번호 재설정")
     public SuccessResponse userModifyPassword(@Valid @RequestBody UserModifyPasswordRequest request){
         userLoginService.userModifyPassword(request);
         return new SuccessResponse();

@@ -44,7 +44,7 @@ public class UserController {
     /**
      *  사용자 보안정보수정 - 비밀번호 변경
      */
-    @PutMapping(value = "/modify-password", name = "사용자 보안정보수정 - 비밀번호 변경")
+    @PutMapping(value = "/password", name = "사용자 보안정보수정 - 비밀번호 변경")
     public SuccessResponse userModifyPassword(HttpServletRequest httpServletRequest, @Valid @RequestBody UserInfoModifyPasswordRequest request){
         userService.userModifyPassword(httpServletRequest, request);
         return new SuccessResponse();
@@ -53,7 +53,7 @@ public class UserController {
     /**
      *  사용자 보안정보수정 - 질문과 답변 수정
      */
-    @PutMapping(value = "/modify-qna", name = "사용자 보안정보수정 - 질문과 답변 수정")
+    @PutMapping(value = "/qna", name = "사용자 보안정보수정 - 질문과 답변 수정")
     public SuccessResponse userModifyQnA(HttpServletRequest httpServletRequest, @Valid @RequestBody UserInfoModifyQnARequest request){
         userService.userModifyQnA(httpServletRequest, request);
         return new SuccessResponse();

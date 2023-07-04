@@ -155,12 +155,12 @@ include::{snippets}/login/find-password/response-body.adoc[]
 - 존재하지 않는 사용자 : `"존재하지 않는 회원입니다."`
 
 === Http
-include::{snippets}/login/modify-password/http-request.adoc[]
+include::{snippets}/login/password/http-request.adoc[]
 === Request
-include::{snippets}/login/modify-password/request-fields.adoc[]
+include::{snippets}/login/password/request-fields.adoc[]
 === Reponse
-include::{snippets}/login/modify-password/response-fields.adoc[]
-include::{snippets}/login/modify-password/response-body.adoc[]
+include::{snippets}/login/password/response-fields.adoc[]
+include::{snippets}/login/password/response-body.adoc[]
 
 [[userPasswordVerify]]
 == 8. 사용자 비밀번호 확인
@@ -190,12 +190,12 @@ include::{snippets}/user/password-verify/response-body.adoc[]
 - 사용자 조회 불가능 : `"존재하지 않는 사용자입니다."`
 
 === Http
-include::{snippets}/user/modify-password/http-request.adoc[]
+include::{snippets}/user/password/http-request.adoc[]
 === Request
-include::{snippets}/user/modify-password/request-fields.adoc[]
+include::{snippets}/user/password/request-fields.adoc[]
 === Response
-include::{snippets}/user/modify-password/response-fields.adoc[]
-include::{snippets}/user/modify-password/response-body.adoc[]
+include::{snippets}/user/password/response-fields.adoc[]
+include::{snippets}/user/password/response-body.adoc[]
 
 [[userInfoModifyQnA]]
 == 10. 사용자 보안정보 수정 - 질문과 답변 수정
@@ -208,9 +208,9 @@ include::{snippets}/user/modify-password/response-body.adoc[]
 - 존재하지 않는 비밀번호 찾기 질문 : `"존재하지 않는 질문입니다."`
 
 === Http
-include::{snippets}/user/modify-qna/http-request.adoc[]
+include::{snippets}/user/qna/http-request.adoc[]
 === Request
-include::{snippets}/user/modify-qna/request-fields.adoc[]
+include::{snippets}/user/qna/request-fields.adoc[]
 === Response
-include::{snippets}/user/modify-qna/response-fields.adoc[]
-include::{snippets}/user/modify-qna/response-body.adoc[]
+include::{snippets}/user/qna/response-fields.adoc[]
+include::{snippets}/user/qna/response-body.adoc[]

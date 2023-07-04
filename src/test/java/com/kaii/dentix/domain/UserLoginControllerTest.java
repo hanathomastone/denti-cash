@@ -388,7 +388,7 @@ public class UserLoginControllerTest extends ControllerTest{
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.put("/login/modify-password")
+                RestDocumentationRequestBuilders.put("/login/password")
                         .content(objectMapper.writeValueAsString(userPasswordVerifyRequest))
                         .contentType(MediaType.APPLICATION_JSON)
         );
@@ -397,7 +397,7 @@ public class UserLoginControllerTest extends ControllerTest{
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("rt").value(200))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andDo(document("login/modify-password",
+                .andDo(document("login/password",
                         getDocumentRequest(),
                         getDocumentResponse(),
                         requestFields(
