@@ -6,6 +6,7 @@ import com.kaii.dentix.domain.type.GenderType;
 import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.domain.user.application.UserLoginService;
 import com.kaii.dentix.domain.user.controller.UserLoginController;
+import com.kaii.dentix.domain.user.dto.UserFindPasswordDto;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
 import com.kaii.dentix.domain.user.dto.UserSignUpDto;
 import com.kaii.dentix.domain.user.dto.UserVerifyDto;
@@ -89,6 +90,12 @@ public class UserLoginControllerTest extends ControllerTest{
                 .refreshToken("Refresh Token")
                 .userId(1L)
                 .userLoginId("dentix123")
+                .build();
+    }
+
+    private UserFindPasswordDto userFindPasswordDto(){
+        return UserFindPasswordDto.builder()
+                .userId(1L)
                 .build();
     }
 
@@ -328,7 +335,7 @@ public class UserLoginControllerTest extends ControllerTest{
     public void userFindPassword() throws Exception{
 
         // given
-        doNothing().when(userLoginService).userFindPassword(any(UserFindPasswordRequest.class));
+        given(userLoginService.userFindPassword(any(UserFindPasswordRequest.class))).willReturn(userFindPasswordDto());
 
         UserFindPasswordRequest userFindPasswordRequest = UserFindPasswordRequest.builder()
                 .userLoginId("dentix123")
@@ -357,7 +364,9 @@ public class UserLoginControllerTest extends ControllerTest{
                         ),
                         responseFields(
                                 fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
-                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지")
+                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
+                                fieldWithPath("userFindPasswordDto").type(JsonFieldType.OBJECT).description("사용자 비밀번호 찾기 정보"),
+                                fieldWithPath("userFindPasswordDto.userId").type(JsonFieldType.NUMBER).description("사용자 고유 번호")
                         )
                 ));
 

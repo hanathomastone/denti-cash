@@ -10,6 +10,7 @@ import com.kaii.dentix.domain.serviceAgreement.application.ServiceAgreementServi
 import com.kaii.dentix.domain.serviceAgreement.dto.ServiceAgreementDto;
 import com.kaii.dentix.domain.user.dao.UserRepository;
 import com.kaii.dentix.domain.user.domain.User;
+import com.kaii.dentix.domain.user.dto.UserFindPasswordDto;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
 import com.kaii.dentix.domain.user.dto.UserSignUpDto;
 import com.kaii.dentix.domain.user.dto.UserVerifyDto;
@@ -218,7 +219,7 @@ public class UserLoginService {
      *  사용자 비밀번호 찾기
      */
     @Transactional
-    public void userFindPassword(UserFindPasswordRequest request){
+    public UserFindPasswordDto userFindPassword(UserFindPasswordRequest request){
 
         User user = userRepository.findByUserLoginId(request.getUserLoginId()).orElseThrow(() -> new NotFoundDataException("존재하지 않는 아이디입니다."));
 
@@ -229,6 +230,10 @@ public class UserLoginService {
         } else { // 입력받은 질문과 DB 정보가 일치하지 않는 경우
             throw new UnauthorizedException("질문 혹은 답변이 일치하지 않습니다.");
         }
+
+        return UserFindPasswordDto.builder()
+                .userId(user.getUserId())
+                .build();
 
     }
 
