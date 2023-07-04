@@ -96,4 +96,12 @@ public class User extends TimeEntity {
         this.userPassword = passwordEncoder.encode(userPassword);
     }
 
+    /**
+     *  질문과 답변 수정
+     */
+    public void modifyQnA(Long findPwdQuestionId, String findPwdAnswer){
+        this.findPwdQuestionId = findPwdQuestionId;
+        this.findPwdAnswer = findPwdAnswer;
+    }
+
 }

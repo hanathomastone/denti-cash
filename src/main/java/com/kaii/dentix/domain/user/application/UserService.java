@@ -1,5 +1,6 @@
 package com.kaii.dentix.domain.user.application;
 
+import com.kaii.dentix.domain.findPwdQuestion.dao.FindPwdQuestionRepository;
 import com.kaii.dentix.domain.jwt.JwtTokenUtil;
 import com.kaii.dentix.domain.jwt.TokenType;
 import com.kaii.dentix.domain.type.DeviceType;
@@ -9,6 +10,7 @@ import com.kaii.dentix.domain.user.domain.User;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
 import com.kaii.dentix.domain.user.dto.request.UserAutoLoginRequest;
 import com.kaii.dentix.domain.user.dto.request.UserInfoModifyPasswordRequest;
+import com.kaii.dentix.domain.user.dto.request.UserInfoModifyQnARequest;
 import com.kaii.dentix.domain.user.dto.request.UserPasswordVerifyRequest;
 import com.kaii.dentix.domain.user.event.UserModifyDeviceInfoEvent;
 import com.kaii.dentix.domain.userDeviceType.dao.UserDeviceTypeRepository;
@@ -37,6 +39,8 @@ public class UserService {
     private final UserDeviceTypeRepository userDeviceTypeRepository;
 
     private final BCryptPasswordEncoder passwordEncoder;
+
+    private final FindPwdQuestionRepository findPwdQuestionRepository;
 
 
     /**
@@ -141,6 +145,20 @@ public class UserService {
         User user = this.getTokenUser(httpServletRequest);
 
         user.modifyUserPassword(passwordEncoder, request.getUserPassword());
+
+    }
+
+    /**
+     *  사용자 보안정보수정 - 질문과 답변 수정
+     */
+    @Transactional
+    public void userModifyQnA(HttpServletRequest httpServletRequest, UserInfoModifyQnARequest request) {
+
+        User user = this.getTokenUser(httpServletRequest);
+
+        if (!findPwdQuestionRepository.findById(request.getFindPwdQuestionId()).isPresent()) throw new NotFoundDataException("존재하지 않는 질문입니다.");
+
+        user.modifyQnA(request.getFindPwdQuestionId(), request.getFindPwdAnswer());
 
     }
 

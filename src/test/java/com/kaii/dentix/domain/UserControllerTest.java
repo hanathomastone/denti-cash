@@ -5,10 +5,7 @@ import com.kaii.dentix.common.ControllerTest;
 import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.controller.UserController;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
-import com.kaii.dentix.domain.user.dto.request.UserAutoLoginRequest;
-import com.kaii.dentix.domain.user.dto.request.UserInfoModifyPasswordRequest;
-import com.kaii.dentix.domain.user.dto.request.UserModifyPasswordRequest;
-import com.kaii.dentix.domain.user.dto.request.UserPasswordVerifyRequest;
+import com.kaii.dentix.domain.user.dto.request.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -201,6 +198,50 @@ public class UserControllerTest extends ControllerTest {
                 ));
 
         verify(userService).userModifyPassword(any(HttpServletRequest.class), any(UserInfoModifyPasswordRequest.class));
+
+    }
+
+    /**
+     *  사용자 보안정보수정 - 질문과 답변 수정
+     */
+    @Test
+    public void userModifyQnA() throws Exception {
+
+        // given
+        doNothing().when(userService).userModifyQnA(any(HttpServletRequest.class), any(UserInfoModifyQnARequest.class));
+
+        UserInfoModifyQnARequest userInfoModifyQnARequest = UserInfoModifyQnARequest.builder()
+                .findPwdQuestionId(2L)
+                .findPwdAnswer("덴티엑스초등학교")
+                .build();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                RestDocumentationRequestBuilders.put("/user/modify-qna")
+                        .content(objectMapper.writeValueAsString(userInfoModifyQnARequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "user-info.고유경.AccessToken")
+                        .with(user("user").roles("USER"))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("rt").value(200))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andDo(document("user/modify-qna",
+                        getDocumentRequest(),
+                        getDocumentResponse(),
+                        requestFields(
+                                fieldWithPath("findPwdQuestionId").type(JsonFieldType.NUMBER).description("사용자 비밀번호 찾기 질문"),
+                                fieldWithPath("findPwdAnswer").type(JsonFieldType.STRING).description("사용자 비밀번호 찾기 답변")
+                        ),
+                        responseFields(
+                                fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
+                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지")
+                        )
+                ));
+
+        verify(userService).userModifyQnA(any(HttpServletRequest.class), any(UserInfoModifyQnARequest.class));
 
     }
 

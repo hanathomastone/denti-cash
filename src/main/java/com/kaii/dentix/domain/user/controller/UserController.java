@@ -4,6 +4,7 @@ import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
 import com.kaii.dentix.domain.user.dto.request.UserAutoLoginRequest;
 import com.kaii.dentix.domain.user.dto.request.UserInfoModifyPasswordRequest;
+import com.kaii.dentix.domain.user.dto.request.UserInfoModifyQnARequest;
 import com.kaii.dentix.domain.user.dto.request.UserPasswordVerifyRequest;
 import com.kaii.dentix.domain.user.dto.response.UserLoginResponse;
 import com.kaii.dentix.global.common.response.SuccessResponse;
@@ -46,6 +47,15 @@ public class UserController {
     @PutMapping(value = "/modify-password", name = "사용자 보안정보수정 - 비밀번호 변경")
     public SuccessResponse userModifyPassword(HttpServletRequest httpServletRequest, @Valid @RequestBody UserInfoModifyPasswordRequest request){
         userService.userModifyPassword(httpServletRequest, request);
+        return new SuccessResponse();
+    }
+
+    /**
+     *  사용자 보안정보수정 - 질문과 답변 수정
+     */
+    @PutMapping(value = "/modify-qna", name = "사용자 보안정보수정 - 질문과 답변 수정")
+    public SuccessResponse userModifyQnA(HttpServletRequest httpServletRequest, @Valid @RequestBody UserInfoModifyQnARequest request){
+        userService.userModifyQnA(httpServletRequest, request);
         return new SuccessResponse();
     }
 
