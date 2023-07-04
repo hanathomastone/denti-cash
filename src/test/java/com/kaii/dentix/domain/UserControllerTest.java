@@ -6,6 +6,7 @@ import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.controller.UserController;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
 import com.kaii.dentix.domain.user.dto.request.UserAutoLoginRequest;
+import com.kaii.dentix.domain.user.dto.request.UserPasswordVerifyRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,7 @@ import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentRequest;
 import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentResponse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
@@ -114,6 +116,47 @@ public class UserControllerTest extends ControllerTest {
 
         verify(userService).userAutoLogin(any(HttpServletRequest.class), any(UserAutoLoginRequest.class));
 
+    }
+
+    /**
+     *  사용자 비밀번호 확인
+     */
+    @Test
+    public void userPasswordVerify() throws Exception{
+
+        // given
+        doNothing().when(userService).userPasswordVerify(any(HttpServletRequest.class), any(UserPasswordVerifyRequest.class));
+
+        UserPasswordVerifyRequest userPasswordVerifyRequest = UserPasswordVerifyRequest.builder()
+                .userPassword("password")
+                .build();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                RestDocumentationRequestBuilders.post("/user/password-verify")
+                        .content(objectMapper.writeValueAsString(userPasswordVerifyRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "user-info.고유경.AccessToken")
+                        .with(user("user").roles("USER"))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("rt").value(200))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andDo(document("user/password-verify",
+                        getDocumentRequest(),
+                        getDocumentResponse(),
+                        requestFields(
+                                fieldWithPath("userPassword").type(JsonFieldType.STRING).description("사용자 비밀번호")
+                        ),
+                        responseFields(
+                                fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
+                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지")
+                        )
+                ));
+
+        verify(userService).userPasswordVerify(any(HttpServletRequest.class), any(UserPasswordVerifyRequest.class));
 
     }
 
