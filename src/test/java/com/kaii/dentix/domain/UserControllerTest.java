@@ -2,6 +2,7 @@ package com.kaii.dentix.domain;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaii.dentix.common.ControllerTest;
+import com.kaii.dentix.domain.type.GenderType;
 import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.controller.UserController;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
@@ -24,6 +25,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentRequest;
 import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentResponse;
+import static com.kaii.dentix.common.DocumentOptionalGenerator.genderFormat;
+import static com.kaii.dentix.common.DocumentOptionalGenerator.userBirthFormat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -242,6 +245,52 @@ public class UserControllerTest extends ControllerTest {
                 ));
 
         verify(userService).userModifyQnA(any(HttpServletRequest.class), any(UserInfoModifyQnARequest.class));
+
+    }
+
+    /**
+     *  사용자 회원정보 수정
+     */
+    @Test
+    public void userModifyInfo() throws Exception{
+
+        // given
+        doNothing().when(userService).userModifyInfo(any(HttpServletRequest.class), any(UserInfoModifyRequest.class));
+
+        UserInfoModifyRequest userInfoModifyRequest = UserInfoModifyRequest.builder()
+                .userName("강덴티")
+                .userGender(GenderType.W)
+                .userBirth("20000801")
+                .build();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                RestDocumentationRequestBuilders.put("/user")
+                        .content(objectMapper.writeValueAsString(userInfoModifyRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "user-info.고유경.AccessToken")
+                        .with(user("user").roles("USER"))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("rt").value(200))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andDo(document("user",
+                        getDocumentRequest(),
+                        getDocumentResponse(),
+                        requestFields(
+                                fieldWithPath("userName").type(JsonFieldType.STRING).description("사용자 이름"),
+                                fieldWithPath("userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별"),
+                                fieldWithPath("userBirth").type(JsonFieldType.STRING).attributes(userBirthFormat()).description("사용자 생년월일")
+                        ),
+                        responseFields(
+                                fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
+                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지")
+                        )
+                ));
+
+        verify(userService).userModifyInfo(any(HttpServletRequest.class), any(UserInfoModifyRequest.class));
 
     }
 

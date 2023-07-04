@@ -104,4 +104,13 @@ public class User extends TimeEntity {
         this.findPwdAnswer = findPwdAnswer;
     }
 
+    /**
+     *  회원 정보 수정
+     */
+    public void modifyInfo(String userName, GenderType userGender, String userBirth){
+        this.userName = userName;
+        this.userGender = userGender;
+        this.userBirth = userBirth;
+    }
+
 }

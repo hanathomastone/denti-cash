@@ -8,10 +8,7 @@ import com.kaii.dentix.domain.type.UserRole;
 import com.kaii.dentix.domain.user.dao.UserRepository;
 import com.kaii.dentix.domain.user.domain.User;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
-import com.kaii.dentix.domain.user.dto.request.UserAutoLoginRequest;
-import com.kaii.dentix.domain.user.dto.request.UserInfoModifyPasswordRequest;
-import com.kaii.dentix.domain.user.dto.request.UserInfoModifyQnARequest;
-import com.kaii.dentix.domain.user.dto.request.UserPasswordVerifyRequest;
+import com.kaii.dentix.domain.user.dto.request.*;
 import com.kaii.dentix.domain.user.event.UserModifyDeviceInfoEvent;
 import com.kaii.dentix.domain.userDeviceType.dao.UserDeviceTypeRepository;
 import com.kaii.dentix.domain.userDeviceType.domain.UserDeviceType;
@@ -159,6 +156,18 @@ public class UserService {
         if (!findPwdQuestionRepository.findById(request.getFindPwdQuestionId()).isPresent()) throw new NotFoundDataException("존재하지 않는 질문입니다.");
 
         user.modifyQnA(request.getFindPwdQuestionId(), request.getFindPwdAnswer());
+
+    }
+
+    /**
+     *  사용자 회원 정보 수정
+     */
+    @Transactional
+    public void userModifyInfo(HttpServletRequest httpServletRequest, UserInfoModifyRequest request){
+
+        User user = this.getTokenUser(httpServletRequest);
+
+        user.modifyInfo(request.getUserName(), request.getUserGender(), request.getUserBirth());
 
     }
 
