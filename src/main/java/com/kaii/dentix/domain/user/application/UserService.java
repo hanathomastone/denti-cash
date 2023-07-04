@@ -7,7 +7,9 @@ import com.kaii.dentix.domain.type.UserRole;
 import com.kaii.dentix.domain.user.dao.UserRepository;
 import com.kaii.dentix.domain.user.domain.User;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
+import com.kaii.dentix.domain.user.dto.UserPasswordVerifyDto;
 import com.kaii.dentix.domain.user.dto.request.UserAutoLoginRequest;
+import com.kaii.dentix.domain.user.dto.request.UserPasswordVerifyRequest;
 import com.kaii.dentix.domain.user.event.UserModifyDeviceInfoEvent;
 import com.kaii.dentix.domain.userDeviceType.dao.UserDeviceTypeRepository;
 import com.kaii.dentix.domain.userDeviceType.domain.UserDeviceType;
@@ -18,6 +20,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +35,8 @@ public class UserService {
     private final ApplicationEventPublisher publisher;
 
     private final UserDeviceTypeRepository userDeviceTypeRepository;
+
+    private final BCryptPasswordEncoder passwordEncoder;
 
 
     /**
@@ -109,6 +114,24 @@ public class UserService {
                 .userLoginId(user.getUserLoginId())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .build();
+
+    }
+
+    /**
+     *  사용자 비밀번호 확인
+     */
+    @Transactional
+    public UserPasswordVerifyDto userPasswordVerify(HttpServletRequest httpServletRequest, UserPasswordVerifyRequest request){
+
+        User user = this.getTokenUser(httpServletRequest);
+
+        if (!passwordEncoder.matches(request.getUserPassword(), user.getUserPassword())){
+            throw new UnauthorizedException("비밀번호가 일치하지 않습니다.");
+        }
+
+        return UserPasswordVerifyDto.builder()
+                .userId(user.getUserId())
                 .build();
 
     }
