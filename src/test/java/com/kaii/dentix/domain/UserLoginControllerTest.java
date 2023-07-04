@@ -6,9 +6,11 @@ import com.kaii.dentix.domain.type.GenderType;
 import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.domain.user.application.UserLoginService;
 import com.kaii.dentix.domain.user.controller.UserLoginController;
+import com.kaii.dentix.domain.user.dto.UserFindPasswordDto;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
 import com.kaii.dentix.domain.user.dto.UserSignUpDto;
 import com.kaii.dentix.domain.user.dto.UserVerifyDto;
+import com.kaii.dentix.domain.user.dto.request.UserFindPasswordRequest;
 import com.kaii.dentix.domain.user.dto.request.UserLoginRequest;
 import com.kaii.dentix.domain.user.dto.request.UserSignUpRequest;
 import com.kaii.dentix.domain.user.dto.request.UserVerifyRequest;
@@ -88,6 +90,12 @@ public class UserLoginControllerTest extends ControllerTest{
                 .refreshToken("Refresh Token")
                 .userId(1L)
                 .userLoginId("dentix123")
+                .build();
+    }
+
+    private UserFindPasswordDto userFindPasswordDto(){
+        return UserFindPasswordDto.builder()
+                .userId(1L)
                 .build();
     }
 
@@ -318,6 +326,51 @@ public class UserLoginControllerTest extends ControllerTest{
 
         verify(userLoginService).userLogin(any(HttpServletRequest.class), any(UserLoginRequest.class));
 
+    }
+
+    /**
+     *  사용자 비밀번호 찾기
+     */
+    @Test
+    public void userFindPassword() throws Exception{
+
+        // given
+        given(userLoginService.userFindPassword(any(UserFindPasswordRequest.class))).willReturn(userFindPasswordDto());
+
+        UserFindPasswordRequest userFindPasswordRequest = UserFindPasswordRequest.builder()
+                .userLoginId("dentix123")
+                .findPwdQuestionId(1L)
+                .findPwdAnswer("초록색")
+                .build();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                RestDocumentationRequestBuilders.post("/login/find-password")
+                        .content(objectMapper.writeValueAsString(userFindPasswordRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("rt").value(200))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andDo(document("login/find-password",
+                        getDocumentRequest(),
+                        getDocumentResponse(),
+                        requestFields(
+                                fieldWithPath("userLoginId").type(JsonFieldType.STRING).description("사용자 아이디"),
+                                fieldWithPath("findPwdQuestionId").type(JsonFieldType.NUMBER).description("사용자 비밀번호 찾기 질문"),
+                                fieldWithPath("findPwdAnswer").type(JsonFieldType.STRING).description("사용자 비밀번호 찾기 답변")
+                        ),
+                        responseFields(
+                                fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
+                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
+                                fieldWithPath("userFindPasswordDto").type(JsonFieldType.OBJECT).description("사용자 비밀번호 찾기 정보"),
+                                fieldWithPath("userFindPasswordDto.userId").type(JsonFieldType.NUMBER).description("사용자 고유 번호")
+                        )
+                ));
+
+        verify(userLoginService).userFindPassword(any(UserFindPasswordRequest.class));
 
     }
 

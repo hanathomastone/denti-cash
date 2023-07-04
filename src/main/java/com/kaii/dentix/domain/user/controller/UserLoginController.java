@@ -1,9 +1,11 @@
 package com.kaii.dentix.domain.user.controller;
 
 import com.kaii.dentix.domain.user.application.UserLoginService;
+import com.kaii.dentix.domain.user.dto.request.UserFindPasswordRequest;
 import com.kaii.dentix.domain.user.dto.request.UserLoginRequest;
 import com.kaii.dentix.domain.user.dto.request.UserSignUpRequest;
 import com.kaii.dentix.domain.user.dto.request.UserVerifyRequest;
+import com.kaii.dentix.domain.user.dto.response.UserFindPasswordResponse;
 import com.kaii.dentix.domain.user.dto.response.UserLoginResponse;
 import com.kaii.dentix.domain.user.dto.response.UserSignUpResponse;
 import com.kaii.dentix.domain.user.dto.response.UserVerifyResponse;
@@ -56,6 +58,15 @@ public class UserLoginController {
     public UserLoginResponse userLogin(HttpServletRequest httpServletRequest, @Valid @RequestBody UserLoginRequest request){
         UserLoginResponse userLoginResponse = new UserLoginResponse(userLoginService.userLogin(httpServletRequest, request));
         return userLoginResponse;
+    }
+
+    /**
+     *  사용자 비밀번호 찾기
+     */
+    @PostMapping(value = "/find-password", name = "사용자 비밀번호 찾기")
+    public UserFindPasswordResponse userFindPassword(@Valid @RequestBody UserFindPasswordRequest request){
+        UserFindPasswordResponse userFindPasswordResponse = new UserFindPasswordResponse(userLoginService.userFindPassword(request));
+        return userFindPasswordResponse;
     }
 
 }
