@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Date;
 
@@ -86,6 +87,13 @@ public class User extends TimeEntity {
         this.userDeviceManufacturer = userDeviceManufacturer;
         this.userOsVersion = userOsVersion;
         this.userDeviceToken = userDeviceToken;
+    }
+
+    /**
+     *  비밀번호 수정
+     */
+    public void modifyUserPassword(PasswordEncoder passwordEncoder, String userPassword) {
+        this.userPassword = passwordEncoder.encode(userPassword);
     }
 
 }

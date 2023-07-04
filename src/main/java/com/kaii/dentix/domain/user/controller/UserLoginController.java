@@ -1,10 +1,7 @@
 package com.kaii.dentix.domain.user.controller;
 
 import com.kaii.dentix.domain.user.application.UserLoginService;
-import com.kaii.dentix.domain.user.dto.request.UserFindPasswordRequest;
-import com.kaii.dentix.domain.user.dto.request.UserLoginRequest;
-import com.kaii.dentix.domain.user.dto.request.UserSignUpRequest;
-import com.kaii.dentix.domain.user.dto.request.UserVerifyRequest;
+import com.kaii.dentix.domain.user.dto.request.*;
 import com.kaii.dentix.domain.user.dto.response.UserFindPasswordResponse;
 import com.kaii.dentix.domain.user.dto.response.UserLoginResponse;
 import com.kaii.dentix.domain.user.dto.response.UserSignUpResponse;
@@ -67,6 +64,15 @@ public class UserLoginController {
     public UserFindPasswordResponse userFindPassword(@Valid @RequestBody UserFindPasswordRequest request){
         UserFindPasswordResponse userFindPasswordResponse = new UserFindPasswordResponse(userLoginService.userFindPassword(request));
         return userFindPasswordResponse;
+    }
+
+    /**
+     *  사용자 비밀번호 재설정
+     */
+    @PutMapping(value = "/modify-password", name = "사용자 비밀번호 재설정")
+    public SuccessResponse userModifyPassword(@Valid @RequestBody UserModifyPasswordRequest request){
+        userLoginService.userModifyPassword(request);
+        return new SuccessResponse();
     }
 
 }
