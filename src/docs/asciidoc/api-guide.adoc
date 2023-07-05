@@ -144,9 +144,27 @@ include::{snippets}/login/find-password/request-fields.adoc[]
 include::{snippets}/login/find-password/response-fields.adoc[]
 include::{snippets}/login/find-password/response-body.adoc[]
 
+[[userModifyPassword]]
+== 7. 사용자 비밀번호 재설정
+비밀번호 찾기 후 비밀번호 재설정 API
+
+비밀번호 찾기 API 성공 시 return 된 `userId` 를 담아서 요청합니다.
+
+*[비밀번호 재설정 실패]*
+
+- 존재하지 않는 사용자 : `"존재하지 않는 회원입니다."`
+
+=== Http
+include::{snippets}/login/password/http-request.adoc[]
+=== Request
+include::{snippets}/login/password/request-fields.adoc[]
+=== Reponse
+include::{snippets}/login/password/response-fields.adoc[]
+include::{snippets}/login/password/response-body.adoc[]
+
 [[userPasswordVerify]]
-== 7. 사용자 비밀번호 확인
-비밀번호 재설정을 위한 비밀번호 확인 API
+== 8. 사용자 비밀번호 확인
+보안정보 수정을 위한 비밀번호 확인 API
 
 *[비밀번호 확인 실패]*
 
@@ -161,3 +179,55 @@ include::{snippets}/user/password-verify/request-fields.adoc[]
 === Response
 include::{snippets}/user/password-verify/response-fields.adoc[]
 include::{snippets}/user/password-verify/response-body.adoc[]
+
+[[userInfoModifyPassword]]
+== 9. 사용자 보안정보 수정 - 비밀번호 변경
+보안정보 수정 시, 비밀번호 변경 API
+
+*[비밀번호 변경 실패]*
+
+- 사용자 권한이 아닌 경우 : `"권한이 없는 사용자입니다."`
+- 사용자 조회 불가능 : `"존재하지 않는 사용자입니다."`
+
+=== Http
+include::{snippets}/user/password/http-request.adoc[]
+=== Request
+include::{snippets}/user/password/request-fields.adoc[]
+=== Response
+include::{snippets}/user/password/response-fields.adoc[]
+include::{snippets}/user/password/response-body.adoc[]
+
+[[userInfoModifyQnA]]
+== 10. 사용자 보안정보 수정 - 질문과 답변 수정
+보안정보 수정 시, 질문과 답변 수정 API
+
+*[질문과 답변 수정 실패]*
+
+- 사용자 권한이 아닌 경우 : `"권한이 없는 사용자입니다."`
+- 사용자 조회 불가능 : `"존재하지 않는 사용자입니다."`
+- 존재하지 않는 비밀번호 찾기 질문 : `"존재하지 않는 질문입니다."`
+
+=== Http
+include::{snippets}/user/qna/http-request.adoc[]
+=== Request
+include::{snippets}/user/qna/request-fields.adoc[]
+=== Response
+include::{snippets}/user/qna/response-fields.adoc[]
+include::{snippets}/user/qna/response-body.adoc[]
+
+[[userModifyInfo]]
+== 11. 사용자 회원정보 수정
+사용자 회원정보 수정 API
+
+*[회원정보 수정 실패]*
+
+- 사용자 권한이 아닌 경우 : `"권한이 없는 사용자입니다."`
+- 사용자 조회 불가능 : `"존재하지 않는 사용자입니다."`
+
+=== Http
+include::{snippets}/user/http-request.adoc[]
+=== Request
+include::{snippets}/user/request-fields.adoc[]
+=== Response
+include::{snippets}/user/response-fields.adoc[]
+include::{snippets}/user/response-body.adoc[]

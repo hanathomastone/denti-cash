@@ -10,14 +10,8 @@ import com.kaii.dentix.domain.serviceAgreement.application.ServiceAgreementServi
 import com.kaii.dentix.domain.serviceAgreement.dto.ServiceAgreementDto;
 import com.kaii.dentix.domain.user.dao.UserRepository;
 import com.kaii.dentix.domain.user.domain.User;
-import com.kaii.dentix.domain.user.dto.UserFindPasswordDto;
-import com.kaii.dentix.domain.user.dto.UserLoginDto;
-import com.kaii.dentix.domain.user.dto.UserSignUpDto;
-import com.kaii.dentix.domain.user.dto.UserVerifyDto;
-import com.kaii.dentix.domain.user.dto.request.UserFindPasswordRequest;
-import com.kaii.dentix.domain.user.dto.request.UserLoginRequest;
-import com.kaii.dentix.domain.user.dto.request.UserSignUpRequest;
-import com.kaii.dentix.domain.user.dto.request.UserVerifyRequest;
+import com.kaii.dentix.domain.user.dto.*;
+import com.kaii.dentix.domain.user.dto.request.*;
 import com.kaii.dentix.domain.user.event.UserModifyDeviceInfoEvent;
 import com.kaii.dentix.domain.userServiceAgreement.dao.UserServiceAgreementRepository;
 import com.kaii.dentix.domain.userServiceAgreement.domain.UserServiceAgreement;
@@ -234,6 +228,18 @@ public class UserLoginService {
         return UserFindPasswordDto.builder()
                 .userId(user.getUserId())
                 .build();
+
+    }
+
+    /**
+     *  사용자 비밀번호 재설정
+     */
+    @Transactional
+    public void userModifyPassword(UserModifyPasswordRequest request){
+
+        User user = userRepository.findById(request.getUserId()).orElseThrow(() -> new NotFoundDataException("존재하지 않는 회원입니다."));
+
+        user.modifyUserPassword(passwordEncoder, request.getUserPassword());
 
     }
 

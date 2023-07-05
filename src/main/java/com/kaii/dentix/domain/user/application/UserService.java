@@ -1,5 +1,6 @@
 package com.kaii.dentix.domain.user.application;
 
+import com.kaii.dentix.domain.findPwdQuestion.dao.FindPwdQuestionRepository;
 import com.kaii.dentix.domain.jwt.JwtTokenUtil;
 import com.kaii.dentix.domain.jwt.TokenType;
 import com.kaii.dentix.domain.type.DeviceType;
@@ -7,8 +8,7 @@ import com.kaii.dentix.domain.type.UserRole;
 import com.kaii.dentix.domain.user.dao.UserRepository;
 import com.kaii.dentix.domain.user.domain.User;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
-import com.kaii.dentix.domain.user.dto.request.UserAutoLoginRequest;
-import com.kaii.dentix.domain.user.dto.request.UserPasswordVerifyRequest;
+import com.kaii.dentix.domain.user.dto.request.*;
 import com.kaii.dentix.domain.user.event.UserModifyDeviceInfoEvent;
 import com.kaii.dentix.domain.userDeviceType.dao.UserDeviceTypeRepository;
 import com.kaii.dentix.domain.userDeviceType.domain.UserDeviceType;
@@ -36,6 +36,8 @@ public class UserService {
     private final UserDeviceTypeRepository userDeviceTypeRepository;
 
     private final BCryptPasswordEncoder passwordEncoder;
+
+    private final FindPwdQuestionRepository findPwdQuestionRepository;
 
 
     /**
@@ -128,6 +130,44 @@ public class UserService {
         if (!passwordEncoder.matches(request.getUserPassword(), user.getUserPassword())){
             throw new UnauthorizedException("비밀번호가 일치하지 않습니다.");
         }
+
+    }
+
+    /**
+     *  사용자 보안정보수정 - 비밀번호 변경
+     */
+    @Transactional
+    public void userModifyPassword(HttpServletRequest httpServletRequest, UserInfoModifyPasswordRequest request){
+
+        User user = this.getTokenUser(httpServletRequest);
+
+        user.modifyUserPassword(passwordEncoder, request.getUserPassword());
+
+    }
+
+    /**
+     *  사용자 보안정보수정 - 질문과 답변 수정
+     */
+    @Transactional
+    public void userModifyQnA(HttpServletRequest httpServletRequest, UserInfoModifyQnARequest request) {
+
+        User user = this.getTokenUser(httpServletRequest);
+
+        if (!findPwdQuestionRepository.findById(request.getFindPwdQuestionId()).isPresent()) throw new NotFoundDataException("존재하지 않는 질문입니다.");
+
+        user.modifyQnA(request.getFindPwdQuestionId(), request.getFindPwdAnswer());
+
+    }
+
+    /**
+     *  사용자 회원 정보 수정
+     */
+    @Transactional
+    public void userModifyInfo(HttpServletRequest httpServletRequest, UserInfoModifyRequest request){
+
+        User user = this.getTokenUser(httpServletRequest);
+
+        user.modifyInfo(request.getUserName(), request.getUserGender(), request.getUserBirth());
 
     }
 

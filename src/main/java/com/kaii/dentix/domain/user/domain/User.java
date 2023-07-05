@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Date;
 
@@ -86,6 +87,30 @@ public class User extends TimeEntity {
         this.userDeviceManufacturer = userDeviceManufacturer;
         this.userOsVersion = userOsVersion;
         this.userDeviceToken = userDeviceToken;
+    }
+
+    /**
+     *  비밀번호 수정
+     */
+    public void modifyUserPassword(PasswordEncoder passwordEncoder, String userPassword) {
+        this.userPassword = passwordEncoder.encode(userPassword);
+    }
+
+    /**
+     *  질문과 답변 수정
+     */
+    public void modifyQnA(Long findPwdQuestionId, String findPwdAnswer){
+        this.findPwdQuestionId = findPwdQuestionId;
+        this.findPwdAnswer = findPwdAnswer;
+    }
+
+    /**
+     *  회원 정보 수정
+     */
+    public void modifyInfo(String userName, GenderType userGender, String userBirth){
+        this.userName = userName;
+        this.userGender = userGender;
+        this.userBirth = userBirth;
     }
 
 }
