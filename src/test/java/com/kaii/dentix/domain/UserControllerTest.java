@@ -294,4 +294,40 @@ public class UserControllerTest extends ControllerTest {
 
     }
 
+    /**
+     *  사용자 로그아웃
+     */
+    @Test
+    public void userLogout() throws Exception{
+
+        // given
+        doNothing().when(userService).userLogout(any(HttpServletRequest.class));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                RestDocumentationRequestBuilders.put("/user/logout")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("deviceType", "iOS")
+                        .header("appVersion", 1.1)
+                        .header(HttpHeaders.AUTHORIZATION, "user-info.고유경.AccessToken")
+                        .with(user("user").roles("USER"))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("rt").value(200))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andDo(document("user/logout",
+                        getDocumentRequest(),
+                        getDocumentResponse(),
+                        responseFields(
+                                fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
+                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지")
+                        )
+                ));
+
+        verify(userService).userLogout(any(HttpServletRequest.class));
+
+    }
+
 }

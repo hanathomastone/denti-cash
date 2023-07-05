@@ -113,4 +113,11 @@ public class User extends TimeEntity {
         this.userBirth = userBirth;
     }
 
+    /**
+     *  로그아웃
+     */
+    public void logout(){
+        this.userDeviceToken = null;
+    }
+
 }

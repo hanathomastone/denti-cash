@@ -65,4 +65,13 @@ public class UserController {
         return new SuccessResponse();
     }
 
+    /**
+     *  사용자 로그아웃
+     */
+    @PutMapping(value = "/logout", name = "사용자 로그아웃")
+    public SuccessResponse userLogout(HttpServletRequest httpServletRequest){
+        userService.userLogout(httpServletRequest);
+        return new SuccessResponse();
+    }
+
 }

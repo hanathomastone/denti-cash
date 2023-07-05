@@ -171,4 +171,14 @@ public class UserService {
 
     }
 
+    /**
+     *  사용자 로그아웃
+     */
+    @Transactional
+    public void userLogout(HttpServletRequest httpServletRequest){
+        User user = this.getTokenUser(httpServletRequest);
+        user.logout();
+    }
+
+
 }
