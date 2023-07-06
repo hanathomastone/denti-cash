@@ -7,6 +7,8 @@ import com.kaii.dentix.domain.type.DeviceType;
 import com.kaii.dentix.domain.type.UserRole;
 import com.kaii.dentix.domain.user.dao.UserRepository;
 import com.kaii.dentix.domain.user.domain.User;
+import com.kaii.dentix.domain.user.dto.UserInfoModifyDto;
+import com.kaii.dentix.domain.user.dto.UserInfoModifyQnADto;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
 import com.kaii.dentix.domain.user.dto.request.*;
 import com.kaii.dentix.domain.user.event.UserModifyDeviceInfoEvent;
@@ -149,7 +151,7 @@ public class UserService {
      *  사용자 보안정보수정 - 질문과 답변 수정
      */
     @Transactional
-    public void userModifyQnA(HttpServletRequest httpServletRequest, UserInfoModifyQnARequest request) {
+    public UserInfoModifyQnADto userModifyQnA(HttpServletRequest httpServletRequest, UserInfoModifyQnARequest request) {
 
         User user = this.getTokenUser(httpServletRequest);
 
@@ -157,18 +159,26 @@ public class UserService {
 
         user.modifyQnA(request.getFindPwdQuestionId(), request.getFindPwdAnswer());
 
+        return UserInfoModifyQnADto.builder()
+                .findPwdQuestionId(request.getFindPwdQuestionId())
+                .findPwdAnswer(request.getFindPwdAnswer())
+                .build();
+
     }
 
     /**
      *  사용자 회원 정보 수정
      */
     @Transactional
-    public void userModifyInfo(HttpServletRequest httpServletRequest, UserInfoModifyRequest request){
-
+    public UserInfoModifyDto userModifyInfo(HttpServletRequest httpServletRequest, UserInfoModifyRequest request){
         User user = this.getTokenUser(httpServletRequest);
-
         user.modifyInfo(request.getUserName(), request.getUserGender(), request.getUserBirth());
 
+        return UserInfoModifyDto.builder()
+                .userName(request.getUserName())
+                .userGender(request.getUserGender())
+                .userBirth(request.getUserBirth())
+                .build();
     }
 
     /**

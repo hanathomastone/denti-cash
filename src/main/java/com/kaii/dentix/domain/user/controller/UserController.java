@@ -1,8 +1,12 @@
 package com.kaii.dentix.domain.user.controller;
 
 import com.kaii.dentix.domain.user.application.UserService;
+import com.kaii.dentix.domain.user.dto.UserInfoModifyDto;
+import com.kaii.dentix.domain.user.dto.UserInfoModifyQnADto;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
 import com.kaii.dentix.domain.user.dto.request.*;
+import com.kaii.dentix.domain.user.dto.response.UserInfoModifyQnAResponse;
+import com.kaii.dentix.domain.user.dto.response.UserInfoModifyResponse;
 import com.kaii.dentix.domain.user.dto.response.UserLoginResponse;
 import com.kaii.dentix.global.common.response.SuccessResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,18 +55,20 @@ public class UserController {
      *  사용자 보안정보수정 - 질문과 답변 수정
      */
     @PutMapping(value = "/qna", name = "사용자 보안정보수정 - 질문과 답변 수정")
-    public SuccessResponse userModifyQnA(HttpServletRequest httpServletRequest, @Valid @RequestBody UserInfoModifyQnARequest request){
-        userService.userModifyQnA(httpServletRequest, request);
-        return new SuccessResponse();
+    public UserInfoModifyQnAResponse userModifyQnA(HttpServletRequest httpServletRequest, @Valid @RequestBody UserInfoModifyQnARequest request){
+        UserInfoModifyQnADto userInfoModifyQnADto = userService.userModifyQnA(httpServletRequest, request);
+        UserInfoModifyQnAResponse response = new UserInfoModifyQnAResponse(userInfoModifyQnADto);
+        return response;
     }
 
     /**
      *  사용자 회원 정보 수정
      */
     @PutMapping(name = "사용자 회원 정보 수정")
-    public SuccessResponse userModifyInfo(HttpServletRequest httpServletRequest, @Valid @RequestBody UserInfoModifyRequest request){
-        userService.userModifyInfo(httpServletRequest, request);
-        return new SuccessResponse();
+    public UserInfoModifyResponse userModifyInfo(HttpServletRequest httpServletRequest, @Valid @RequestBody UserInfoModifyRequest request){
+        UserInfoModifyDto userInfoModifyDto = userService.userModifyInfo(httpServletRequest, request);
+        UserInfoModifyResponse response = new UserInfoModifyResponse(userInfoModifyDto);
+        return response;
     }
 
     /**

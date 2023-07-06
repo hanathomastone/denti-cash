@@ -5,6 +5,8 @@ import com.kaii.dentix.common.ControllerTest;
 import com.kaii.dentix.domain.type.GenderType;
 import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.controller.UserController;
+import com.kaii.dentix.domain.user.dto.UserInfoModifyDto;
+import com.kaii.dentix.domain.user.dto.UserInfoModifyQnADto;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
 import com.kaii.dentix.domain.user.dto.request.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -62,6 +64,21 @@ public class UserControllerTest extends ControllerTest {
                 .refreshToken("Refresh Token")
                 .userId(1L)
                 .userLoginId("dentix123")
+                .build();
+    }
+
+    private UserInfoModifyQnADto userInfoModifyQnADto(){
+        return UserInfoModifyQnADto.builder()
+                .findPwdQuestionId(2L)
+                .findPwdAnswer("덴티엑스초등학교")
+                .build();
+    }
+
+    private UserInfoModifyDto userInfoModifyDto(){
+        return UserInfoModifyDto.builder()
+                .userName("강덴티")
+                .userGender(GenderType.W)
+                .userBirth("20000801")
                 .build();
     }
 
@@ -210,8 +227,9 @@ public class UserControllerTest extends ControllerTest {
     @Test
     public void userModifyQnA() throws Exception {
 
+
         // given
-        doNothing().when(userService).userModifyQnA(any(HttpServletRequest.class), any(UserInfoModifyQnARequest.class));
+        given(userService.userModifyQnA(any(HttpServletRequest.class), any(UserInfoModifyQnARequest.class))).willReturn(userInfoModifyQnADto());
 
         UserInfoModifyQnARequest userInfoModifyQnARequest = UserInfoModifyQnARequest.builder()
                 .findPwdQuestionId(2L)
@@ -240,7 +258,10 @@ public class UserControllerTest extends ControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
-                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지")
+                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
+                                fieldWithPath("userInfoModifyQnADto").type(JsonFieldType.OBJECT).description("사용자 비밀번호 찾기 정보"),
+                                fieldWithPath("userInfoModifyQnADto.findPwdQuestionId").type(JsonFieldType.NUMBER).description("사용자 비밀번호 찾기 질문"),
+                                fieldWithPath("userInfoModifyQnADto.findPwdAnswer").type(JsonFieldType.STRING).description("사용자 비밀번호 찾기 답변")
                         )
                 ));
 
@@ -255,7 +276,7 @@ public class UserControllerTest extends ControllerTest {
     public void userModifyInfo() throws Exception{
 
         // given
-        doNothing().when(userService).userModifyInfo(any(HttpServletRequest.class), any(UserInfoModifyRequest.class));
+        given(userService.userModifyInfo(any(HttpServletRequest.class), any(UserInfoModifyRequest.class))).willReturn(userInfoModifyDto());
 
         UserInfoModifyRequest userInfoModifyRequest = UserInfoModifyRequest.builder()
                 .userName("강덴티")
@@ -286,7 +307,11 @@ public class UserControllerTest extends ControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
-                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지")
+                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
+                                fieldWithPath("userInfoModifyDto").type(JsonFieldType.OBJECT).description("사용자 회원정보 수정 정보"),
+                                fieldWithPath("userInfoModifyDto.userName").type(JsonFieldType.STRING).description("사용자 이름"),
+                                fieldWithPath("userInfoModifyDto.userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별"),
+                                fieldWithPath("userInfoModifyDto.userBirth").type(JsonFieldType.STRING).attributes(userBirthFormat()).description("사용자 생년월일")
                         )
                 ));
 
