@@ -14,6 +14,10 @@ import com.kaii.dentix.domain.user.dto.request.*;
 import com.kaii.dentix.domain.user.event.UserModifyDeviceInfoEvent;
 import com.kaii.dentix.domain.userDeviceType.dao.UserDeviceTypeRepository;
 import com.kaii.dentix.domain.userDeviceType.domain.UserDeviceType;
+import com.kaii.dentix.domain.userServiceAgreement.dao.UserServiceAgreementRepository;
+import com.kaii.dentix.domain.userServiceAgreement.domain.UserServiceAgreement;
+import com.kaii.dentix.domain.userServiceAgreement.dto.UserModifyServiceAgreeDto;
+import com.kaii.dentix.domain.userServiceAgreement.dto.request.UserModifyServiceAgreeRequest;
 import com.kaii.dentix.global.common.error.exception.NotFoundDataException;
 import com.kaii.dentix.global.common.error.exception.RequiredVersionInfoException;
 import com.kaii.dentix.global.common.error.exception.UnauthorizedException;
@@ -40,6 +44,8 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     private final FindPwdQuestionRepository findPwdQuestionRepository;
+
+    private final UserServiceAgreementRepository userServiceAgreementRepository;
 
 
     /**
@@ -179,6 +185,24 @@ public class UserService {
                 .userGender(request.getUserGender())
                 .userBirth(request.getUserBirth())
                 .build();
+    }
+
+    /**
+     *  사용자 마케팅 수신 여부 수정
+     */
+    @Transactional
+    public UserModifyServiceAgreeDto userModifyServiceAgree(HttpServletRequest httpServletRequest, UserModifyServiceAgreeRequest request){
+
+        User user = this.getTokenUser(httpServletRequest);
+
+        UserServiceAgreement userServiceAgreement = userServiceAgreementRepository.findByServiceAgreeIdAndUserId(request.getUserServiceAgreeId(), user.getUserId())
+                .orElseThrow(() -> new NotFoundDataException(""));
+        userServiceAgreement.modifyMarketing(request.getIsUserServiceAgree());
+
+        return UserModifyServiceAgreeDto.builder()
+                .isUserServiceAgree(request.getIsUserServiceAgree())
+                .build();
+
     }
 
     /**

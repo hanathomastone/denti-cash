@@ -8,6 +8,9 @@ import com.kaii.dentix.domain.user.dto.request.*;
 import com.kaii.dentix.domain.user.dto.response.UserInfoModifyQnAResponse;
 import com.kaii.dentix.domain.user.dto.response.UserInfoModifyResponse;
 import com.kaii.dentix.domain.user.dto.response.UserLoginResponse;
+import com.kaii.dentix.domain.userServiceAgreement.dto.UserModifyServiceAgreeDto;
+import com.kaii.dentix.domain.userServiceAgreement.dto.request.UserModifyServiceAgreeRequest;
+import com.kaii.dentix.domain.userServiceAgreement.dto.response.UserModifyServiceAgreeResponse;
 import com.kaii.dentix.global.common.response.SuccessResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -68,6 +71,17 @@ public class UserController {
     public UserInfoModifyResponse userModifyInfo(HttpServletRequest httpServletRequest, @Valid @RequestBody UserInfoModifyRequest request){
         UserInfoModifyDto userInfoModifyDto = userService.userModifyInfo(httpServletRequest, request);
         UserInfoModifyResponse response = new UserInfoModifyResponse(userInfoModifyDto);
+        return response;
+    }
+
+    /**
+     *  사용자 마케팅 정보 수신 동의 수정
+     */
+    @PutMapping(value = "/service-agreement", name = "사용자 마케팅 정보 수신 동의 수정")
+    public UserModifyServiceAgreeResponse userModifyServiceAgree(HttpServletRequest httpServletRequest, @Valid @RequestBody UserModifyServiceAgreeRequest request){
+        UserModifyServiceAgreeDto userModifyServiceAgreeDto = userService.userModifyServiceAgree(httpServletRequest, request);
+        UserModifyServiceAgreeResponse response = new UserModifyServiceAgreeResponse(userModifyServiceAgreeDto);
+
         return response;
     }
 

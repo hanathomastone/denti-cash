@@ -1,5 +1,6 @@
 package com.kaii.dentix.domain.serviceAgreement.domain;
 
+import com.kaii.dentix.domain.type.ServiceAgreeType;
 import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.global.common.entity.TimeEntity;
 import jakarta.persistence.*;
@@ -35,5 +36,9 @@ public class ServiceAgreement extends TimeEntity {
 
     @Column(nullable = false)
     private String serviceAgreePath;
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "enum", nullable = false)
+    private ServiceAgreeType serviceAgreeType;
 
 }
