@@ -180,5 +180,14 @@ public class UserService {
         user.logout();
     }
 
+    /**
+     *  사용자 회원탈퇴
+     */
+    @Transactional
+    public void userRevoke(HttpServletRequest httpServletRequest){
+        User user = this.getTokenUser(httpServletRequest);
+        user.revoke();
+    }
+
 
 }

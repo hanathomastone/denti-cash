@@ -74,4 +74,13 @@ public class UserController {
         return new SuccessResponse();
     }
 
+    /**
+     *  사용자 회원탈퇴
+     */
+    @DeleteMapping(name = "사용자 회원탈퇴")
+    public SuccessResponse userRevoke(HttpServletRequest httpServletRequest){
+        userService.userRevoke(httpServletRequest);
+        return new SuccessResponse();
+    }
+
 }
