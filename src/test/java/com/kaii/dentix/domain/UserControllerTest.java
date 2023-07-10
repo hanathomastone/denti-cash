@@ -3,12 +3,15 @@ package com.kaii.dentix.domain;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaii.dentix.common.ControllerTest;
 import com.kaii.dentix.domain.type.GenderType;
+import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.controller.UserController;
 import com.kaii.dentix.domain.user.dto.UserInfoModifyDto;
 import com.kaii.dentix.domain.user.dto.UserInfoModifyQnADto;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
 import com.kaii.dentix.domain.user.dto.request.*;
+import com.kaii.dentix.domain.userServiceAgreement.dto.UserModifyServiceAgreeDto;
+import com.kaii.dentix.domain.userServiceAgreement.dto.request.UserModifyServiceAgreeRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,8 +30,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentRequest;
 import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentResponse;
-import static com.kaii.dentix.common.DocumentOptionalGenerator.genderFormat;
-import static com.kaii.dentix.common.DocumentOptionalGenerator.userBirthFormat;
+import static com.kaii.dentix.common.DocumentOptionalGenerator.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -79,6 +81,12 @@ public class UserControllerTest extends ControllerTest {
                 .userName("강덴티")
                 .userGender(GenderType.W)
                 .userBirth("20000801")
+                .build();
+    }
+
+    private UserModifyServiceAgreeDto userModifyServiceAgreeDto(){
+        return UserModifyServiceAgreeDto.builder()
+                .isUserServiceAgree(YnType.Y)
                 .build();
     }
 
@@ -388,6 +396,50 @@ public class UserControllerTest extends ControllerTest {
                 ));
 
         verify(userService).userRevoke(any(HttpServletRequest.class));
+
+    }
+
+    /**
+     *  사용자 마케팅 수신 정보 동의 수정
+     */
+    @Test
+    public void userModifyServiceAgree() throws Exception{
+
+        // given
+        given(userService.userModifyServiceAgree(any(HttpServletRequest.class), any(UserModifyServiceAgreeRequest.class))).willReturn(userModifyServiceAgreeDto());
+
+        UserModifyServiceAgreeRequest userModifyServiceAgreeRequest = UserModifyServiceAgreeRequest.builder()
+                .isUserServiceAgree(YnType.Y)
+                .build();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                RestDocumentationRequestBuilders.put("/user/service-agreement")
+                        .content(objectMapper.writeValueAsString(userModifyServiceAgreeRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "user-info.고유경.AccessToken")
+                        .with(user("user").roles("USER"))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("rt").value(200))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andDo(document("user/service-agreement",
+                        getDocumentRequest(),
+                        getDocumentResponse(),
+                        requestFields(
+                                fieldWithPath("isUserServiceAgree").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("사용자 마케팅 동의 여부")
+                        ),
+                        responseFields(
+                                fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
+                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
+                                fieldWithPath("userModifyServiceAgreeDto").type(JsonFieldType.OBJECT).description("사용자 마케팅 동의 수정 정보"),
+                                fieldWithPath("userModifyServiceAgreeDto.isUserServiceAgree").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("사용자 마케팅 동의 여부")
+                        )
+                ));
+
+        verify(userService).userModifyServiceAgree(any(HttpServletRequest.class), any(UserModifyServiceAgreeRequest.class));
 
     }
 

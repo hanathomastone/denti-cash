@@ -3,7 +3,10 @@ package com.kaii.dentix.domain.user.application;
 import com.kaii.dentix.domain.findPwdQuestion.dao.FindPwdQuestionRepository;
 import com.kaii.dentix.domain.jwt.JwtTokenUtil;
 import com.kaii.dentix.domain.jwt.TokenType;
+import com.kaii.dentix.domain.serviceAgreement.dao.ServiceAgreementRepository;
+import com.kaii.dentix.domain.serviceAgreement.domain.ServiceAgreement;
 import com.kaii.dentix.domain.type.DeviceType;
+import com.kaii.dentix.domain.type.ServiceAgreeType;
 import com.kaii.dentix.domain.type.UserRole;
 import com.kaii.dentix.domain.user.dao.UserRepository;
 import com.kaii.dentix.domain.user.domain.User;
@@ -46,6 +49,8 @@ public class UserService {
     private final FindPwdQuestionRepository findPwdQuestionRepository;
 
     private final UserServiceAgreementRepository userServiceAgreementRepository;
+
+    private final ServiceAgreementRepository serviceAgreementRepository;
 
 
     /**
@@ -195,8 +200,12 @@ public class UserService {
 
         User user = this.getTokenUser(httpServletRequest);
 
-        UserServiceAgreement userServiceAgreement = userServiceAgreementRepository.findByServiceAgreeIdAndUserId(request.getUserServiceAgreeId(), user.getUserId())
-                .orElseThrow(() -> new NotFoundDataException(""));
+        ServiceAgreement serviceAgreement = serviceAgreementRepository.findByServiceAgreeType(ServiceAgreeType.MARKETING)
+                .orElseThrow(() -> new NotFoundDataException("존재하지 않는 서비스 이용 동의입니다."));
+
+        UserServiceAgreement userServiceAgreement = userServiceAgreementRepository.findByServiceAgreeIdAndUserId(serviceAgreement.getServiceAgreeId(), user.getUserId())
+                .orElseThrow(() -> new NotFoundDataException("회원 정보를 조회할 수 없습니다."));
+
         userServiceAgreement.modifyMarketing(request.getIsUserServiceAgree());
 
         return UserModifyServiceAgreeDto.builder()
