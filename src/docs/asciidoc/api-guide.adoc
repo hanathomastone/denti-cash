@@ -34,6 +34,8 @@ include::{doc}/common.adoc[]
 
 *[회원 인증 실패]*
 
+- 연락처 일치, 실명 불일치 : `"회원 정보가 일치하지 않아요. 다시 확인해주세요."`
+- 연락처 불일치, 실명 일치 : `"회원 정보를 찾을 수 없습니다. 다시 확인해주세요."`
 - 병원 환자 테이블에 존재하지 않는 사용자 : `"존재하지 않는 회원입니다."`
 - 이미 가입된 사용자 : `"이미 가입한 사용자입니다."`
 - 서비스 이용 동의 불일치, 누락 : `"서비스 동의 개수 불일치"`
@@ -231,3 +233,70 @@ include::{snippets}/user/request-fields.adoc[]
 === Response
 include::{snippets}/user/response-fields.adoc[]
 include::{snippets}/user/response-body.adoc[]
+
+[[userModifyServiceAgree]]
+== 12. 사용자 마케팅 동의 여부 수정
+사용자 마케팅 동의 여부 수정 API
+
+*[마케팅 동의 여부 수정 실패]*
+
+- 사용자 권한이 아닌 경우 : `"권한이 없는 사용자입니다."`
+- 사용자 조회 불가능 : `"존재하지 않는 사용자입니다."`
+- 잘못된 서비스 수정인 경우 : `"존재하지 않는 서비스 이용 동의입니다."`
+
+=== Http
+include::{snippets}/user/service-agreement/http-request.adoc[]
+=== Request
+include::{snippets}/user/service-agreement/request-fields.adoc[]
+=== Response
+include::{snippets}/user/service-agreement/response-fields.adoc[]
+include::{snippets}/user/service-agreement/response-body.adoc[]
+
+[[userInfo]]
+== 13. 사용자 회원정보 조회
+사용자 회원정보 조회 API
+
+*[회원정보 조회 실패]*
+
+- 사용자 권한이 아닌 경우 : `"권한이 없는 사용자입니다."`
+- 사용자 조회 불가능, 병원 환자 테이블에 존재하지 않는 사용자 : `"회원 정보를 조회할 수 없습니다."`
+- 서비스 이용동의 조회 불가능 : `"존재하지 않는 서비스 이용 동의입니다."`
+
+=== Http
+include::{snippets}/user/info/http-request.adoc[]
+=== Response
+include::{snippets}/user/info/response-fields.adoc[]
+include::{snippets}/user/info/response-body.adoc[]
+
+
+[[userLogout]]
+== 14. 사용자 로그아웃
+사용자 로그아웃 API
+
+*[로그아웃 실패]*
+
+- 사용자 권한이 아닌 경우 : `"권한이 없는 사용자입니다."`
+- 사용자 조회 불가능 : `"존재하지 않는 사용자입니다."`
+- 사용자 기기 정보 조회 불가능 : `"기기 종류 및 버전 정보가 없거나 잘못되었습니다."`
+
+=== Http
+include::{snippets}/user/logout/http-request.adoc[]
+=== Response
+include::{snippets}/user/logout/response-fields.adoc[]
+include::{snippets}/user/logout/response-body.adoc[]
+
+[[userDelete]]
+== 15. 사용자 회원탈퇴
+사용자 회원탈퇴 API
+
+*[회원탈퇴 실패]*
+
+- 사용자 권한이 아닌 경우 : `"권한이 없는 사용자입니다."`
+- 사용자 조회 불가능 : `"존재하지 않는 사용자입니다."`
+- 사용자 기기 정보 조회 불가능 : `"기기 종류 및 버전 정보가 없거나 잘못되었습니다."`
+
+=== Http
+include::{snippets}/user/revoke/http-request.adoc[]
+=== Response
+include::{snippets}/user/revoke/response-fields.adoc[]
+include::{snippets}/user/revoke/response-body.adoc[]

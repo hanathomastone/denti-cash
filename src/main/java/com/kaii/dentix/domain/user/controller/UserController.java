@@ -1,9 +1,18 @@
 package com.kaii.dentix.domain.user.controller;
 
 import com.kaii.dentix.domain.user.application.UserService;
+import com.kaii.dentix.domain.user.dto.UserInfoDto;
+import com.kaii.dentix.domain.user.dto.UserInfoModifyDto;
+import com.kaii.dentix.domain.user.dto.UserInfoModifyQnADto;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
 import com.kaii.dentix.domain.user.dto.request.*;
+import com.kaii.dentix.domain.user.dto.response.UserInfoModifyQnAResponse;
+import com.kaii.dentix.domain.user.dto.response.UserInfoModifyResponse;
+import com.kaii.dentix.domain.user.dto.response.UserInfoResponse;
 import com.kaii.dentix.domain.user.dto.response.UserLoginResponse;
+import com.kaii.dentix.domain.userServiceAgreement.dto.UserModifyServiceAgreeDto;
+import com.kaii.dentix.domain.userServiceAgreement.dto.request.UserModifyServiceAgreeRequest;
+import com.kaii.dentix.domain.userServiceAgreement.dto.response.UserModifyServiceAgreeResponse;
 import com.kaii.dentix.global.common.response.SuccessResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -51,17 +60,58 @@ public class UserController {
      *  사용자 보안정보수정 - 질문과 답변 수정
      */
     @PutMapping(value = "/qna", name = "사용자 보안정보수정 - 질문과 답변 수정")
-    public SuccessResponse userModifyQnA(HttpServletRequest httpServletRequest, @Valid @RequestBody UserInfoModifyQnARequest request){
-        userService.userModifyQnA(httpServletRequest, request);
-        return new SuccessResponse();
+    public UserInfoModifyQnAResponse userModifyQnA(HttpServletRequest httpServletRequest, @Valid @RequestBody UserInfoModifyQnARequest request){
+        UserInfoModifyQnADto userInfoModifyQnADto = userService.userModifyQnA(httpServletRequest, request);
+        UserInfoModifyQnAResponse response = new UserInfoModifyQnAResponse(userInfoModifyQnADto);
+        return response;
     }
 
     /**
      *  사용자 회원 정보 수정
      */
     @PutMapping(name = "사용자 회원 정보 수정")
-    public SuccessResponse userModifyInfo(HttpServletRequest httpServletRequest, @Valid @RequestBody UserInfoModifyRequest request){
-        userService.userModifyInfo(httpServletRequest, request);
+    public UserInfoModifyResponse userModifyInfo(HttpServletRequest httpServletRequest, @Valid @RequestBody UserInfoModifyRequest request){
+        UserInfoModifyDto userInfoModifyDto = userService.userModifyInfo(httpServletRequest, request);
+        UserInfoModifyResponse response = new UserInfoModifyResponse(userInfoModifyDto);
+        return response;
+    }
+
+    /**
+     *  사용자 마케팅 정보 수신 동의 수정
+     */
+    @PutMapping(value = "/service-agreement", name = "사용자 마케팅 정보 수신 동의 수정")
+    public UserModifyServiceAgreeResponse userModifyServiceAgree(HttpServletRequest httpServletRequest, @Valid @RequestBody UserModifyServiceAgreeRequest request){
+        UserModifyServiceAgreeDto userModifyServiceAgreeDto = userService.userModifyServiceAgree(httpServletRequest, request);
+        UserModifyServiceAgreeResponse response = new UserModifyServiceAgreeResponse(userModifyServiceAgreeDto);
+
+        return response;
+    }
+
+    /**
+     *  사용자 회원 정보 조회
+     */
+    @GetMapping(name = "사용자 회원정보 조회")
+    public UserInfoResponse userInfo(HttpServletRequest httpServletRequest){
+        UserInfoDto userInfoDto = userService.userInfo(httpServletRequest);
+        UserInfoResponse response = new UserInfoResponse(userInfoDto);
+        return response;
+    }
+
+    /**
+     *  사용자 로그아웃
+     */
+    @PutMapping(value = "/logout", name = "사용자 로그아웃")
+    public SuccessResponse userLogout(HttpServletRequest httpServletRequest){
+        userService.userLogout(httpServletRequest);
+        return new SuccessResponse();
+    }
+
+    /**
+     *  사용자 회원탈퇴
+     */
+    @DeleteMapping(name = "사용자 회원탈퇴")
+    public SuccessResponse userRevoke(HttpServletRequest httpServletRequest){
+        userService.userRevoke(httpServletRequest);
         return new SuccessResponse();
     }
 

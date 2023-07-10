@@ -3,15 +3,27 @@ package com.kaii.dentix.domain.user.application;
 import com.kaii.dentix.domain.findPwdQuestion.dao.FindPwdQuestionRepository;
 import com.kaii.dentix.domain.jwt.JwtTokenUtil;
 import com.kaii.dentix.domain.jwt.TokenType;
+import com.kaii.dentix.domain.patient.dao.PatientRepository;
+import com.kaii.dentix.domain.patient.domain.Patient;
+import com.kaii.dentix.domain.serviceAgreement.dao.ServiceAgreementRepository;
+import com.kaii.dentix.domain.serviceAgreement.domain.ServiceAgreement;
 import com.kaii.dentix.domain.type.DeviceType;
+import com.kaii.dentix.domain.type.ServiceAgreeType;
 import com.kaii.dentix.domain.type.UserRole;
 import com.kaii.dentix.domain.user.dao.UserRepository;
 import com.kaii.dentix.domain.user.domain.User;
+import com.kaii.dentix.domain.user.dto.UserInfoDto;
+import com.kaii.dentix.domain.user.dto.UserInfoModifyDto;
+import com.kaii.dentix.domain.user.dto.UserInfoModifyQnADto;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
 import com.kaii.dentix.domain.user.dto.request.*;
 import com.kaii.dentix.domain.user.event.UserModifyDeviceInfoEvent;
 import com.kaii.dentix.domain.userDeviceType.dao.UserDeviceTypeRepository;
 import com.kaii.dentix.domain.userDeviceType.domain.UserDeviceType;
+import com.kaii.dentix.domain.userServiceAgreement.dao.UserServiceAgreementRepository;
+import com.kaii.dentix.domain.userServiceAgreement.domain.UserServiceAgreement;
+import com.kaii.dentix.domain.userServiceAgreement.dto.UserModifyServiceAgreeDto;
+import com.kaii.dentix.domain.userServiceAgreement.dto.request.UserModifyServiceAgreeRequest;
 import com.kaii.dentix.global.common.error.exception.NotFoundDataException;
 import com.kaii.dentix.global.common.error.exception.RequiredVersionInfoException;
 import com.kaii.dentix.global.common.error.exception.UnauthorizedException;
@@ -38,6 +50,12 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     private final FindPwdQuestionRepository findPwdQuestionRepository;
+
+    private final UserServiceAgreementRepository userServiceAgreementRepository;
+
+    private final ServiceAgreementRepository serviceAgreementRepository;
+
+    private final PatientRepository patientRepository;
 
 
     /**
@@ -149,7 +167,7 @@ public class UserService {
      *  사용자 보안정보수정 - 질문과 답변 수정
      */
     @Transactional
-    public void userModifyQnA(HttpServletRequest httpServletRequest, UserInfoModifyQnARequest request) {
+    public UserInfoModifyQnADto userModifyQnA(HttpServletRequest httpServletRequest, UserInfoModifyQnARequest request) {
 
         User user = this.getTokenUser(httpServletRequest);
 
@@ -157,18 +175,90 @@ public class UserService {
 
         user.modifyQnA(request.getFindPwdQuestionId(), request.getFindPwdAnswer());
 
+        return UserInfoModifyQnADto.builder()
+                .findPwdQuestionId(user.getFindPwdQuestionId())
+                .findPwdAnswer(user.getFindPwdAnswer())
+                .build();
+
     }
 
     /**
      *  사용자 회원 정보 수정
      */
     @Transactional
-    public void userModifyInfo(HttpServletRequest httpServletRequest, UserInfoModifyRequest request){
+    public UserInfoModifyDto userModifyInfo(HttpServletRequest httpServletRequest, UserInfoModifyRequest request){
+        User user = this.getTokenUser(httpServletRequest);
+        user.modifyInfo(request.getUserName(), request.getUserGender(), request.getUserBirth());
+
+        return UserInfoModifyDto.builder()
+                .userName(user.getUserName())
+                .userGender(user.getUserGender())
+                .userBirth(user.getUserBirth())
+                .build();
+    }
+
+    /**
+     *  사용자 마케팅 수신 여부 수정
+     */
+    @Transactional
+    public UserModifyServiceAgreeDto userModifyServiceAgree(HttpServletRequest httpServletRequest, UserModifyServiceAgreeRequest request){
 
         User user = this.getTokenUser(httpServletRequest);
 
-        user.modifyInfo(request.getUserName(), request.getUserGender(), request.getUserBirth());
+        ServiceAgreement serviceAgreement = serviceAgreementRepository.findByServiceAgreeType(ServiceAgreeType.MARKETING)
+                .orElseThrow(() -> new NotFoundDataException("존재하지 않는 서비스 이용 동의입니다."));
+
+        UserServiceAgreement userServiceAgreement = userServiceAgreementRepository.findByServiceAgreeIdAndUserId(serviceAgreement.getServiceAgreeId(), user.getUserId())
+                .orElseThrow(() -> new NotFoundDataException("회원 정보를 조회할 수 없습니다."));
+
+        userServiceAgreement.modifyMarketing(request.getIsUserServiceAgree());
+
+        return UserModifyServiceAgreeDto.builder()
+                .isUserServiceAgree(userServiceAgreement.getIsUserServiceAgree())
+                .build();
 
     }
+
+    /**
+     *  사용자 회원정보 조회
+     */
+    public UserInfoDto userInfo(HttpServletRequest httpServletRequest){
+        User user = this.getTokenUser(httpServletRequest);
+
+        Patient patient = patientRepository.findById(user.getPatientId()).orElseThrow(() -> new NotFoundDataException("회원 정보를 조회할 수 없습니다."));
+
+        ServiceAgreement serviceAgreement = serviceAgreementRepository.findByServiceAgreeType(ServiceAgreeType.MARKETING)
+                .orElseThrow(() -> new NotFoundDataException("존재하지 않는 서비스 이용 동의입니다."));
+
+        UserServiceAgreement userServiceAgreement = userServiceAgreementRepository.findByServiceAgreeIdAndUserId(serviceAgreement.getServiceAgreeId(), user.getUserId())
+                .orElseThrow(() -> new NotFoundDataException("회원 정보를 조회할 수 없습니다."));
+
+        return UserInfoDto.builder()
+                .userName(user.getUserName())
+                .userLoginId(user.getUserLoginId())
+                .userBirth(user.getUserBirth())
+                .userPhoneNumber(patient.getPatientPhoneNumber())
+                .isUserServiceAgree(userServiceAgreement.getIsUserServiceAgree())
+                .build();
+    }
+
+    /**
+     *  사용자 로그아웃
+     */
+    @Transactional
+    public void userLogout(HttpServletRequest httpServletRequest){
+        User user = this.getTokenUser(httpServletRequest);
+        user.logout();
+    }
+
+    /**
+     *  사용자 회원탈퇴
+     */
+    @Transactional
+    public void userRevoke(HttpServletRequest httpServletRequest){
+        User user = this.getTokenUser(httpServletRequest);
+        user.revoke();
+    }
+
 
 }

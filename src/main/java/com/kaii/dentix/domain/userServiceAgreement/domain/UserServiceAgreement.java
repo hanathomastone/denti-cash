@@ -32,4 +32,11 @@ public class UserServiceAgreement extends TimeEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date userServiceAgreeDate;
 
+    /**
+     *  사용자 마케팅 수신 동의 여부 수정
+     */
+    public void modifyMarketing(YnType isUserServiceAgree){
+        this.isUserServiceAgree = isUserServiceAgree;
+    }
+
 }

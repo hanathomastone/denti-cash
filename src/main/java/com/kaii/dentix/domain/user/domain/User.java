@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Where;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Date;
@@ -15,6 +16,7 @@ import java.util.Date;
 @Getter @Builder
 @AllArgsConstructor @NoArgsConstructor
 @Table(name = "user")
+@Where(clause = "deleted IS NULL")
 public class User extends TimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -111,6 +113,20 @@ public class User extends TimeEntity {
         this.userName = userName;
         this.userGender = userGender;
         this.userBirth = userBirth;
+    }
+
+    /**
+     *  로그아웃
+     */
+    public void logout(){
+        this.userDeviceToken = null;
+    }
+
+    /**
+     *  회원탈퇴
+     */
+    public void revoke(){
+        this.deleted = new Date();
     }
 
 }

@@ -55,9 +55,18 @@ public class UserLoginService {
     @Transactional(rollbackFor = Exception.class)
     public UserVerifyDto userVerify(UserVerifyRequest request){
 
+        // 연락처 일치 && 실명 불일치
+        if (patientRepository.findByPatientPhoneNumber(request.getPatientPhoneNumber()).isPresent() && !patientRepository.findByPatientName(request.getPatientName()).isPresent())
+            throw new UnauthorizedException("회원 정보가 일치하지 않아요. 다시 확인해주세요.");
+
+        // 연락처 존재 X && 실명 일치
+        if (!patientRepository.findByPatientPhoneNumber(request.getPatientPhoneNumber()).isPresent() && patientRepository.findByPatientName(request.getPatientName()).isPresent())
+            throw new UnauthorizedException("회원 정보를 찾을 수 없습니다. 다시 확인해주세요.");
+
         Patient patient = patientRepository.findByPatientPhoneNumberAndPatientName(request.getPatientPhoneNumber(), request.getPatientName())
                 .orElseThrow(() -> new NotFoundDataException("존재하지 않는 회원입니다."));
 
+        // 이미 인증된 사용자
         if (userRepository.findByPatientId(patient.getPatientId()).isPresent()) throw new AlreadyDataException("이미 가입한 사용자입니다.");
 
         // 서비스 이용 동의
