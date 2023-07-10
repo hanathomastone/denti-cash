@@ -176,8 +176,8 @@ public class UserService {
         user.modifyQnA(request.getFindPwdQuestionId(), request.getFindPwdAnswer());
 
         return UserInfoModifyQnADto.builder()
-                .findPwdQuestionId(request.getFindPwdQuestionId())
-                .findPwdAnswer(request.getFindPwdAnswer())
+                .findPwdQuestionId(user.getFindPwdQuestionId())
+                .findPwdAnswer(user.getFindPwdAnswer())
                 .build();
 
     }
@@ -191,9 +191,9 @@ public class UserService {
         user.modifyInfo(request.getUserName(), request.getUserGender(), request.getUserBirth());
 
         return UserInfoModifyDto.builder()
-                .userName(request.getUserName())
-                .userGender(request.getUserGender())
-                .userBirth(request.getUserBirth())
+                .userName(user.getUserName())
+                .userGender(user.getUserGender())
+                .userBirth(user.getUserBirth())
                 .build();
     }
 
@@ -214,7 +214,7 @@ public class UserService {
         userServiceAgreement.modifyMarketing(request.getIsUserServiceAgree());
 
         return UserModifyServiceAgreeDto.builder()
-                .isUserServiceAgree(request.getIsUserServiceAgree())
+                .isUserServiceAgree(userServiceAgreement.getIsUserServiceAgree())
                 .build();
 
     }
