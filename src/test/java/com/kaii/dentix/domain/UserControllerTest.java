@@ -6,6 +6,7 @@ import com.kaii.dentix.domain.type.GenderType;
 import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.controller.UserController;
+import com.kaii.dentix.domain.user.dto.UserInfoDto;
 import com.kaii.dentix.domain.user.dto.UserInfoModifyDto;
 import com.kaii.dentix.domain.user.dto.UserInfoModifyQnADto;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
@@ -86,6 +87,16 @@ public class UserControllerTest extends ControllerTest {
 
     private UserModifyServiceAgreeDto userModifyServiceAgreeDto(){
         return UserModifyServiceAgreeDto.builder()
+                .isUserServiceAgree(YnType.Y)
+                .build();
+    }
+
+    private UserInfoDto userInfoDto(){
+        return UserInfoDto.builder()
+                .userName("김덴티")
+                .userLoginId("detix123")
+                .userBirth("20000701")
+                .userPhoneNumber("01012345678")
                 .isUserServiceAgree(YnType.Y)
                 .build();
     }
@@ -440,6 +451,46 @@ public class UserControllerTest extends ControllerTest {
                 ));
 
         verify(userService).userModifyServiceAgree(any(HttpServletRequest.class), any(UserModifyServiceAgreeRequest.class));
+
+    }
+
+    /**
+     *  사용자 회원정보 조회
+     */
+    @Test
+    public void userInfo() throws Exception{
+
+        // given
+        given(userService.userInfo(any(HttpServletRequest.class))).willReturn(userInfoDto());
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                RestDocumentationRequestBuilders.get("/user")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "user-info.고유경.AccessToken")
+                        .with(user("user").roles("USER"))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("rt").value(200))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andDo(document("user/info",
+                        getDocumentRequest(),
+                        getDocumentResponse(),
+                        responseFields(
+                                fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
+                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
+                                fieldWithPath("userInfoDto").type(JsonFieldType.OBJECT).description("사용자 마케팅 동의 수정 정보"),
+                                fieldWithPath("userInfoDto.userName").type(JsonFieldType.STRING).description("사용자 이름"),
+                                fieldWithPath("userInfoDto.userLoginId").type(JsonFieldType.STRING).description("사용자 아이디"),
+                                fieldWithPath("userInfoDto.userBirth").type(JsonFieldType.STRING).attributes(userBirthFormat()).description("사용자 생년월일"),
+                                fieldWithPath("userInfoDto.userPhoneNumber").type(JsonFieldType.STRING).attributes(userNumberFormat()).description("사용자 연락처"),
+                                fieldWithPath("userInfoDto.isUserServiceAgree").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("사용자 마케팅 동의 여부")
+                        )
+                ));
+
+        verify(userService).userInfo(any(HttpServletRequest.class));
 
     }
 

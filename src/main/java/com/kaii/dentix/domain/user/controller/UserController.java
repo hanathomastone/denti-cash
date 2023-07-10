@@ -1,12 +1,14 @@
 package com.kaii.dentix.domain.user.controller;
 
 import com.kaii.dentix.domain.user.application.UserService;
+import com.kaii.dentix.domain.user.dto.UserInfoDto;
 import com.kaii.dentix.domain.user.dto.UserInfoModifyDto;
 import com.kaii.dentix.domain.user.dto.UserInfoModifyQnADto;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
 import com.kaii.dentix.domain.user.dto.request.*;
 import com.kaii.dentix.domain.user.dto.response.UserInfoModifyQnAResponse;
 import com.kaii.dentix.domain.user.dto.response.UserInfoModifyResponse;
+import com.kaii.dentix.domain.user.dto.response.UserInfoResponse;
 import com.kaii.dentix.domain.user.dto.response.UserLoginResponse;
 import com.kaii.dentix.domain.userServiceAgreement.dto.UserModifyServiceAgreeDto;
 import com.kaii.dentix.domain.userServiceAgreement.dto.request.UserModifyServiceAgreeRequest;
@@ -82,6 +84,16 @@ public class UserController {
         UserModifyServiceAgreeDto userModifyServiceAgreeDto = userService.userModifyServiceAgree(httpServletRequest, request);
         UserModifyServiceAgreeResponse response = new UserModifyServiceAgreeResponse(userModifyServiceAgreeDto);
 
+        return response;
+    }
+
+    /**
+     *  사용자 회원 정보 조회
+     */
+    @GetMapping(name = "사용자 회원정보 조회")
+    public UserInfoResponse userInfo(HttpServletRequest httpServletRequest){
+        UserInfoDto userInfoDto = userService.userInfo(httpServletRequest);
+        UserInfoResponse response = new UserInfoResponse(userInfoDto);
         return response;
     }
 
