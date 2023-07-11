@@ -88,6 +88,13 @@ dependencies {
     asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 
+    // json
+    implementation group: 'org.json', name: 'json', version: '20180813'
+
+    // s3
+    implementation platform('com.amazonaws:aws-java-sdk-bom:1.11.1000')
+    implementation group: 'com.amazonaws', name: 'aws-java-sdk-sts', version: '1.11.895'
+    implementation group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.11.895'
 }
 
 tasks.named('test') {
