@@ -23,8 +23,7 @@ public class VersionCheckFilter implements Filter {
      * 필터 실행 부분 입니다.
      */
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         log.info(" ::: VersionCheckFilter ::: ");
 
         HttpServletRequest servletRequest = (HttpServletRequest) request;
