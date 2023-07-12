@@ -111,7 +111,6 @@ public class UserService {
      */
     @Transactional
     public UserLoginDto userAutoLogin(HttpServletRequest httpServletRequest, UserAutoLoginRequest userAutoLoginRequest){
-
         User user = this.getTokenUser(httpServletRequest);
 
         String accessToken = jwtTokenUtil.createToken(user, TokenType.AccessToken);
@@ -142,7 +141,6 @@ public class UserService {
      */
     @Transactional
     public void userPasswordVerify(HttpServletRequest httpServletRequest, UserPasswordVerifyRequest request){
-
         User user = this.getTokenUser(httpServletRequest);
 
         if (!passwordEncoder.matches(request.getUserPassword(), user.getUserPassword())){
@@ -156,11 +154,8 @@ public class UserService {
      */
     @Transactional
     public void userModifyPassword(HttpServletRequest httpServletRequest, UserInfoModifyPasswordRequest request){
-
         User user = this.getTokenUser(httpServletRequest);
-
         user.modifyUserPassword(passwordEncoder, request.getUserPassword());
-
     }
 
     /**
@@ -168,9 +163,9 @@ public class UserService {
      */
     @Transactional
     public UserInfoModifyQnADto userModifyQnA(HttpServletRequest httpServletRequest, UserInfoModifyQnARequest request) {
-
         User user = this.getTokenUser(httpServletRequest);
 
+        // 올바르지 않은 findPwdQuestionId 인 경우
         if (!findPwdQuestionRepository.findById(request.getFindPwdQuestionId()).isPresent()) throw new NotFoundDataException("존재하지 않는 질문입니다.");
 
         user.modifyQnA(request.getFindPwdQuestionId(), request.getFindPwdAnswer());
@@ -188,6 +183,7 @@ public class UserService {
     @Transactional
     public UserInfoModifyDto userModifyInfo(HttpServletRequest httpServletRequest, UserInfoModifyRequest request){
         User user = this.getTokenUser(httpServletRequest);
+
         user.modifyInfo(request.getUserName(), request.getUserGender(), request.getUserBirth());
 
         return UserInfoModifyDto.builder()
@@ -202,12 +198,11 @@ public class UserService {
      */
     @Transactional
     public UserModifyServiceAgreeDto userModifyServiceAgree(HttpServletRequest httpServletRequest, UserModifyServiceAgreeRequest request){
-
         User user = this.getTokenUser(httpServletRequest);
 
+        // 사용자 마케팅 동의 여부 조회를 위해 serviceAgreementId 조회
         ServiceAgreement serviceAgreement = serviceAgreementRepository.findByServiceAgreeType(ServiceAgreeType.MARKETING)
                 .orElseThrow(() -> new NotFoundDataException("존재하지 않는 서비스 이용 동의입니다."));
-
         UserServiceAgreement userServiceAgreement = userServiceAgreementRepository.findByServiceAgreeIdAndUserId(serviceAgreement.getServiceAgreeId(), user.getUserId())
                 .orElseThrow(() -> new NotFoundDataException("회원 정보를 조회할 수 없습니다."));
 
@@ -225,11 +220,12 @@ public class UserService {
     public UserInfoDto userInfo(HttpServletRequest httpServletRequest){
         User user = this.getTokenUser(httpServletRequest);
 
+        // 사용자 연락처 조회를 위해 patientId 조회
         Patient patient = patientRepository.findById(user.getPatientId()).orElseThrow(() -> new NotFoundDataException("회원 정보를 조회할 수 없습니다."));
 
+        // 사용자 마케팅 동의 여부 조회를 위해 serviceAgreementId 조회
         ServiceAgreement serviceAgreement = serviceAgreementRepository.findByServiceAgreeType(ServiceAgreeType.MARKETING)
                 .orElseThrow(() -> new NotFoundDataException("존재하지 않는 서비스 이용 동의입니다."));
-
         UserServiceAgreement userServiceAgreement = userServiceAgreementRepository.findByServiceAgreeIdAndUserId(serviceAgreement.getServiceAgreeId(), user.getUserId())
                 .orElseThrow(() -> new NotFoundDataException("회원 정보를 조회할 수 없습니다."));
 

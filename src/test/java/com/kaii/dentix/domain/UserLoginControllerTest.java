@@ -112,8 +112,7 @@ public class UserLoginControllerTest extends ControllerTest{
                 .userServiceAgreementRequest(Arrays.asList(
                         new UserServiceAgreementRequest(1L, YnType.Y),
                         new UserServiceAgreementRequest(2L, YnType.Y),
-                        new UserServiceAgreementRequest(3L, YnType.Y),
-                        new UserServiceAgreementRequest(4L, YnType.N)
+                        new UserServiceAgreementRequest(3L, YnType.N)
                 ))
                 .build();
 
@@ -163,8 +162,7 @@ public class UserLoginControllerTest extends ControllerTest{
                 .userServiceAgreementRequest(Arrays.asList(
                         new UserServiceAgreementRequest(1L, YnType.Y),
                         new UserServiceAgreementRequest(2L, YnType.Y),
-                        new UserServiceAgreementRequest(3L, YnType.Y),
-                        new UserServiceAgreementRequest(4L, YnType.N)
+                        new UserServiceAgreementRequest(3L, YnType.N)
                 ))
                 .userLoginId("dentix123")
                 .userName("김덴티")

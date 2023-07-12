@@ -351,8 +351,6 @@ public class UserControllerTest extends ControllerTest {
         ResultActions resultActions = mockMvc.perform(
                 RestDocumentationRequestBuilders.put("/user/logout")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("deviceType", "iOS")
-                        .header("appVersion", 1.1)
                         .header(HttpHeaders.AUTHORIZATION, "user-info.고유경.AccessToken")
                         .with(user("user").roles("USER"))
         );
@@ -387,8 +385,6 @@ public class UserControllerTest extends ControllerTest {
         ResultActions resultActions = mockMvc.perform(
                 RestDocumentationRequestBuilders.delete("/user")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("deviceType", "iOS")
-                        .header("appVersion", 1.1)
                         .header(HttpHeaders.AUTHORIZATION, "user-info.고유경.AccessToken")
                         .with(user("user").roles("USER"))
         );
