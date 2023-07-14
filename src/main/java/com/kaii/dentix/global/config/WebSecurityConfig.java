@@ -28,6 +28,7 @@ public class WebSecurityConfig {
 
     public static String[] EXCLUDE_URLS = {
         "/static/docs/*", // restdocs
+        "/actuator/health", // health check
         "/resources/edu/thumbnail/*",
         "/corps",
         "/login/*", "/login",
