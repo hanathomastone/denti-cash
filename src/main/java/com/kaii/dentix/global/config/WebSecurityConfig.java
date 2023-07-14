@@ -27,8 +27,8 @@ public class WebSecurityConfig {
     private final UserDeviceTypeService userDeviceTypeService;
 
     public static String[] EXCLUDE_URLS = {
-        "/static/docs/*", // restdocs
         "/actuator/health", // health check
+        "/docs/*", // restdocs
         "/resources/edu/thumbnail/*",
         "/corps",
         "/login/*", "/login",

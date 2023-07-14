@@ -20,7 +20,7 @@ ifndef::snippets-custom[]
 [[title]]
 = DTX API 문서
 
-include::{doc}/common.adoc[]
+include::common.adoc[]
 
 
 [[verify]]
