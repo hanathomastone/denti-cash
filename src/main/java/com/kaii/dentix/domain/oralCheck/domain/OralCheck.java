@@ -11,12 +11,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.Where;
 import org.hibernate.type.SqlTypes;
 
 @Entity
 @Getter @Builder
 @AllArgsConstructor @NoArgsConstructor
+@Where(clause = "oralCheckAnalysisState = 'SUCCESS'")
 @Table(name = "oralCheck")
 public class OralCheck extends TimeEntity {
 

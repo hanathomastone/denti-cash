@@ -9,6 +9,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ *  구강 검진 사진 분석 결과
+ */
 @Getter @Builder
 @AllArgsConstructor @NoArgsConstructor
 public class OralCheckAnalysisResponse {

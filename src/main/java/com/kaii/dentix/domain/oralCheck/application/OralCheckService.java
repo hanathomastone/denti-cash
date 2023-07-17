@@ -13,12 +13,12 @@ import com.kaii.dentix.domain.user.domain.User;
 import com.kaii.dentix.global.common.aws.AWSS3Service;
 import com.kaii.dentix.global.common.error.exception.BadRequestApiException;
 import com.kaii.dentix.global.common.util.LambdaService;
+import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -55,18 +55,22 @@ public class OralCheckService {
     public OralCheckPhotoResponse oralCheckPhoto(HttpServletRequest httpServletRequest, byte[] file, String contentType) throws IOException, NoSuchAlgorithmException, InvalidKeyException, InterruptedException  {
         User user = userService.getTokenUser(httpServletRequest);
 
+        // 업로드 결과 경로 생성
         String uploadedUrl = awss3Service.upload(file, folderPath, contentType);
 
         try {
 
             TimeUnit.SECONDS.sleep(3);
 
+            // 업로드 경로가 없을 경우, 파일 저장 실패
             if (StringUtils.isBlank(uploadedUrl)) throw new BadRequestApiException("파일 저장에 실패했습니다.");
 
-            String findText = "";
+            // 불필요 경로를 제외하고 추출
+            String findText = "aws.com/";
             int pathIndex = uploadedUrl.indexOf(findText);
             String imagePath = uploadedUrl.substring(pathIndex + findText.length());
 
+            // 람다 AI 서버로 업로드 경로 전달 후, AI 분석 결과 받아옴
             OralCheckAnalysisResponse analysisData = lambdaService.getPyDentalLambda(imagePath);
 
             OralCheck oralCheck = null;
@@ -98,6 +102,7 @@ public class OralCheckService {
             if (oralCheck == null) {
                 throw new BadRequestApiException("양치 상태 체크 확인 결과 저장에 실패했습니다... 관리자에게 문의 바랍니다.");
             } else {
+                // 분석 결과 상태가 '성공'일 경우
                 if (oralCheck.getOralCheckAnalysisState() == OralCheckAnalysisState.SUCCESS) {
                     return OralCheckPhotoResponse.builder()
                             .rt(200)
@@ -105,6 +110,7 @@ public class OralCheckService {
                             .oralCheckId(oralCheck.getOralCheckId())
                             .build();
                 } else {
+                    // 분석 결과 상태가 '실패'일 경우
                     return OralCheckPhotoResponse.builder()
                             .rt(resultCode)
                             .rtMsg("양치 상태 체크 확인을 실패했습니다. 재촬영 바랍니다.")
@@ -142,7 +148,8 @@ public class OralCheckService {
      * @return ToothColoringDivisionCommentType : 4등분 코멘트 유형
      */
     public OralCheckDivisionCommentType calcDivisionCommentType(int totalRange, int upRightRange, int upLeftRange, int downRightRange, int downLeftRange) {
-        // 4등분 코멘트 유형
+
+        // 부위별 구강 상태 Comment
         OralCheckDivisionCommentType divisionCommentType = null;
 
         int upDivision = upRightRange + upLeftRange; // 윗니
@@ -150,7 +157,7 @@ public class OralCheckService {
         int rightDivision = upRightRange + downRightRange; // 오른쪽
         int leftDivision = upLeftRange + downLeftRange; // 왼쪽
 
-        if (totalRange == 0) {
+        if (totalRange == 0) { // 전체 플라그 비율이 0일 경우
             divisionCommentType = HEALTHY;
         } else {
             boolean rightBool = rightDivision > 0;
@@ -158,10 +165,8 @@ public class OralCheckService {
             boolean upBool = upDivision > 0;
             boolean downBool = downDivision > 0;
 
-            boolean rightGtLeftBool = rightBool && leftBool ? rightDivision > leftDivision
-                    : rightBool;
-            boolean downGtUpBool = upBool && downBool ? downDivision > upDivision
-                    : downBool;
+            boolean rightGtLeftBool = rightBool && leftBool ? rightDivision > leftDivision : rightBool; // true : 오른쪽, false : 왼쪽
+            boolean downGtUpBool = upBool && downBool ? downDivision > upDivision : downBool; // true : 아래, false : 위
 
             divisionCommentType = rightGtLeftBool && downGtUpBool ? DR
                     : rightGtLeftBool && !downGtUpBool ? UR
@@ -170,44 +175,6 @@ public class OralCheckService {
         }
 
         return divisionCommentType;
-    }
-
-    /**
-     * 플라그 분포 유형 계산
-     *
-     * @param totalRange         : 전체 비율
-     * @param interproximalRange : 치간 비율
-     * @param cervicalRange      : 치경 비율
-     * @param labialRange        : 순면 비율
-     * @return ToothColoringPlaqueDistributionType : 플라그 분포 유형 결과
-     */
-    public OralCheckPlaqueDistributionType calcPlaqueDistributionType(int totalRange, int interproximalRange, int cervicalRange, int labialRange) {
-        OralCheckPlaqueDistributionType plaqueDistributionType = null;
-
-        if (totalRange == 0) {
-            plaqueDistributionType = OralCheckPlaqueDistributionType.S;
-        } else {
-            if (interproximalRange == cervicalRange && interproximalRange == labialRange) {
-                plaqueDistributionType = OralCheckPlaqueDistributionType.ICL;
-            } else {
-                if (interproximalRange == cervicalRange) {
-                    plaqueDistributionType = OralCheckPlaqueDistributionType.IC;
-                } else if (interproximalRange == labialRange) {
-                    plaqueDistributionType = OralCheckPlaqueDistributionType.IL;
-                } else if (cervicalRange == labialRange) {
-                    plaqueDistributionType = OralCheckPlaqueDistributionType.CL;
-                }
-
-                if (interproximalRange > cervicalRange && interproximalRange > labialRange) {
-                    plaqueDistributionType = OralCheckPlaqueDistributionType.I;
-                } else if (cervicalRange > interproximalRange && cervicalRange > labialRange) {
-                    plaqueDistributionType = OralCheckPlaqueDistributionType.C;
-                } else if (labialRange > interproximalRange && labialRange > cervicalRange) {
-                    plaqueDistributionType = OralCheckPlaqueDistributionType.L;
-                }
-            }
-        }
-        return plaqueDistributionType;
     }
 
     /**
@@ -232,14 +199,8 @@ public class OralCheckService {
 
         OralCheckAnalysisTotalDto total = resource.getTotal();
         Float totalGroupRatio = total.getGroup().getRatio();
-        Float totalInterproximalRatio = total.getInterproximal() != null ? total.getInterproximal().getRatio() : null;
-        Float totalCervicalRatio = total.getCervical() != null ? total.getCervical().getRatio() : null;
-        Float totalLabialRatio = total.getLabial() != null ? total.getLabial().getRatio() : null;
 
         int totalRange = totalGroupRatio != null ? totalGroupRatio < 1 ? 0 : round(totalGroupRatio) : 0; // 전체 비율
-        int interproximalRange = totalInterproximalRatio != null ? round(totalInterproximalRatio) : 0; // 치간 비율
-        int cervicalRange = totalCervicalRatio != null ? round(totalCervicalRatio) : 0; // 치경 비율
-        int labialRange = totalLabialRatio != null ? round(totalLabialRatio) : 0; // 순면 비율
 
         String resultJsonData = objectMapper.writeValueAsString(resource); // 분석 결과 JSON data 전체
 
@@ -263,9 +224,6 @@ public class OralCheckService {
                 : divisionBadCount == 1 ? OralCheckResultTotalType.GOOD
                 : divisionBadCount == 2 ? OralCheckResultTotalType.ATTENTION
                 : OralCheckResultTotalType.DANGER;
-
-        // 플라그 분포 유형
-        OralCheckPlaqueDistributionType plaqueDistributionType = this.calcPlaqueDistributionType(totalRange, interproximalRange, cervicalRange, labialRange);
 
         // insert 데이터 set
         OralCheck insertData = OralCheck.builder()
@@ -296,6 +254,9 @@ public class OralCheckService {
         }
     }
 
+    /**
+     * 구강 사진 분석 실패
+     */
     @Transactional
     public OralCheck registAnalysisFailedData(Long userId, String filePath, OralCheckAnalysisResponse resource) throws JsonProcessingException {
         String resultJsonData = objectMapper.writeValueAsString(resource); // 분석 결과 JSON data 전체
