@@ -10,7 +10,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Getter @Builder
@@ -40,9 +42,9 @@ public class OralCheck extends TimeEntity {
 
     private Integer oralCheckDownLeftRange; // 구강 검진 좌하 비율
 
-    @Type(type = "json")
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "json")
-    private String toothColoringResultJsonData; // 결과 JSON data 전체
+    private String oralCheckResultJsonData; // 결과 JSON data 전체
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum")
