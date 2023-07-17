@@ -7,7 +7,7 @@
 | 환경 | 도메인 주소
 
 | 개발서버
-| -
+| http://dentix-api-dev.kai-i.com
 
 | 운영서버
 | -
@@ -77,7 +77,7 @@ Header 에 ``appVersion``과 `deviceType` 정보가 있을 경우, 버전 확인
 
 두 정보가 없을 경우에는 버전 확인 없이 API가 호출됩니다.
 
-- ``appVersion``과 `deviceType` 정보가 필요한 경우는 다음과 같습니다.
+- ``appVersion``과 `deviceType` 정보가 필수인 경우는 다음과 같습니다.
 * 2. 회원가입 API
 * 4. 사용자 로그인 API
 * 5. 사용자 자동 로그인 API
