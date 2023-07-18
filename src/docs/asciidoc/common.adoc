@@ -51,6 +51,14 @@
 | 기기 종류 및 버전 정보가 없거나 잘못되었습니다.
 | header에 deviceType, appVersion 없거나 잘못된 데이터 (APP 전용)
 
+| 410
+| Plague analysis fail by user
+| 구강검진 사진 촬영 분석 실패 (재촬영 안내)
+
+| 411
+| Plague analysis fail by server
+| 구강검진 사진 촬영 분석 실패 (관리자에게 문의)
+
 | 416
 | Not found Data {DataName}
 | 데이터 조회 실패로 인한 처리 불가
