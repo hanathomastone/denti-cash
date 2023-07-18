@@ -213,11 +213,11 @@ public class AWSS3Service {
     /**
      * Storage 파일 업로드
      */
-    public String upload(byte[] file, String path, String contentType) throws IOException, NoSuchAlgorithmException, InvalidKeyException, InterruptedException {
+    public String upload(byte[] file, String path) throws IOException, NoSuchAlgorithmException, InvalidKeyException, InterruptedException {
         init(false);
 
         objectMetadata.setContentLength(0L);
-        objectMetadata.setContentType(StringUtils.isNotBlank(contentType) ? contentType : "application/x-directory");
+        objectMetadata.setContentType("application/x-directory");
 
         objectMetadata.setContentLength(file.length);
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(file);
@@ -238,7 +238,7 @@ public class AWSS3Service {
      * @throws NoSuchAlgorithmException
      * @throws InvalidKeyException
      */
-    public String uploadAndDelete(byte[] file, String path, String key, String contentType) throws IOException, NoSuchAlgorithmException, InvalidKeyException, InterruptedException {
+    public String uploadAndDelete(byte[] file, String path, String key) throws IOException, NoSuchAlgorithmException, InvalidKeyException, InterruptedException {
         init(false);
 
         if (key != null) {
@@ -246,7 +246,7 @@ public class AWSS3Service {
         }
 
         objectMetadata.setContentLength(0L);
-        objectMetadata.setContentType(StringUtils.isNotBlank(contentType) ? contentType : "application/x-directory");
+        objectMetadata.setContentType("application/x-directory");
 
         objectMetadata.setContentLength(file.length);
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(file);
