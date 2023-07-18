@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -24,8 +25,8 @@ public class OralCheckController {
      * 구강검진 사진 촬영
      */
     @PostMapping(value = "/photo", name = "구강검진 사진 촬영")
-    public OralCheckPhotoResponse oralCheckPhoto(HttpServletRequest httpServletRequest, @RequestParam byte[] file, String contentType) throws IOException, NoSuchAlgorithmException, InvalidKeyException, InterruptedException {
-        OralCheckPhotoResponse response = oralCheckService.oralCheckPhoto(httpServletRequest, file, contentType);
+    public OralCheckPhotoResponse oralCheckPhoto(HttpServletRequest httpServletRequest, @RequestParam MultipartFile file) throws IOException, NoSuchAlgorithmException, InvalidKeyException, InterruptedException {
+        OralCheckPhotoResponse response = oralCheckService.oralCheckPhoto(httpServletRequest, file);
         return response;
     }
 

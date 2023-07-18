@@ -26,6 +26,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.multipart.MultipartFile;
 
 import static com.kaii.dentix.domain.type.oral.OralCheckDivisionCommentType.*;
 import static com.kaii.dentix.global.common.response.ResponseMessage.SUCCESS_MSG;
@@ -52,11 +53,14 @@ public class OralCheckService {
      *  구강검진 사진 촬영
      */
     @Transactional
-    public OralCheckPhotoResponse oralCheckPhoto(HttpServletRequest httpServletRequest, byte[] file, String contentType) throws IOException, NoSuchAlgorithmException, InvalidKeyException, InterruptedException  {
+    public OralCheckPhotoResponse oralCheckPhoto(HttpServletRequest httpServletRequest, MultipartFile file) throws IOException, NoSuchAlgorithmException, InvalidKeyException, InterruptedException  {
         User user = userService.getTokenUser(httpServletRequest);
 
+        // MultipartFile to byte[]
+        byte[] bytes = file.getBytes();
+
         // 업로드 결과 경로 생성
-        String uploadedUrl = awss3Service.upload(file, folderPath, contentType);
+        String uploadedUrl = awss3Service.upload(bytes, folderPath);
 
         try {
 
@@ -69,6 +73,8 @@ public class OralCheckService {
             String findText = "aws.com/";
             int pathIndex = uploadedUrl.indexOf(findText);
             String imagePath = uploadedUrl.substring(pathIndex + findText.length());
+
+            imagePath = "public/upload/tooth_coloration_test/1635829930233_tooth.jpg";
 
             // 람다 AI 서버로 업로드 경로 전달 후, AI 분석 결과 받아옴
             OralCheckAnalysisResponse analysisData = lambdaService.getPyDentalLambda(imagePath);
@@ -114,6 +120,7 @@ public class OralCheckService {
                     return OralCheckPhotoResponse.builder()
                             .rt(resultCode)
                             .rtMsg("양치 상태 체크 확인을 실패했습니다. 재촬영 바랍니다.")
+                            .oralCheckId(oralCheck.getOralCheckId())
                             .build();
                 }
             }

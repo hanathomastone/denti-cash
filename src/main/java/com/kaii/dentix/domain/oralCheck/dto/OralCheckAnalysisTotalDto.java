@@ -11,11 +11,4 @@ public class OralCheckAnalysisTotalDto {
 
     private OralCheckAreaPlaqueRatioDto group; // 그룹
 
-    private OralCheckAreaPlaqueRatioDto interproximal; // 치간
-
-    private OralCheckAreaPlaqueRatioDto cervical; // 치경
-
-    private OralCheckAreaPlaqueRatioDto labial; // 순면
-
-
 }

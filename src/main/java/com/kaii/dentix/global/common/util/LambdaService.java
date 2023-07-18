@@ -17,12 +17,12 @@ import java.util.Map;
 @Service
 public class LambdaService {
 
-    @Value("")
+    @Value("${lambda.pyDentalPat.apiUrl}")
     private String pyDentalApiUrl;
-    @Value("")
+    @Value("${lambda.pyDentalPat.apiKey}")
     private String pyDentalApiKey;
 
-    @Value("")
+    @Value("${s3.storage.bucketName}")
     private String bucket;
 
     private final RestTemplate restTemplate;
@@ -39,7 +39,7 @@ public class LambdaService {
         headers.set("x-api-key", pyDentalApiKey);
 
         Map<String, Object> params = new HashMap<>();
-        params.put("bucket", bucket);
+        params.put("bucket", "kaii-denti-roka"); // TODO
         params.put("imagePath", imagePath);
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(params, headers);
