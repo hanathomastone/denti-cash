@@ -9,7 +9,6 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
 import com.kaii.dentix.global.common.aws.dto.NcsStsRequestDTO;
 import com.kaii.dentix.global.common.aws.handler.RestTemplateResponseErrorHandler;
-import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -36,6 +36,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
+
+import static java.lang.System.currentTimeMillis;
 
 @Slf4j
 @Service
@@ -81,7 +83,7 @@ public class AWSS3Service {
     public AmazonS3 s3Client() throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
 
         // 서버 timestamp 추출
-        String timestamp = Long.toString(System.currentTimeMillis());
+        String timestamp = Long.toString(currentTimeMillis());
 
         // signature 생성
         String signature = makeSignature(timestamp, accessKey, secretKey);
@@ -213,20 +215,26 @@ public class AWSS3Service {
     /**
      * Storage 파일 업로드
      */
-    public String upload(byte[] file, String path) throws IOException, NoSuchAlgorithmException, InvalidKeyException, InterruptedException {
+    public String upload(MultipartFile file, String path, boolean isTime) throws IOException, NoSuchAlgorithmException, InvalidKeyException, InterruptedException {
         init(false);
+
+        String originFileName = file.getOriginalFilename(); // 기존 파일명
+        String originFileNameNotExt = originFileName.substring(0, originFileName.lastIndexOf(".")); // 확장자 제외한 기존 파일명
+        String fileExt = originFileName.substring(originFileName.lastIndexOf(".") + 1); // 업로드 파일 확장자
+        String fileName = isTime ? originFileNameNotExt + "_" + currentTimeMillis() + '.' + fileExt : originFileName; // 파일명
+        String filePath = path + fileName; // 파일 경로
 
         objectMetadata.setContentLength(0L);
         objectMetadata.setContentType("application/x-directory");
 
-        objectMetadata.setContentLength(file.length);
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(file);
+        byte[] bytes = file.getBytes(); // MultipartFile to byte[]
+        objectMetadata.setContentLength(bytes.length);
 
-        s3.putObject(new PutObjectRequest(bucketName, path, byteArrayInputStream, objectMetadata)
+        s3.putObject(new PutObjectRequest(bucketName, filePath, file.getInputStream(), objectMetadata)
             .withCannedAcl(CannedAccessControlList.PublicRead));
 
         // 업로드 결과 경로
-        return s3.getUrl(bucketName, path).toString();
+        return s3.getUrl(bucketName, filePath).toString();
     }
 
     /**

@@ -46,7 +46,7 @@ public class OralCheckService {
 
     private final ObjectMapper objectMapper;
 
-    @Value("public/upload/oralCheck/")
+    @Value("${s3.folderPath.oralCheck}")
     private String folderPath;
 
     /**
@@ -56,11 +56,8 @@ public class OralCheckService {
     public OralCheckPhotoResponse oralCheckPhoto(HttpServletRequest httpServletRequest, MultipartFile file) throws IOException, NoSuchAlgorithmException, InvalidKeyException, InterruptedException  {
         User user = userService.getTokenUser(httpServletRequest);
 
-        // MultipartFile to byte[]
-        byte[] bytes = file.getBytes();
-
         // 업로드 결과 경로 생성
-        String uploadedUrl = awss3Service.upload(bytes, folderPath);
+        String uploadedUrl = awss3Service.upload(file, folderPath, true);
 
         try {
 
@@ -74,7 +71,7 @@ public class OralCheckService {
             int pathIndex = uploadedUrl.indexOf(findText);
             String imagePath = uploadedUrl.substring(pathIndex + findText.length());
 
-            imagePath = "public/upload/tooth_coloration_test/1635829930233_tooth.jpg";
+            imagePath = "public/upload/tooth_coloration_test/1635829930233_tooth.jpg"; // TODO : 수정 필요
 
             // 람다 AI 서버로 업로드 경로 전달 후, AI 분석 결과 받아옴
             OralCheckAnalysisResponse analysisData = lambdaService.getPyDentalLambda(imagePath);

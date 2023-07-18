@@ -1,4 +1,4 @@
-package com.kaii.dentix.domain;
+package com.kaii.dentix.domain.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaii.dentix.common.ControllerTest;

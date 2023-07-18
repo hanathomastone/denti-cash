@@ -39,7 +39,7 @@ public class LambdaService {
         headers.set("x-api-key", pyDentalApiKey);
 
         Map<String, Object> params = new HashMap<>();
-        params.put("bucket", "kaii-denti-roka"); // TODO
+        params.put("bucket", "kaii-denti-roka"); // TODO : bucketName 수정 필요
         params.put("imagePath", imagePath);
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(params, headers);
