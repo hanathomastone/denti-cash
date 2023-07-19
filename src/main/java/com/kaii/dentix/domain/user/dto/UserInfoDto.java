@@ -11,7 +11,7 @@ public class UserInfoDto {
 
     private String userName;
 
-    private String userLoginId;
+    private String userLoginIdentifier;
 
     private String userBirth;
 

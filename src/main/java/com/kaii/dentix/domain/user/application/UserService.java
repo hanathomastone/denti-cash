@@ -129,7 +129,7 @@ public class UserService {
 
         return UserLoginDto.builder()
                 .userId(user.getUserId())
-                .userLoginId(user.getUserLoginId())
+                .userLoginIdentifier(user.getUserLoginIdentifier())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
@@ -231,7 +231,7 @@ public class UserService {
 
         return UserInfoDto.builder()
                 .userName(user.getUserName())
-                .userLoginId(user.getUserLoginId())
+                .userLoginIdentifier(user.getUserLoginIdentifier())
                 .userBirth(user.getUserBirth())
                 .userPhoneNumber(patient.getPatientPhoneNumber())
                 .isUserServiceAgree(userServiceAgreement.getIsUserServiceAgree())

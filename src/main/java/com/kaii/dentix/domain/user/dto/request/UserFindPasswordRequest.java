@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class UserFindPasswordRequest {
 
     @NotBlank @Size(min = 4, max = 12)
-    private String userLoginId;
+    private String userLoginIdentifier;
 
     @NotNull
     private Long findPwdQuestionId;

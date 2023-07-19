@@ -5,15 +5,16 @@ import com.kaii.dentix.domain.oralCheck.dao.OralCheckRepository;
 import com.kaii.dentix.domain.oralCheck.domain.OralCheck;
 import com.kaii.dentix.domain.oralCheck.dto.OralCheckAnalysisDivisionDto;
 import com.kaii.dentix.domain.oralCheck.dto.OralCheckAnalysisTotalDto;
+import com.kaii.dentix.domain.oralCheck.dto.OralCheckPhotoDto;
 import com.kaii.dentix.domain.oralCheck.dto.OralCheckResultDto;
 import com.kaii.dentix.domain.oralCheck.dto.resoponse.OralCheckAnalysisResponse;
-import com.kaii.dentix.domain.oralCheck.dto.resoponse.OralCheckPhotoResponse;
 import com.kaii.dentix.domain.type.oral.*;
 import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.domain.User;
 import com.kaii.dentix.global.common.aws.AWSS3Service;
 import com.kaii.dentix.global.common.error.exception.BadRequestApiException;
 import com.kaii.dentix.global.common.error.exception.NotFoundDataException;
+import com.kaii.dentix.global.common.response.DataResponse;
 import com.kaii.dentix.global.common.util.LambdaService;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -56,7 +57,7 @@ public class OralCheckService {
      *  구강검진 사진 촬영
      */
     @Transactional
-    public OralCheckPhotoResponse oralCheckPhoto(HttpServletRequest httpServletRequest, MultipartFile file) throws IOException, NoSuchAlgorithmException, InvalidKeyException, InterruptedException  {
+    public DataResponse<OralCheckPhotoDto> oralCheckPhoto(HttpServletRequest httpServletRequest, MultipartFile file) throws IOException, NoSuchAlgorithmException, InvalidKeyException, InterruptedException  {
         User user = userService.getTokenUser(httpServletRequest);
 
         // 업로드 결과 경로 생성
@@ -110,18 +111,10 @@ public class OralCheckService {
             } else {
                 // 분석 결과 상태가 '성공'일 경우
                 if (oralCheck.getOralCheckAnalysisState() == OralCheckAnalysisState.SUCCESS) {
-                    return OralCheckPhotoResponse.builder()
-                            .rt(200)
-                            .rtMsg(SUCCESS_MSG)
-                            .oralCheckId(oralCheck.getOralCheckId())
-                            .build();
+                    return new DataResponse<>(200, SUCCESS_MSG, new OralCheckPhotoDto(oralCheck.getOralCheckId()));
                 } else {
                     // 분석 결과 상태가 '실패'일 경우
-                    return OralCheckPhotoResponse.builder()
-                            .rt(resultCode)
-                            .rtMsg("양치 상태 체크 확인을 실패했습니다. 재촬영 바랍니다.")
-                            .oralCheckId(oralCheck.getOralCheckId())
-                            .build();
+                    return new DataResponse<>(resultCode, "양치 상태 체크 확인을 실패했습니다. 재촬영 바랍니다.", null);
                 }
             }
 

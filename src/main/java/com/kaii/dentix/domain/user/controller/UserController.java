@@ -6,13 +6,9 @@ import com.kaii.dentix.domain.user.dto.UserInfoModifyDto;
 import com.kaii.dentix.domain.user.dto.UserInfoModifyQnADto;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
 import com.kaii.dentix.domain.user.dto.request.*;
-import com.kaii.dentix.domain.user.dto.response.UserInfoModifyQnAResponse;
-import com.kaii.dentix.domain.user.dto.response.UserInfoModifyResponse;
-import com.kaii.dentix.domain.user.dto.response.UserInfoResponse;
-import com.kaii.dentix.domain.user.dto.response.UserLoginResponse;
 import com.kaii.dentix.domain.userServiceAgreement.dto.UserModifyServiceAgreeDto;
 import com.kaii.dentix.domain.userServiceAgreement.dto.request.UserModifyServiceAgreeRequest;
-import com.kaii.dentix.domain.userServiceAgreement.dto.response.UserModifyServiceAgreeResponse;
+import com.kaii.dentix.global.common.response.DataResponse;
 import com.kaii.dentix.global.common.response.SuccessResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -31,11 +27,9 @@ public class UserController {
      *  사용자 자동 로그인
      */
     @PutMapping(value = "/auto-login", name = "사용자 자동 로그인")
-    public UserLoginResponse userAutoLogin(HttpServletRequest servletRequest, @Valid @RequestBody UserAutoLoginRequest request){
-        UserLoginDto userLoginDto = userService.userAutoLogin(servletRequest, request);
-        UserLoginResponse userLoginResponse = new UserLoginResponse(userLoginDto);
-
-        return userLoginResponse;
+    public DataResponse<UserLoginDto> userAutoLogin(HttpServletRequest servletRequest, @Valid @RequestBody UserAutoLoginRequest request){
+        DataResponse<UserLoginDto> response = new DataResponse<>(userService.userAutoLogin(servletRequest, request));
+        return response;
     }
 
     /**
@@ -60,9 +54,8 @@ public class UserController {
      *  사용자 보안정보수정 - 질문과 답변 수정
      */
     @PutMapping(value = "/qna", name = "사용자 보안정보수정 - 질문과 답변 수정")
-    public UserInfoModifyQnAResponse userModifyQnA(HttpServletRequest httpServletRequest, @Valid @RequestBody UserInfoModifyQnARequest request){
-        UserInfoModifyQnADto userInfoModifyQnADto = userService.userModifyQnA(httpServletRequest, request);
-        UserInfoModifyQnAResponse response = new UserInfoModifyQnAResponse(userInfoModifyQnADto);
+    public DataResponse<UserInfoModifyQnADto> userModifyQnA(HttpServletRequest httpServletRequest, @Valid @RequestBody UserInfoModifyQnARequest request){
+        DataResponse<UserInfoModifyQnADto> response = new DataResponse<>(userService.userModifyQnA(httpServletRequest, request));
         return response;
     }
 
@@ -70,9 +63,8 @@ public class UserController {
      *  사용자 회원 정보 수정
      */
     @PutMapping(name = "사용자 회원 정보 수정")
-    public UserInfoModifyResponse userModifyInfo(HttpServletRequest httpServletRequest, @Valid @RequestBody UserInfoModifyRequest request){
-        UserInfoModifyDto userInfoModifyDto = userService.userModifyInfo(httpServletRequest, request);
-        UserInfoModifyResponse response = new UserInfoModifyResponse(userInfoModifyDto);
+    public DataResponse<UserInfoModifyDto> userModifyInfo(HttpServletRequest httpServletRequest, @Valid @RequestBody UserInfoModifyRequest request){
+        DataResponse<UserInfoModifyDto> response = new DataResponse<>(userService.userModifyInfo(httpServletRequest, request));
         return response;
     }
 
@@ -80,10 +72,8 @@ public class UserController {
      *  사용자 마케팅 정보 수신 동의 수정
      */
     @PutMapping(value = "/service-agreement", name = "사용자 마케팅 정보 수신 동의 수정")
-    public UserModifyServiceAgreeResponse userModifyServiceAgree(HttpServletRequest httpServletRequest, @Valid @RequestBody UserModifyServiceAgreeRequest request){
-        UserModifyServiceAgreeDto userModifyServiceAgreeDto = userService.userModifyServiceAgree(httpServletRequest, request);
-        UserModifyServiceAgreeResponse response = new UserModifyServiceAgreeResponse(userModifyServiceAgreeDto);
-
+    public DataResponse<UserModifyServiceAgreeDto> userModifyServiceAgree(HttpServletRequest httpServletRequest, @Valid @RequestBody UserModifyServiceAgreeRequest request){
+        DataResponse<UserModifyServiceAgreeDto> response = new DataResponse<>(userService.userModifyServiceAgree(httpServletRequest, request));
         return response;
     }
 
@@ -91,9 +81,8 @@ public class UserController {
      *  사용자 회원 정보 조회
      */
     @GetMapping(name = "사용자 회원정보 조회")
-    public UserInfoResponse userInfo(HttpServletRequest httpServletRequest){
-        UserInfoDto userInfoDto = userService.userInfo(httpServletRequest);
-        UserInfoResponse response = new UserInfoResponse(userInfoDto);
+    public DataResponse<UserInfoDto> userInfo(HttpServletRequest httpServletRequest){
+        DataResponse<UserInfoDto> response = new DataResponse<>(userService.userInfo(httpServletRequest));
         return response;
     }
 
