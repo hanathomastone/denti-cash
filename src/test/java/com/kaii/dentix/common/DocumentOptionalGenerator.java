@@ -34,5 +34,16 @@ public class DocumentOptionalGenerator {
         return setFormat("yyyy-MM-dd HH:mm:ss");
     }
 
+    public static Attributes.Attribute oralCheckResultTotalFormat() {
+        return setFormat("HEALTHY : 건강, GOOD : 양호, ATTENTION : 주의, DANGER : 위험");
+    }
+
+    public static Attributes.Attribute oralCheckDivisionScoreFormat() {
+        return setFormat("HEALTHY : 건강, GOOD : 양호, ATTENTION : 주의, DANGER : 위험");
+    }
+
+    public static Attributes.Attribute oralCheckDivisionCommentFormat() {
+        return setFormat("HEALTHY : 모두 잘 닦인 경우, UR : 상악 우측, UL : 상악 좌측, DR : 하악 우측, DL : 하악 좌측");
+    }
 
 }
