@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -55,16 +56,29 @@ public class UserLoginService {
     @Transactional(rollbackFor = Exception.class)
     public UserVerifyDto userVerify(UserVerifyRequest request){
 
-        // 연락처 일치 && 실명 불일치
-        if (patientRepository.findByPatientPhoneNumber(request.getPatientPhoneNumber()).isPresent() && !patientRepository.findByPatientName(request.getPatientName()).isPresent())
-            throw new UnauthorizedException("회원 정보가 일치하지 않아요. 다시 확인해주세요.");
+        List<Patient> patientList = patientRepository.findByPatientPhoneNumberOrPatientName(request.getPatientPhoneNumber(), request.getPatientName());
 
-        // 연락처 존재 X && 실명 일치
-        if (!patientRepository.findByPatientPhoneNumber(request.getPatientPhoneNumber()).isPresent() && patientRepository.findByPatientName(request.getPatientName()).isPresent())
-            throw new UnauthorizedException("회원 정보를 찾을 수 없습니다. 다시 확인해주세요.");
+        if (patientList.size() == 0) {
+            // 연락처 불일치 && 실명 불일치
+            throw new UnauthorizedException("회원 정보를 찾을 수 없어요.\n다시 확인해 주세요.");
+        }
 
-        Patient patient = patientRepository.findByPatientPhoneNumberAndPatientName(request.getPatientPhoneNumber(), request.getPatientName())
-                .orElseThrow(() -> new NotFoundDataException("존재하지 않는 회원입니다."));
+        Patient patient = patientList.stream()
+            .filter(p -> p.getPatientName().equals(request.getPatientName()) && p.getPatientPhoneNumber().equals(request.getPatientPhoneNumber()))
+            .findAny().orElse(null);
+
+        if (patient == null) {
+            boolean isSamePhoneNumber = patientList.stream()
+                .anyMatch(p -> p.getPatientPhoneNumber().equals(request.getPatientPhoneNumber()));
+
+            if (isSamePhoneNumber) {
+                // 연락처 일치 && 실명 불일치
+                throw new UnauthorizedException("본인인증 번호가 일치하지 않아요.\n다시 확인해 주세요.");
+            } else {
+                // 연락처 불일치 && 실명 일치
+                throw new UnauthorizedException("회원 정보를 찾을 수 없습니다. 다시 확인해주세요.");
+            }
+        }
 
         // 이미 인증된 사용자
         if (userRepository.findByPatientId(patient.getPatientId()).isPresent()) throw new AlreadyDataException("이미 가입한 사용자입니다.");
