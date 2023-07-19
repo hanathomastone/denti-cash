@@ -140,8 +140,8 @@ public class UserLoginControllerTest extends ControllerTest{
                         responseFields(
                                 fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
                                 fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
-                                fieldWithPath("userVerifyDto").type(JsonFieldType.OBJECT).description("인증된 환자 정보"),
-                                fieldWithPath("userVerifyDto.patientId").type(JsonFieldType.NUMBER).description("환자 고유 번호")
+                                fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
+                                fieldWithPath("response.patientId").type(JsonFieldType.NUMBER).description("환자 고유 번호")
                         )
                 ));
 

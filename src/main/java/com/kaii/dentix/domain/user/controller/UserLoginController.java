@@ -1,11 +1,12 @@
 package com.kaii.dentix.domain.user.controller;
 
 import com.kaii.dentix.domain.user.application.UserLoginService;
+import com.kaii.dentix.domain.user.dto.UserVerifyDto;
 import com.kaii.dentix.domain.user.dto.request.*;
 import com.kaii.dentix.domain.user.dto.response.UserFindPasswordResponse;
 import com.kaii.dentix.domain.user.dto.response.UserLoginResponse;
 import com.kaii.dentix.domain.user.dto.response.UserSignUpResponse;
-import com.kaii.dentix.domain.user.dto.response.UserVerifyResponse;
+import com.kaii.dentix.global.common.response.DataResponse;
 import com.kaii.dentix.global.common.response.SuccessResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -25,9 +26,9 @@ public class UserLoginController {
      *  사용자 회원인증
      */
     @PostMapping(value = "/verify", name = "사용자 회원 인증")
-    public UserVerifyResponse userVerify(@Valid @RequestBody UserVerifyRequest request){
-        UserVerifyResponse userVerifyResponse = new UserVerifyResponse(userLoginService.userVerify(request));
-        return userVerifyResponse;
+    public DataResponse<UserVerifyDto> userVerify(@Valid @RequestBody UserVerifyRequest request){
+        DataResponse<UserVerifyDto> response = new DataResponse<>(userLoginService.userVerify(request));
+        return response;
     }
 
     /**
