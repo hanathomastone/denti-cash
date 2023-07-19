@@ -1,9 +1,7 @@
 package com.kaii.dentix.global.common.response;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
 @AllArgsConstructor
 public class DataResponse<T> extends SuccessResponse {
 
