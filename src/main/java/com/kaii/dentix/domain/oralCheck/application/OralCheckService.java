@@ -5,6 +5,7 @@ import com.kaii.dentix.domain.oralCheck.dao.OralCheckRepository;
 import com.kaii.dentix.domain.oralCheck.domain.OralCheck;
 import com.kaii.dentix.domain.oralCheck.dto.OralCheckAnalysisDivisionDto;
 import com.kaii.dentix.domain.oralCheck.dto.OralCheckAnalysisTotalDto;
+import com.kaii.dentix.domain.oralCheck.dto.OralCheckResultDto;
 import com.kaii.dentix.domain.oralCheck.dto.resoponse.OralCheckAnalysisResponse;
 import com.kaii.dentix.domain.oralCheck.dto.resoponse.OralCheckPhotoResponse;
 import com.kaii.dentix.domain.type.oral.*;
@@ -12,6 +13,7 @@ import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.domain.User;
 import com.kaii.dentix.global.common.aws.AWSS3Service;
 import com.kaii.dentix.global.common.error.exception.BadRequestApiException;
+import com.kaii.dentix.global.common.error.exception.NotFoundDataException;
 import com.kaii.dentix.global.common.util.LambdaService;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -280,6 +283,37 @@ public class OralCheckService {
         } else {
             return inserted;
         }
+    }
+
+    /**
+     *  구강 검진 결과
+     */
+    @Transactional(readOnly = true)
+    public OralCheckResultDto oralCheckResult(HttpServletRequest httpServletRequest, Long oralCheckId){
+        User user = userService.getTokenUser(httpServletRequest);
+
+        OralCheck oralCheck = oralCheckRepository.findById(oralCheckId).orElseThrow(() -> new NotFoundDataException("존재하지 않는 구강 검진입니다."));
+
+        if (!oralCheck.getUserId().equals(user.getUserId())) throw new BadRequestApiException("회원 정보와 구강 검진 정보가 일치하지 않습니다.");
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+
+        return OralCheckResultDto.builder()
+                .userId(user.getUserId())
+                .oralCheckResultTotalType(oralCheck.getOralCheckResultTotalType())
+                .created(formatter.format(oralCheck.getCreated()))
+                .oralCheckTotalRange(oralCheck.getOralCheckTotalRange())
+                .oralCheckUpRightRange(oralCheck.getOralCheckUpRightRange())
+                .oralCheckUpRightScoreType(oralCheck.getOralCheckUpRightScoreType())
+                .oralCheckUpLeftRange(oralCheck.getOralCheckUpLeftRange())
+                .oralCheckUpLeftScoreType(oralCheck.getOralCheckUpLeftScoreType())
+                .oralCheckDownLeftRange(oralCheck.getOralCheckDownLeftRange())
+                .oralCheckDownLeftScoreType(oralCheck.getOralCheckDownLeftScoreType())
+                .oralCheckDownRightRange(oralCheck.getOralCheckDownRightRange())
+                .oralCheckDownRightScoreType(oralCheck.getOralCheckDownRightScoreType())
+                .oralCheckDivisionCommentType(oralCheck.getOralCheckDivisionCommentType())
+                .build();
+
     }
 
 }

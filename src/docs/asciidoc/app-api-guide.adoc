@@ -339,3 +339,24 @@ include::{snippets}/oralCheck/photo/http-request.adoc[]
 === Response
 include::{snippets}/oralCheck/photo/response-fields.adoc[]
 include::{snippets}/oralCheck/photo/response-body.adoc[]
+
+[[oralCheckResult]]
+== 17. 구강검진 결과
+*구강검진 결과 API*
+
+: 구강검진 사진 촬영 API 성공 시 return 된 `oralCheckId` 를 담아서 요청합니다.
+
+*[ 개발 중 잘못된 Request나 데이터 오류로 인해 발생할 수 있는 경우 ]*::
+
+- 사용자 권한이 아닌 경우 : `"권한이 없는 사용자입니다."`
+- 사용자 조회 불가능 : `"존재하지 않는 사용자입니다."`
+- 존재하지 않는 구강검진 고유 번호 : `"존재하지 않는 구강 검진입니다."`
+- 회원 정보와 구강검진 정보 미일치 : `"회원 정보와 구강 검진 정보가 일치하지 않습니다."`
+
+=== Http
+include::{snippets}/oralCheck/result/http-request.adoc[]
+=== Request
+include::{snippets}/oralCheck/result/query-parameters.adoc[]
+=== Response
+include::{snippets}/oralCheck/result/response-fields.adoc[]
+include::{snippets}/oralCheck/result/response-body.adoc[]
