@@ -74,7 +74,7 @@ public class UserLoginControllerTest extends ControllerTest{
                 .refreshToken("Refresh Token")
                 .patientId(1L)
                 .userId(1L)
-                .userLoginId("detix123")
+                .userLoginIdentifier("detix123")
                 .userName("김덴티")
                 .userBirth("20000701")
                 .userGender(GenderType.W)
@@ -86,7 +86,7 @@ public class UserLoginControllerTest extends ControllerTest{
                 .accessToken("Access Token")
                 .refreshToken("Refresh Token")
                 .userId(1L)
-                .userLoginId("dentix123")
+                .userLoginIdentifier("dentix123")
                 .build();
     }
 
@@ -140,8 +140,8 @@ public class UserLoginControllerTest extends ControllerTest{
                         responseFields(
                                 fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
                                 fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
-                                fieldWithPath("userVerifyDto").type(JsonFieldType.OBJECT).description("인증된 환자 정보"),
-                                fieldWithPath("userVerifyDto.patientId").type(JsonFieldType.NUMBER).description("환자 고유 번호")
+                                fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
+                                fieldWithPath("response.patientId").type(JsonFieldType.NUMBER).description("환자 고유 번호")
                         )
                 ));
 
@@ -164,7 +164,7 @@ public class UserLoginControllerTest extends ControllerTest{
                         new UserServiceAgreementRequest(2L, YnType.Y),
                         new UserServiceAgreementRequest(3L, YnType.N)
                 ))
-                .userLoginId("dentix123")
+                .userLoginIdentifier("dentix123")
                 .userName("김덴티")
                 .userPassword("password")
                 .userGender(GenderType.W)
@@ -198,7 +198,7 @@ public class UserLoginControllerTest extends ControllerTest{
                                 fieldWithPath("userServiceAgreementRequest[]").type(JsonFieldType.ARRAY).description("사용자 서비스 동의"),
                                 fieldWithPath("userServiceAgreementRequest[].userServiceAgreeId").type(JsonFieldType.NUMBER).description("사용자 서비스 동의 고유 번호"),
                                 fieldWithPath("userServiceAgreementRequest[].isUserServiceAgree").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("사용자 서비스 동의 여부"),
-                                fieldWithPath("userLoginId").type(JsonFieldType.STRING).description("사용자 아이디"),
+                                fieldWithPath("userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디"),
                                 fieldWithPath("userName").type(JsonFieldType.STRING).description("사용자 이름"),
                                 fieldWithPath("userPassword").type(JsonFieldType.STRING).description("사용자 비밀번호"),
                                 fieldWithPath("userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별"),
@@ -213,15 +213,15 @@ public class UserLoginControllerTest extends ControllerTest{
                         responseFields(
                                 fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
                                 fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
-                                fieldWithPath("userSignUpDto").type(JsonFieldType.OBJECT).description("사용자 회원가입 정보"),
-                                fieldWithPath("userSignUpDto.accessToken").type(JsonFieldType.STRING).description("Access Token"),
-                                fieldWithPath("userSignUpDto.refreshToken").type(JsonFieldType.STRING).description("Refresh Token"),
-                                fieldWithPath("userSignUpDto.patientId").type(JsonFieldType.NUMBER).description("환자 고유 번호"),
-                                fieldWithPath("userSignUpDto.userId").type(JsonFieldType.NUMBER).description("사용자 고유 번호"),
-                                fieldWithPath("userSignUpDto.userLoginId").type(JsonFieldType.STRING).description("사용자 아이디"),
-                                fieldWithPath("userSignUpDto.userName").type(JsonFieldType.STRING).description("사용자 이름"),
-                                fieldWithPath("userSignUpDto.userBirth").type(JsonFieldType.STRING).attributes(userBirthFormat()).description("사용자 생년월일"),
-                                fieldWithPath("userSignUpDto.userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별")
+                                fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
+                                fieldWithPath("response.accessToken").type(JsonFieldType.STRING).description("Access Token"),
+                                fieldWithPath("response.refreshToken").type(JsonFieldType.STRING).description("Refresh Token"),
+                                fieldWithPath("response.patientId").type(JsonFieldType.NUMBER).description("환자 고유 번호"),
+                                fieldWithPath("response.userId").type(JsonFieldType.NUMBER).description("사용자 고유 번호"),
+                                fieldWithPath("response.userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디"),
+                                fieldWithPath("response.userName").type(JsonFieldType.STRING).description("사용자 이름"),
+                                fieldWithPath("response.userBirth").type(JsonFieldType.STRING).attributes(userBirthFormat()).description("사용자 생년월일"),
+                                fieldWithPath("response.userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별")
                         )
                 ));
 
@@ -240,7 +240,7 @@ public class UserLoginControllerTest extends ControllerTest{
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.get("/login/loginId-check?userLoginId={userLoginId}", "dentix123")
+                RestDocumentationRequestBuilders.get("/login/loginIdentifier-check?userLoginIdentifier={userLoginIdentifier}", "dentix123")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
         );
@@ -249,11 +249,11 @@ public class UserLoginControllerTest extends ControllerTest{
         resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("rt").value(200))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andDo(document("login/loginId-check",
+                .andDo(document("login/loginIdentifier-check",
                         getDocumentRequest(),
                         getDocumentResponse(),
                         queryParameters(
-                                parameterWithName("userLoginId").description("사용자 아이디")
+                                parameterWithName("userLoginIdentifier").description("사용자 아이디")
                         ),
                         responseFields(
                                 fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
@@ -275,7 +275,7 @@ public class UserLoginControllerTest extends ControllerTest{
         given(userLoginService.userLogin(any(HttpServletRequest.class), any(UserLoginRequest.class))).willReturn(userLoginDto());
 
         UserLoginRequest userLoginRequest = UserLoginRequest.builder()
-                .userLoginId("dentix123")
+                .userLoginIdentifier("dentix123")
                 .userPassword("password")
                 .userDeviceModel("iPhone 14 Pro")
                 .userDeviceManufacturer("APPLE")
@@ -301,7 +301,7 @@ public class UserLoginControllerTest extends ControllerTest{
                         getDocumentRequest(),
                         getDocumentResponse(),
                         requestFields(
-                                fieldWithPath("userLoginId").type(JsonFieldType.STRING).description("사용자 아이디"),
+                                fieldWithPath("userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디"),
                                 fieldWithPath("userPassword").type(JsonFieldType.STRING).description("사용자 비밀번호"),
                                 fieldWithPath("userDeviceModel").type(JsonFieldType.STRING).optional().description("사용자 기기 모델"),
                                 fieldWithPath("userDeviceManufacturer").type(JsonFieldType.STRING).optional().description("사용자 기기 제조사"),
@@ -311,11 +311,11 @@ public class UserLoginControllerTest extends ControllerTest{
                         responseFields(
                                 fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
                                 fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
-                                fieldWithPath("userLoginDto").type(JsonFieldType.OBJECT).description("사용자 회원가입 정보"),
-                                fieldWithPath("userLoginDto.accessToken").type(JsonFieldType.STRING).description("Access Token"),
-                                fieldWithPath("userLoginDto.refreshToken").type(JsonFieldType.STRING).description("Refresh Token"),
-                                fieldWithPath("userLoginDto.userId").type(JsonFieldType.NUMBER).description("사용자 고유 번호"),
-                                fieldWithPath("userLoginDto.userLoginId").type(JsonFieldType.STRING).description("사용자 아이디")
+                                fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
+                                fieldWithPath("response.accessToken").type(JsonFieldType.STRING).description("Access Token"),
+                                fieldWithPath("response.refreshToken").type(JsonFieldType.STRING).description("Refresh Token"),
+                                fieldWithPath("response.userId").type(JsonFieldType.NUMBER).description("사용자 고유 번호"),
+                                fieldWithPath("response.userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디")
                         )
                 ));
 
@@ -333,7 +333,7 @@ public class UserLoginControllerTest extends ControllerTest{
         given(userLoginService.userFindPassword(any(UserFindPasswordRequest.class))).willReturn(userFindPasswordDto());
 
         UserFindPasswordRequest userFindPasswordRequest = UserFindPasswordRequest.builder()
-                .userLoginId("dentix123")
+                .userLoginIdentifier("dentix123")
                 .findPwdQuestionId(1L)
                 .findPwdAnswer("초록색")
                 .build();
@@ -353,15 +353,15 @@ public class UserLoginControllerTest extends ControllerTest{
                         getDocumentRequest(),
                         getDocumentResponse(),
                         requestFields(
-                                fieldWithPath("userLoginId").type(JsonFieldType.STRING).description("사용자 아이디"),
+                                fieldWithPath("userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디"),
                                 fieldWithPath("findPwdQuestionId").type(JsonFieldType.NUMBER).description("사용자 비밀번호 찾기 질문"),
                                 fieldWithPath("findPwdAnswer").type(JsonFieldType.STRING).description("사용자 비밀번호 찾기 답변")
                         ),
                         responseFields(
                                 fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
                                 fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
-                                fieldWithPath("userFindPasswordDto").type(JsonFieldType.OBJECT).description("사용자 비밀번호 찾기 정보"),
-                                fieldWithPath("userFindPasswordDto.userId").type(JsonFieldType.NUMBER).description("사용자 고유 번호")
+                                fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
+                                fieldWithPath("response.userId").type(JsonFieldType.NUMBER).description("사용자 고유 번호")
                         )
                 ));
 

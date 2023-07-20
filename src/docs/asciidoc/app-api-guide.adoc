@@ -94,12 +94,12 @@ include::{snippets}/login/signUp/response-body.adoc[]
 - 이미 존재하는 아이디 : `"이미 사용 중인 아이디입니다."`
 
 === Http
-include::{snippets}/login/loginId-check/http-request.adoc[]
+include::{snippets}/login/loginIdentifier-check/http-request.adoc[]
 === Request
-include::{snippets}/login/loginId-check/query-parameters.adoc[]
+include::{snippets}/login/loginIdentifier-check/query-parameters.adoc[]
 === Response
-include::{snippets}/login/loginId-check/response-fields.adoc[]
-include::{snippets}/login/loginId-check/response-body.adoc[]
+include::{snippets}/login/loginIdentifier-check/response-fields.adoc[]
+include::{snippets}/login/loginIdentifier-check/response-body.adoc[]
 
 
 [[userLogin]]

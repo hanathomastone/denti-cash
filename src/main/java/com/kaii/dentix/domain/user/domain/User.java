@@ -23,7 +23,7 @@ public class User extends TimeEntity {
     private Long userId;
 
     @Column(length = 45, nullable = false)
-    private String userLoginId;
+    private String userLoginIdentifier;
 
     @Column(nullable = false)
     private String userPassword;

@@ -103,13 +103,13 @@ public class UserLoginService {
         if (userRepository.findByPatientId(request.getPatientId()).isPresent()) throw new AlreadyDataException("이미 가입한 사용자입니다.");
 
         // 아이디 중복 확인
-        this.loginIdCheck(request.getUserLoginId());
+        this.loginIdCheck(request.getUserLoginIdentifier());
 
         // 올바르지 않은 findPwdQuestionId 인 경우
         if (!findPwdQuestionRepository.findById(request.getFindPwdQuestionId()).isPresent()) throw new NotFoundDataException("존재하지 않는 질문입니다.");
 
         user = userRepository.save(user.builder()
-            .userLoginId(request.getUserLoginId())
+            .userLoginIdentifier(request.getUserLoginIdentifier())
             .userName(request.getUserName())
             .userGender(request.getUserGender())
             .userBirth(request.getUserBirth())
@@ -165,7 +165,7 @@ public class UserLoginService {
                 .userId(user.getUserId())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .userLoginId(request.getUserLoginId())
+                .userLoginIdentifier(request.getUserLoginIdentifier())
                 .userName(request.getUserName())
                 .userGender(request.getUserGender())
                 .userBirth(request.getUserBirth())
@@ -176,9 +176,9 @@ public class UserLoginService {
      *  아이디 중복 확인
      */
     @Transactional(readOnly = true)
-    public void loginIdCheck(String userLoginId){
+    public void loginIdCheck(String userLoginIdentifier){
 
-        if (userRepository.findByUserLoginId(userLoginId).isPresent()){
+        if (userRepository.findByUserLoginIdentifier(userLoginIdentifier).isPresent()){
             throw new AlreadyDataException("이미 사용 중인 아이디입니다.");
         }
 
@@ -190,7 +190,7 @@ public class UserLoginService {
     @Transactional
     public UserLoginDto userLogin(HttpServletRequest httpServletRequest, UserLoginRequest request){
 
-        User user = userRepository.findByUserLoginId(request.getUserLoginId())
+        User user = userRepository.findByUserLoginIdentifier(request.getUserLoginIdentifier())
                 .orElseThrow(() -> new UnauthorizedException("아이디 혹은 비밀번호가 올바르지 않습니다."));
 
         if (!passwordEncoder.matches(request.getUserPassword(), user.getUserPassword())){
@@ -213,7 +213,7 @@ public class UserLoginService {
 
         return UserLoginDto.builder()
                 .userId(user.getUserId())
-                .userLoginId(user.getUserLoginId())
+                .userLoginIdentifier(user.getUserLoginIdentifier())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
@@ -226,7 +226,7 @@ public class UserLoginService {
     @Transactional
     public UserFindPasswordDto userFindPassword(UserFindPasswordRequest request){
 
-        User user = userRepository.findByUserLoginId(request.getUserLoginId()).orElseThrow(() -> new NotFoundDataException("존재하지 않는 아이디입니다."));
+        User user = userRepository.findByUserLoginIdentifier(request.getUserLoginIdentifier()).orElseThrow(() -> new NotFoundDataException("존재하지 않는 아이디입니다."));
 
         if (user.getFindPwdQuestionId().equals(request.getFindPwdQuestionId())){ // 입력받은 질문과 DB 정보가 일치하는 경우
             if (!user.getFindPwdAnswer().equals(request.getFindPwdAnswer())){ // 입력받은 답변과 DB 정보가 일치하지 않는 경우

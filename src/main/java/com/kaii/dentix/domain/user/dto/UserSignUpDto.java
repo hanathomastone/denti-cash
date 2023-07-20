@@ -13,7 +13,7 @@ public class UserSignUpDto extends TokenDto{
 
     private Long userId;
 
-    private String userLoginId;
+    private String userLoginIdentifier;
 
     private String userName;
 

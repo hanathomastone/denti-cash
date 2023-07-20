@@ -1,5 +1,8 @@
 package com.kaii.dentix.global.common.response;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 public class SuccessResponse {
 
     public int rt;

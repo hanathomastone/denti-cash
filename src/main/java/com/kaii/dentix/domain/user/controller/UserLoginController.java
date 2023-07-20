@@ -1,11 +1,12 @@
 package com.kaii.dentix.domain.user.controller;
 
 import com.kaii.dentix.domain.user.application.UserLoginService;
+import com.kaii.dentix.domain.user.dto.UserFindPasswordDto;
+import com.kaii.dentix.domain.user.dto.UserLoginDto;
+import com.kaii.dentix.domain.user.dto.UserSignUpDto;
+import com.kaii.dentix.domain.user.dto.UserVerifyDto;
 import com.kaii.dentix.domain.user.dto.request.*;
-import com.kaii.dentix.domain.user.dto.response.UserFindPasswordResponse;
-import com.kaii.dentix.domain.user.dto.response.UserLoginResponse;
-import com.kaii.dentix.domain.user.dto.response.UserSignUpResponse;
-import com.kaii.dentix.domain.user.dto.response.UserVerifyResponse;
+import com.kaii.dentix.global.common.response.DataResponse;
 import com.kaii.dentix.global.common.response.SuccessResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -25,26 +26,26 @@ public class UserLoginController {
      *  사용자 회원인증
      */
     @PostMapping(value = "/verify", name = "사용자 회원 인증")
-    public UserVerifyResponse userVerify(@Valid @RequestBody UserVerifyRequest request){
-        UserVerifyResponse userVerifyResponse = new UserVerifyResponse(userLoginService.userVerify(request));
-        return userVerifyResponse;
+    public DataResponse<UserVerifyDto> userVerify(@Valid @RequestBody UserVerifyRequest request){
+        DataResponse<UserVerifyDto> response = new DataResponse<>(userLoginService.userVerify(request));
+        return response;
     }
 
     /**
      * 사용자 회원가입
      */
     @PostMapping(value = "/signUp", name = "사용자 회원가입")
-    public UserSignUpResponse userSignUp(HttpServletRequest httpServletRequest, @Valid @RequestBody UserSignUpRequest request){
-        UserSignUpResponse userSignUpResponse = new UserSignUpResponse(userLoginService.userSignUp(httpServletRequest, request));
-        return userSignUpResponse;
+    public DataResponse<UserSignUpDto> userSignUp(HttpServletRequest httpServletRequest, @Valid @RequestBody UserSignUpRequest request){
+        DataResponse<UserSignUpDto> response = new DataResponse<>(userLoginService.userSignUp(httpServletRequest, request));
+        return response;
     }
 
     /**
      *  아이디 중복 확인
      */
-    @GetMapping(value = "/loginId-check", name = "아이디 중복 확인")
-    public SuccessResponse loginIdCheck(@RequestParam @NotBlank @Size(min = 4, max = 12) String userLoginId){
-        userLoginService.loginIdCheck(userLoginId);
+    @GetMapping(value = "/loginIdentifier-check", name = "아이디 중복 확인")
+    public SuccessResponse loginIdCheck(@RequestParam @NotBlank @Size(min = 4, max = 12) String userLoginIdentifier){
+        userLoginService.loginIdCheck(userLoginIdentifier);
         return new SuccessResponse();
     }
 
@@ -52,18 +53,18 @@ public class UserLoginController {
      *  사용자 로그인
      */
     @PostMapping(name = "사용자 로그인")
-    public UserLoginResponse userLogin(HttpServletRequest httpServletRequest, @Valid @RequestBody UserLoginRequest request){
-        UserLoginResponse userLoginResponse = new UserLoginResponse(userLoginService.userLogin(httpServletRequest, request));
-        return userLoginResponse;
+    public DataResponse<UserLoginDto> userLogin(HttpServletRequest httpServletRequest, @Valid @RequestBody UserLoginRequest request){
+        DataResponse<UserLoginDto> response = new DataResponse<>(userLoginService.userLogin(httpServletRequest, request));
+        return response;
     }
 
     /**
      *  사용자 비밀번호 찾기
      */
     @PostMapping(value = "/find-password", name = "사용자 비밀번호 찾기")
-    public UserFindPasswordResponse userFindPassword(@Valid @RequestBody UserFindPasswordRequest request){
-        UserFindPasswordResponse userFindPasswordResponse = new UserFindPasswordResponse(userLoginService.userFindPassword(request));
-        return userFindPasswordResponse;
+    public DataResponse<UserFindPasswordDto> userFindPassword(@Valid @RequestBody UserFindPasswordRequest request){
+        DataResponse<UserFindPasswordDto> response = new DataResponse<>(userLoginService.userFindPassword(request));
+        return response;
     }
 
     /**
