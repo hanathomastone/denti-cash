@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -58,26 +57,27 @@ public class UserLoginService {
 
         List<Patient> patientList = patientRepository.findByPatientPhoneNumberOrPatientName(request.getPatientPhoneNumber(), request.getPatientName());
 
-        if (patientList.size() == 0) {
-            // 연락처 불일치 && 실명 불일치
-            throw new UnauthorizedException("회원 정보를 찾을 수 없어요.\n다시 확인해 주세요.");
-        }
-
         Patient patient = patientList.stream()
-            .filter(p -> p.getPatientName().equals(request.getPatientName()) && p.getPatientPhoneNumber().equals(request.getPatientPhoneNumber()))
-            .findAny().orElse(null);
+                .filter(p -> p.getPatientName().equals(request.getPatientName()) && p.getPatientPhoneNumber().equals(request.getPatientPhoneNumber()))
+                .findAny().orElse(null);
+
+        if (userRepository.findByPhoneNumber(request.getPatientPhoneNumber()).isPresent()) throw new AlreadyDataException("이미 사용중인 번호에요.\n번호를 다시 확인해 주세요.");
 
         if (patient == null) {
             boolean isSamePhoneNumber = patientList.stream()
-                .anyMatch(p -> p.getPatientPhoneNumber().equals(request.getPatientPhoneNumber()));
+                    .anyMatch(p -> p.getPatientPhoneNumber().equals(request.getPatientPhoneNumber()));
 
-            if (isSamePhoneNumber) {
-                // 연락처 일치 && 실명 불일치
-                throw new UnauthorizedException("본인인증 번호가 일치하지 않아요.\n다시 확인해 주세요.");
-            } else {
-                // 연락처 불일치 && 실명 일치
-                throw new UnauthorizedException("회원 정보를 찾을 수 없습니다. 다시 확인해주세요.");
+            if (isSamePhoneNumber) { // 연락처 일치 && 실명 불일치
+                throw new UnauthorizedException("회원 정보가 일치하지 않아요.\n다시 확인해 주세요.");
             }
+        }
+
+        // 미인증 회원 (연락처 불일치 && 실명 불일치)
+        if (patientList.size() == 0) {
+            return UserVerifyDto.builder()
+                    .patientId(null)
+                    .patientPhoneNumber(request.getPatientPhoneNumber())
+                    .build();
         }
 
         // 이미 인증된 사용자
@@ -100,7 +100,10 @@ public class UserLoginService {
 
         });
 
-        return UserVerifyDto.builder().patientId(patient.getPatientId()).build();
+        return UserVerifyDto.builder()
+                .patientId(patient.getPatientId())
+                .patientPhoneNumber(patient.getPatientPhoneNumber())
+                .build();
     }
 
 
@@ -126,11 +129,11 @@ public class UserLoginService {
             .userLoginIdentifier(request.getUserLoginIdentifier())
             .userName(request.getUserName())
             .userGender(request.getUserGender())
-            .userBirth(request.getUserBirth())
             .userPassword(passwordEncoder.encode(request.getUserPassword()))
             .findPwdQuestionId(request.getFindPwdQuestionId())
             .findPwdAnswer(request.getFindPwdAnswer())
             .patientId(request.getPatientId())
+            .phoneNumber(request.getPhoneNumber())
         .build());
 
         Long userId = user.getUserId();
@@ -182,7 +185,7 @@ public class UserLoginService {
                 .userLoginIdentifier(request.getUserLoginIdentifier())
                 .userName(request.getUserName())
                 .userGender(request.getUserGender())
-                .userBirth(request.getUserBirth())
+                .phoneNumber(request.getPhoneNumber())
                 .build();
     }
 

@@ -88,4 +88,3 @@ Header 에 ``appVersion``과 `deviceType` 정보가 있을 경우, 버전 확인
 - ``appVersion``과 `deviceType` 정보가 필수인 경우는 다음과 같습니다.
 * 2. 회원가입 API
 * 4. 사용자 로그인 API
-* 5. 사용자 자동 로그인 API

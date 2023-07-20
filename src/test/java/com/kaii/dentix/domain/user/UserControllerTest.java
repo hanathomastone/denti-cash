@@ -81,7 +81,6 @@ public class UserControllerTest extends ControllerTest {
         return UserInfoModifyDto.builder()
                 .userName("강덴티")
                 .userGender(GenderType.W)
-                .userBirth("20000801")
                 .build();
     }
 
@@ -95,65 +94,9 @@ public class UserControllerTest extends ControllerTest {
         return UserInfoDto.builder()
                 .userName("김덴티")
                 .userLoginIdentifier("detix123")
-                .userBirth("20000701")
                 .userPhoneNumber("01012345678")
                 .isUserServiceAgree(YnType.Y)
                 .build();
-    }
-
-    /**
-     *  사용자 자동 로그인
-     */
-    @Test
-    public void userAutoLogin() throws Exception{
-
-        // given
-        given(userService.userAutoLogin(any(HttpServletRequest.class), any(UserAutoLoginRequest.class))).willReturn(userLoginDto());
-
-        UserAutoLoginRequest userAutoLoginRequest = UserAutoLoginRequest.builder()
-                .userDeviceModel("iPhone 14 Pro")
-                .userDeviceManufacturer("APPLE")
-                .userOsVersion("1.1")
-                .userDeviceToken("DeviceToken")
-                .build();
-
-        // when
-        ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.put("/user/auto-login")
-                        .content(objectMapper.writeValueAsString(userAutoLoginRequest))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("deviceType", "iOS")
-                        .header("appVersion", 1.1)
-                        .header(HttpHeaders.AUTHORIZATION, "user-info.고유경.AccessToken")
-                        .with(user("user").roles("USER"))
-        );
-
-        // then
-        resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("rt").value(200))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andDo(document("user/auto-login",
-                        getDocumentRequest(),
-                        getDocumentResponse(),
-                        requestFields(
-                                fieldWithPath("userDeviceModel").type(JsonFieldType.STRING).optional().description("사용자 기기 모델"),
-                                fieldWithPath("userDeviceManufacturer").type(JsonFieldType.STRING).optional().description("사용자 기기 제조사"),
-                                fieldWithPath("userOsVersion").type(JsonFieldType.STRING).optional().description("사용자 기기 OS 버전"),
-                                fieldWithPath("userDeviceToken").type(JsonFieldType.STRING).optional().description("사용자 기기 푸시토큰")
-                        ),
-                        responseFields(
-                                fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
-                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
-                                fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
-                                fieldWithPath("response.accessToken").type(JsonFieldType.STRING).description("Access Token"),
-                                fieldWithPath("response.refreshToken").type(JsonFieldType.STRING).description("Refresh Token"),
-                                fieldWithPath("response.userId").type(JsonFieldType.NUMBER).description("사용자 고유 번호"),
-                                fieldWithPath("response.userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디")
-                        )
-                ));
-
-        verify(userService).userAutoLogin(any(HttpServletRequest.class), any(UserAutoLoginRequest.class));
-
     }
 
     /**
@@ -300,7 +243,6 @@ public class UserControllerTest extends ControllerTest {
         UserInfoModifyRequest userInfoModifyRequest = UserInfoModifyRequest.builder()
                 .userName("강덴티")
                 .userGender(GenderType.W)
-                .userBirth("20000801")
                 .build();
 
         // when
@@ -321,16 +263,14 @@ public class UserControllerTest extends ControllerTest {
                         getDocumentResponse(),
                         requestFields(
                                 fieldWithPath("userName").type(JsonFieldType.STRING).description("사용자 이름"),
-                                fieldWithPath("userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별"),
-                                fieldWithPath("userBirth").type(JsonFieldType.STRING).attributes(userBirthFormat()).description("사용자 생년월일")
+                                fieldWithPath("userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별")
                         ),
                         responseFields(
                                 fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
                                 fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
                                 fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
                                 fieldWithPath("response.userName").type(JsonFieldType.STRING).description("사용자 이름"),
-                                fieldWithPath("response.userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별"),
-                                fieldWithPath("response.userBirth").type(JsonFieldType.STRING).attributes(userBirthFormat()).description("사용자 생년월일")
+                                fieldWithPath("response.userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별")
                         )
                 ));
 
@@ -480,7 +420,6 @@ public class UserControllerTest extends ControllerTest {
                                 fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
                                 fieldWithPath("response.userName").type(JsonFieldType.STRING).description("사용자 이름"),
                                 fieldWithPath("response.userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디"),
-                                fieldWithPath("response.userBirth").type(JsonFieldType.STRING).attributes(userBirthFormat()).description("사용자 생년월일"),
                                 fieldWithPath("response.userPhoneNumber").type(JsonFieldType.STRING).attributes(userNumberFormat()).description("사용자 연락처"),
                                 fieldWithPath("response.isUserServiceAgree").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("사용자 마케팅 동의 여부")
                         )

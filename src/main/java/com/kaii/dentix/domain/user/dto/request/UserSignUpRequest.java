@@ -30,9 +30,6 @@ public class UserSignUpRequest {
     @NotNull
     private GenderType userGender;
 
-    @NotBlank
-    private String userBirth;
-
     @NotBlank @Size(min = 8, max = 20)
     private String userPassword;
 
@@ -43,6 +40,9 @@ public class UserSignUpRequest {
     private String findPwdAnswer;
 
     private Long patientId;
+
+    @NotBlank
+    private String phoneNumber;
 
     private String userDeviceModel;
     private String userDeviceManufacturer;

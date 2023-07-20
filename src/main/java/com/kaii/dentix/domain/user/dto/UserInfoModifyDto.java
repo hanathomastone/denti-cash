@@ -13,6 +13,4 @@ public class UserInfoModifyDto {
 
     private GenderType userGender;
 
-    private String userBirth;
-
 }

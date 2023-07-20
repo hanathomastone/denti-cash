@@ -22,10 +22,6 @@ public class DocumentOptionalGenerator {
         return setFormat("M: 남성, W: 여성");
     }
 
-    public static Attributes.Attribute userBirthFormat() {
-        return setFormat("yyyyMMdd");
-    }
-
     public static Attributes.Attribute dateFormat() {
         return setFormat("yyyy-MM-dd");
     }
