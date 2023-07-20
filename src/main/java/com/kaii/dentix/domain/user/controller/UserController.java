@@ -4,6 +4,7 @@ import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.dto.UserInfoDto;
 import com.kaii.dentix.domain.user.dto.UserInfoModifyDto;
 import com.kaii.dentix.domain.user.dto.UserInfoModifyQnADto;
+import com.kaii.dentix.domain.user.dto.UserLoginDto;
 import com.kaii.dentix.domain.user.dto.request.*;
 import com.kaii.dentix.domain.userServiceAgreement.dto.UserModifyServiceAgreeDto;
 import com.kaii.dentix.domain.userServiceAgreement.dto.request.UserModifyServiceAgreeRequest;
@@ -20,6 +21,15 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+
+    /**
+     *  사용자 자동 로그인
+     */
+    @PutMapping(value = "/auto-login", name = "사용자 자동 로그인")
+    public DataResponse<UserLoginDto> userAutoLogin(HttpServletRequest servletRequest, @Valid @RequestBody UserAutoLoginRequest request){
+        DataResponse<UserLoginDto> response = new DataResponse<>(userService.userAutoLogin(servletRequest, request));
+        return response;
+    }
 
     /**
      *  사용자 비밀번호 확인

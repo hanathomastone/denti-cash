@@ -15,6 +15,7 @@ import com.kaii.dentix.domain.user.domain.User;
 import com.kaii.dentix.domain.user.dto.UserInfoDto;
 import com.kaii.dentix.domain.user.dto.UserInfoModifyDto;
 import com.kaii.dentix.domain.user.dto.UserInfoModifyQnADto;
+import com.kaii.dentix.domain.user.dto.UserLoginDto;
 import com.kaii.dentix.domain.user.dto.request.*;
 import com.kaii.dentix.domain.user.event.UserModifyDeviceInfoEvent;
 import com.kaii.dentix.domain.userDeviceType.dao.UserDeviceTypeRepository;
@@ -101,6 +102,36 @@ public class UserService {
                 event.getUserOsVersion(),
                 event.getUserDeviceToken()
         );
+
+    }
+
+    /**
+     *  사용자 자동 로그인
+     */
+    @Transactional
+    public UserLoginDto userAutoLogin(HttpServletRequest httpServletRequest, UserAutoLoginRequest userAutoLoginRequest){
+        User user = this.getTokenUser(httpServletRequest);
+
+        String accessToken = jwtTokenUtil.createToken(user, TokenType.AccessToken);
+        String refreshToken = jwtTokenUtil.createToken(user, TokenType.RefreshToken);
+
+        user.updateLogin(refreshToken);
+
+        publisher.publishEvent(new UserModifyDeviceInfoEvent(
+                user.getUserId(),
+                httpServletRequest,
+                userAutoLoginRequest.getUserDeviceModel(),
+                userAutoLoginRequest.getUserDeviceManufacturer(),
+                userAutoLoginRequest.getUserOsVersion(),
+                userAutoLoginRequest.getUserDeviceToken()
+        ));
+
+        return UserLoginDto.builder()
+                .userId(user.getUserId())
+                .userLoginIdentifier(user.getUserLoginIdentifier())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
 
     }
 
