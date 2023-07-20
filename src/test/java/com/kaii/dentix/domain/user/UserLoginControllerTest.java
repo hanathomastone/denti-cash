@@ -78,7 +78,7 @@ public class UserLoginControllerTest extends ControllerTest{
                 .userLoginIdentifier("detix123")
                 .userName("김덴티")
                 .userGender(GenderType.W)
-                .phoneNumber("01012345678")
+                .userPhoneNumber("01012345678")
                 .build();
     }
 
@@ -176,7 +176,7 @@ public class UserLoginControllerTest extends ControllerTest{
                 .userDeviceManufacturer("APPLE")
                 .userOsVersion("1.1")
                 .userDeviceToken("DeviceToken")
-                .phoneNumber("01012345678")
+                .userPhoneNumber("01012345678")
                 .build();
 
         // when
@@ -210,7 +210,7 @@ public class UserLoginControllerTest extends ControllerTest{
                                 fieldWithPath("userDeviceManufacturer").type(JsonFieldType.STRING).optional().description("사용자 기기 제조사"),
                                 fieldWithPath("userOsVersion").type(JsonFieldType.STRING).optional().description("사용자 기기 OS 버전"),
                                 fieldWithPath("userDeviceToken").type(JsonFieldType.STRING).optional().description("사용자 기기 푸시토큰"),
-                                fieldWithPath("phoneNumber").type(JsonFieldType.STRING).attributes(userNumberFormat()).description("사용자 연락처")
+                                fieldWithPath("userPhoneNumber").type(JsonFieldType.STRING).attributes(userNumberFormat()).description("사용자 연락처(patientPhoneNumber)")
                         ),
                         responseFields(
                                 fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
@@ -223,7 +223,7 @@ public class UserLoginControllerTest extends ControllerTest{
                                 fieldWithPath("response.userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디"),
                                 fieldWithPath("response.userName").type(JsonFieldType.STRING).description("사용자 이름"),
                                 fieldWithPath("response.userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별"),
-                                fieldWithPath("response.phoneNumber").type(JsonFieldType.STRING).attributes(userNumberFormat()).description("사용자 연락처")
+                                fieldWithPath("response.userPhoneNumber").type(JsonFieldType.STRING).attributes(userNumberFormat()).description("사용자 연락처(patientPhoneNumber)")
                         )
                 ));
 

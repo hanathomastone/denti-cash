@@ -32,7 +32,7 @@ public class User extends TimeEntity {
     private String userName;
 
     @Column(length = 11, nullable = false)
-    private String phoneNumber;
+    private String userPhoneNumber;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum", nullable = false)

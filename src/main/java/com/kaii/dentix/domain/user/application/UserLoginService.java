@@ -61,7 +61,7 @@ public class UserLoginService {
                 .filter(p -> p.getPatientName().equals(request.getPatientName()) && p.getPatientPhoneNumber().equals(request.getPatientPhoneNumber()))
                 .findAny().orElse(null);
 
-        if (userRepository.findByPhoneNumber(request.getPatientPhoneNumber()).isPresent()) throw new AlreadyDataException("이미 사용중인 번호에요.\n번호를 다시 확인해 주세요.");
+        if (userRepository.findByUserPhoneNumber(request.getPatientPhoneNumber()).isPresent()) throw new AlreadyDataException("이미 사용중인 번호에요.\n번호를 다시 확인해 주세요.");
 
         if (patient == null) {
             boolean isSamePhoneNumber = patientList.stream()
@@ -133,7 +133,7 @@ public class UserLoginService {
             .findPwdQuestionId(request.getFindPwdQuestionId())
             .findPwdAnswer(request.getFindPwdAnswer())
             .patientId(request.getPatientId())
-            .phoneNumber(request.getPhoneNumber())
+            .userPhoneNumber(request.getUserPhoneNumber())
         .build());
 
         Long userId = user.getUserId();
@@ -185,7 +185,7 @@ public class UserLoginService {
                 .userLoginIdentifier(request.getUserLoginIdentifier())
                 .userName(request.getUserName())
                 .userGender(request.getUserGender())
-                .phoneNumber(request.getPhoneNumber())
+                .userPhoneNumber(request.getUserPhoneNumber())
                 .build();
     }
 

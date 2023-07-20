@@ -42,7 +42,7 @@ public class UserSignUpRequest {
     private Long patientId;
 
     @NotBlank
-    private String phoneNumber;
+    private String userPhoneNumber;
 
     private String userDeviceModel;
     private String userDeviceManufacturer;
