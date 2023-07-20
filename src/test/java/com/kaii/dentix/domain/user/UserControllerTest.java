@@ -81,7 +81,6 @@ public class UserControllerTest extends ControllerTest {
         return UserInfoModifyDto.builder()
                 .userName("강덴티")
                 .userGender(GenderType.W)
-                .userBirth("20000801")
                 .build();
     }
 
@@ -95,7 +94,6 @@ public class UserControllerTest extends ControllerTest {
         return UserInfoDto.builder()
                 .userName("김덴티")
                 .userLoginIdentifier("detix123")
-                .userBirth("20000701")
                 .userPhoneNumber("01012345678")
                 .isUserServiceAgree(YnType.Y)
                 .build();
@@ -300,7 +298,6 @@ public class UserControllerTest extends ControllerTest {
         UserInfoModifyRequest userInfoModifyRequest = UserInfoModifyRequest.builder()
                 .userName("강덴티")
                 .userGender(GenderType.W)
-                .userBirth("20000801")
                 .build();
 
         // when
@@ -321,16 +318,14 @@ public class UserControllerTest extends ControllerTest {
                         getDocumentResponse(),
                         requestFields(
                                 fieldWithPath("userName").type(JsonFieldType.STRING).description("사용자 이름"),
-                                fieldWithPath("userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별"),
-                                fieldWithPath("userBirth").type(JsonFieldType.STRING).attributes(userBirthFormat()).description("사용자 생년월일")
+                                fieldWithPath("userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별")
                         ),
                         responseFields(
                                 fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
                                 fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
                                 fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
                                 fieldWithPath("response.userName").type(JsonFieldType.STRING).description("사용자 이름"),
-                                fieldWithPath("response.userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별"),
-                                fieldWithPath("response.userBirth").type(JsonFieldType.STRING).attributes(userBirthFormat()).description("사용자 생년월일")
+                                fieldWithPath("response.userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별")
                         )
                 ));
 
@@ -480,7 +475,6 @@ public class UserControllerTest extends ControllerTest {
                                 fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
                                 fieldWithPath("response.userName").type(JsonFieldType.STRING).description("사용자 이름"),
                                 fieldWithPath("response.userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디"),
-                                fieldWithPath("response.userBirth").type(JsonFieldType.STRING).attributes(userBirthFormat()).description("사용자 생년월일"),
                                 fieldWithPath("response.userPhoneNumber").type(JsonFieldType.STRING).attributes(userNumberFormat()).description("사용자 연락처"),
                                 fieldWithPath("response.isUserServiceAgree").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("사용자 마케팅 동의 여부")
                         )

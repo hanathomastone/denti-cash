@@ -13,8 +13,6 @@ public class UserInfoDto {
 
     private String userLoginIdentifier;
 
-    private String userBirth;
-
     private String userPhoneNumber;
 
     private YnType isUserServiceAgree;

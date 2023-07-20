@@ -31,12 +31,12 @@ public class User extends TimeEntity {
     @Column(length = 45, nullable = false)
     private String userName;
 
+    @Column(length = 11, nullable = false)
+    private String userPhoneNumber;
+
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum", nullable = false)
     private GenderType userGender;
-
-    @Column(length = 10, nullable = false)
-    private String userBirth;
 
     @Column(nullable = false)
     private Long findPwdQuestionId;
@@ -109,10 +109,9 @@ public class User extends TimeEntity {
     /**
      *  회원 정보 수정
      */
-    public void modifyInfo(String userName, GenderType userGender, String userBirth){
+    public void modifyInfo(String userName, GenderType userGender){
         this.userName = userName;
         this.userGender = userGender;
-        this.userBirth = userBirth;
     }
 
     /**

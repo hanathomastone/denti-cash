@@ -19,7 +19,4 @@ public class UserInfoModifyRequest {
     @NotNull
     private GenderType userGender;
 
-    @NotBlank
-    private String userBirth;
-
 }

@@ -105,7 +105,6 @@ public class UserService {
 
     }
 
-
     /**
      *  사용자 자동 로그인
      */
@@ -184,12 +183,11 @@ public class UserService {
     public UserInfoModifyDto userModifyInfo(HttpServletRequest httpServletRequest, UserInfoModifyRequest request){
         User user = this.getTokenUser(httpServletRequest);
 
-        user.modifyInfo(request.getUserName(), request.getUserGender(), request.getUserBirth());
+        user.modifyInfo(request.getUserName(), request.getUserGender());
 
         return UserInfoModifyDto.builder()
                 .userName(user.getUserName())
                 .userGender(user.getUserGender())
-                .userBirth(user.getUserBirth())
                 .build();
     }
 
@@ -232,7 +230,6 @@ public class UserService {
         return UserInfoDto.builder()
                 .userName(user.getUserName())
                 .userLoginIdentifier(user.getUserLoginIdentifier())
-                .userBirth(user.getUserBirth())
                 .userPhoneNumber(patient.getPatientPhoneNumber())
                 .isUserServiceAgree(userServiceAgreement.getIsUserServiceAgree())
                 .build();
