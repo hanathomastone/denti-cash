@@ -196,7 +196,7 @@ public class UserLoginControllerTest extends ControllerTest{
                         getDocumentRequest(),
                         getDocumentResponse(),
                         requestFields(
-                                fieldWithPath("patientId").type(JsonFieldType.NUMBER).description("사용자(환자) 고유 번호"),
+                                fieldWithPath("patientId").type(JsonFieldType.NUMBER).optional().description("사용자(환자) 고유 번호"),
                                 fieldWithPath("userServiceAgreementRequest[]").type(JsonFieldType.ARRAY).description("사용자 서비스 동의"),
                                 fieldWithPath("userServiceAgreementRequest[].userServiceAgreeId").type(JsonFieldType.NUMBER).description("사용자 서비스 동의 고유 번호"),
                                 fieldWithPath("userServiceAgreementRequest[].isUserServiceAgree").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("사용자 서비스 동의 여부"),
@@ -218,7 +218,7 @@ public class UserLoginControllerTest extends ControllerTest{
                                 fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
                                 fieldWithPath("response.accessToken").type(JsonFieldType.STRING).description("Access Token"),
                                 fieldWithPath("response.refreshToken").type(JsonFieldType.STRING).description("Refresh Token"),
-                                fieldWithPath("response.patientId").type(JsonFieldType.NUMBER).description("환자 고유 번호"),
+                                fieldWithPath("response.patientId").type(JsonFieldType.NUMBER).optional().description("환자 고유 번호"),
                                 fieldWithPath("response.userId").type(JsonFieldType.NUMBER).description("사용자 고유 번호"),
                                 fieldWithPath("response.userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디"),
                                 fieldWithPath("response.userName").type(JsonFieldType.STRING).description("사용자 이름"),

@@ -113,19 +113,21 @@ public class UserLoginService {
     @Transactional
     public UserSignUpDto userSignUp(HttpServletRequest httpServletRequest, UserSignUpRequest request){
 
-        User user = new User();
-
-        patientRepository.findById(request.getPatientId()).orElseThrow(() -> new NotFoundDataException("존재하지 않는 회원입니다."));
-
-        if (userRepository.findByPatientId(request.getPatientId()).isPresent()) throw new AlreadyDataException("이미 가입한 사용자입니다.");
+        if (request.getPatientId() != null) { // 인증된 회원인 경우
+            patientRepository.findById(request.getPatientId()).orElseThrow(() -> new NotFoundDataException("존재하지 않는 회원입니다."));
+            if (userRepository.findByPatientId(request.getPatientId()).isPresent()) throw new AlreadyDataException("이미 가입한 사용자입니다.");
+        }
 
         // 아이디 중복 확인
         this.loginIdCheck(request.getUserLoginIdentifier());
 
-        // 올바르지 않은 findPwdQuestionId 인 경우
-        if (!findPwdQuestionRepository.findById(request.getFindPwdQuestionId()).isPresent()) throw new NotFoundDataException("존재하지 않는 질문입니다.");
+        // 연락처 중복 확인
+        if (userRepository.findByUserPhoneNumber(request.getUserPhoneNumber()).isPresent()) throw new AlreadyDataException("이미 사용 중인 연락처입니다.");
 
-        user = userRepository.save(user.builder()
+        // 올바르지 않은 findPwdQuestionId 인 경우
+        if (findPwdQuestionRepository.findById(request.getFindPwdQuestionId()).isEmpty()) throw new NotFoundDataException("존재하지 않는 질문입니다.");
+
+        User user = userRepository.save(User.builder()
             .userLoginIdentifier(request.getUserLoginIdentifier())
             .userName(request.getUserName())
             .userGender(request.getUserGender())
