@@ -3,10 +3,7 @@ package com.kaii.dentix.domain.oralCheck.application;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.kaii.dentix.domain.oralCheck.dao.OralCheckRepository;
 import com.kaii.dentix.domain.oralCheck.domain.OralCheck;
-import com.kaii.dentix.domain.oralCheck.dto.OralCheckAnalysisDivisionDto;
-import com.kaii.dentix.domain.oralCheck.dto.OralCheckAnalysisTotalDto;
-import com.kaii.dentix.domain.oralCheck.dto.OralCheckPhotoDto;
-import com.kaii.dentix.domain.oralCheck.dto.OralCheckResultDto;
+import com.kaii.dentix.domain.oralCheck.dto.*;
 import com.kaii.dentix.domain.oralCheck.dto.resoponse.OralCheckAnalysisResponse;
 import com.kaii.dentix.domain.type.oral.*;
 import com.kaii.dentix.domain.user.application.UserService;
@@ -27,6 +24,9 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -305,6 +305,62 @@ public class OralCheckService {
                 .oralCheckDownRightRange(oralCheck.getOralCheckDownRightRange())
                 .oralCheckDownRightScoreType(oralCheck.getOralCheckDownRightScoreType())
                 .oralCheckDivisionCommentType(oralCheck.getOralCheckDivisionCommentType())
+                .build();
+
+    }
+
+    /**
+     *  구강 상태 조회
+     */
+    @Transactional(readOnly = true)
+    public OralCheckDto oralCheck(HttpServletRequest httpServletRequest){
+        User user = userService.getTokenUser(httpServletRequest);
+
+        // 마지막 구강검진일
+        Date latestOralCheck = null;
+
+        // TODO : 문진표 작성일 & 양치질 완료일
+
+        return OralCheckDto.builder()
+                .latestOralCheck(latestOralCheck)
+                .build();
+
+    }
+
+    /**
+     *  요일별 구강 상태 조회
+     */
+    @Transactional(readOnly = true)
+    public DailyOralCheckDto dailyOralCheck(HttpServletRequest httpServletRequest, String day){
+        User user = userService.getTokenUser(httpServletRequest);
+
+        // 마지막 구강검진일
+        Date latestOralCheck = null;
+
+        // 구강검진 목록 조회
+        List<OralCheckListDto> oralCheckList = new ArrayList<>();
+        List<OralCheck> oralCheckDescList = oralCheckRepository.findAllByUserIdOrderByCreatedDesc(user.getUserId());
+
+        // 구강검진 기록이 있는 경우
+        if (oralCheckDescList.size() > 0) {
+            OralCheck lastOralCheck = oralCheckDescList.get(0);
+            latestOralCheck = lastOralCheck.getCreated();
+
+            // 구강 촬영 목록
+            for (OralCheck oralCheck : oralCheckDescList) {
+                oralCheckList.add(OralCheckListDto.builder()
+                        .oralCheckDate(oralCheck.getCreated())
+                        .oralCheckResult(oralCheck.getOralCheckResultTotalType())
+                        .percent(oralCheck.getOralCheckTotalRange())
+                        .build());
+            }
+        }
+
+        // TODO : 문진표 리스트 & 양치질 리스트
+
+        return DailyOralCheckDto.builder()
+                .latestOralCheck(latestOralCheck)
+                .oralCheckList(oralCheckList)
                 .build();
 
     }

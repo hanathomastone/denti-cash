@@ -1,6 +1,8 @@
 package com.kaii.dentix.domain.oralCheck.controller;
 
 import com.kaii.dentix.domain.oralCheck.application.OralCheckService;
+import com.kaii.dentix.domain.oralCheck.dto.DailyOralCheckDto;
+import com.kaii.dentix.domain.oralCheck.dto.OralCheckDto;
 import com.kaii.dentix.domain.oralCheck.dto.OralCheckPhotoDto;
 import com.kaii.dentix.domain.oralCheck.dto.OralCheckResultDto;
 import com.kaii.dentix.global.common.response.DataResponse;
@@ -35,6 +37,24 @@ public class OralCheckController {
     @GetMapping(value = "/result", name = "구강검진 결과")
     public DataResponse<OralCheckResultDto> oralCheckResult(HttpServletRequest httpServletRequest, @RequestParam Long oralCheckId){
         DataResponse<OralCheckResultDto> response = new DataResponse<>(oralCheckService.oralCheckResult(httpServletRequest, oralCheckId));
+        return response;
+    }
+
+    /**
+     *  구강 상태 조회
+     */
+    @GetMapping(name = "구강 상태 조회")
+    public DataResponse<OralCheckDto> oralCheck(HttpServletRequest httpServletRequest){
+        DataResponse<OralCheckDto> response = new DataResponse<>(oralCheckService.oralCheck(httpServletRequest));
+        return response;
+    }
+
+    /**
+     *  요일별 구강 상태 조회
+     */
+    @GetMapping(value = "/daily", name = "요일별 구강 상태 조회")
+    public DataResponse<DailyOralCheckDto> dailyOralCheck(HttpServletRequest httpServletRequest, String day){
+        DataResponse<DailyOralCheckDto> response = new DataResponse<>(oralCheckService.dailyOralCheck(httpServletRequest, day));
         return response;
     }
 
