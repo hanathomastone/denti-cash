@@ -362,3 +362,13 @@ include::{snippets}/oralCheck/result/query-parameters.adoc[]
 === Response
 include::{snippets}/oralCheck/result/response-fields.adoc[]
 include::{snippets}/oralCheck/result/response-body.adoc[]
+
+[[questionnaireTemplate]]
+== 문진표 양식 조회
+*문진표 양식 조회 API*
+
+=== Http
+include::{snippets}/questionnaire/template/http-request.adoc[]
+=== Response
+include::{snippets}/questionnaire/template/response-fields.adoc[]
+include::{snippets}/questionnaire/template/response-body.adoc[]

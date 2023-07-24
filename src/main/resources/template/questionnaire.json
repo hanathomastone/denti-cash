@@ -1,0 +1,143 @@
+[
+  {
+    "key": "q_1",
+    "number": "01",
+    "title": "현재 구강 건강 상태는 어떻다고 생각하십니까?",
+    "description": null,
+    "multiple": false,
+    "contents": [
+      {"value": 1, "text": "매우 건강하다"},
+      {"value": 2, "text": "건강한 편이다"},
+      {"value": 3, "text": "보통이다"},
+      {"value": 4, "text": "건강하지 못한 편이다"},
+      {"value": 5, "text": "전혀 건강하지 않다"}
+    ]
+  },
+  {
+    "key": "q_2",
+    "number": "02",
+    "title": "현재 나이가 어떻게 되시나요?",
+    "description": null,
+    "multiple": false,
+    "contents": [
+      {"value": 1, "text": "만 2세 미만"},
+      {"value": 2, "text": "만 2-6세"},
+      {"value": 3, "text": "만 60세 이상"},
+      {"value": 4, "text": "그 외"}
+    ]
+  },
+  {
+    "key": "q_3",
+    "number": "03",
+    "title": "지난 12개월 동안 구강관련 불편감이 있었습니까?",
+    "description": "(중복 표시 가능)",
+    "multiple": true,
+    "contents": [
+      {"value": 1, "text": "아니요"},
+      {"value": 2, "text": "씹기 힘들다"},
+      {"value": 3, "text": "이가 아프다"},
+      {"value": 4, "text": "뜨겁고 찬 음식에 시리고 민감하다"},
+      {"value": 5, "text": "잇몸이 붓고 피가 난다"},
+      {"value": 6, "text": "입이 마른다"},
+      {"value": 7, "text": "입냄새가 난다"}
+    ]
+  },
+  {
+    "key": "q_4",
+    "number": "04",
+    "title": "어제 하루 동안 칫솔질을 몇 차례 하였습니까?",
+    "description": null,
+    "multiple": false,
+    "contents": [
+      {"value": 1, "text": "1회"},
+      {"value": 2, "text": "2회"},
+      {"value": 3, "text": "3회"},
+      {"value": 4, "text": "4회 이상"}
+    ]
+  },
+  {
+    "key": "q_5",
+    "number": "05",
+    "title": "어제 칫솔질을 하신 때를 모두 표시하여 주십시오.",
+    "description": null,
+    "multiple": true,
+    "contents": [
+      {"value": 1, "text": "아침 식사 전"},
+      {"value": 2, "text": "아침 식사 후"},
+      {"value": 3, "text": "점심 식사 후"},
+      {"value": 4, "text": "저녁 식사 후"},
+      {"value": 5, "text": "취침 전"}
+    ]
+  },
+  {
+    "key": "q_6",
+    "number": "06",
+    "title": "치약과 칫솔 이외에 입안의 건강을 위해 귀하께서 사용하시는 용품이 있습니까?",
+    "description": "사용하시는 용품에 모두 표시해 주세요.",
+    "multiple": true,
+    "contents": [
+      {"value": 1, "text": "치실(Floss)"},
+      {"value": 2, "text": "치간칫솔"},
+      {"value": 3, "text": "양치용액(구강세정액)"},
+      {"value": 4, "text": "전동칫솔"},
+      {"value": 5, "text": "워터픽(물사출기)"},
+      {"value": 6, "text": "혀클리너, 첨단칫솔(임플란트 칫솔)"}
+    ]
+  },
+  {
+    "key": "q_7",
+    "number": "07",
+    "title": "치아 닦는 방법을 (치과나 보건소 등에서) 배운 적이 있습니까?",
+    "description": "사용하시는 용품에 모두 표시해 주세요.",
+    "multiple": false,
+    "contents": [
+      {"value": 1, "text": "예"},
+      {"value": 0, "text": "아니오"}
+    ]
+  },
+  {
+    "key": "q_8",
+    "number": "08",
+    "title": "가장 최근에 치과에서 받은 진료의 내용은 무엇입니까?",
+    "description": "해당 사항 모두 선택",
+    "multiple": true,
+    "contents": [
+      {"value": 1, "text": "구강검사"},
+      {"value": 2, "text": "스케일링"},
+      {"value": 3, "text": "충치치료를 받았다"},
+      {"value": 4, "text": "신경치료를 받았다"},
+      {"value": 5, "text": "이를 뺐다"},
+      {"value": 6, "text": "보철, 임플란트를 해 넣었다"},
+      {"value": 7, "text": "교정 치료 중이다"},
+      {"value": 8, "text": "잇몸치료"},
+      {"value": 9, "text": "1년간 치과에 안갔다"}
+    ]
+  },
+  {
+    "key": "q_9",
+    "number": "09",
+    "title": "어제 단 음식(과자, 사탕, 케이크, 탄산음료등)을 몇 번 드셨습니까?",
+    "description": null,
+    "multiple": false,
+    "contents": [
+      {"value": 1, "text": "1번"},
+      {"value": 2, "text": "2번"},
+      {"value": 3, "text": "3번"},
+      {"value": 4, "text": "4번 이상"},
+      {"value": 5, "text": "먹지 않음"},
+      {"value": 6, "text": "모른다"}
+    ]
+  },
+  {
+    "key": "q_10",
+    "number": "10",
+    "title": "담배를 피우십니까?",
+    "description": null,
+    "multiple": false,
+    "contents": [
+      {"value": 1, "text": "전혀 피운 적 없다"},
+      {"value": 2, "text": "현재 피우고 있다"},
+      {"value": 3, "text": "이전에 피웠으나 끊었다"}
+    ]
+  }
+]
