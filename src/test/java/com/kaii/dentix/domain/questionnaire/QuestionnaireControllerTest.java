@@ -4,8 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaii.dentix.common.ControllerTest;
 import com.kaii.dentix.domain.questionnaire.application.QuestionnaireService;
 import com.kaii.dentix.domain.questionnaire.controller.QuestionnaireController;
+import com.kaii.dentix.domain.questionnaire.dto.QuestionnaireFormDto;
+import com.kaii.dentix.domain.questionnaire.dto.QuestionnaireIdDto;
 import com.kaii.dentix.domain.questionnaire.dto.QuestionnaireTemplateContentDto;
 import com.kaii.dentix.domain.questionnaire.dto.QuestionnaireTemplateDto;
+import com.kaii.dentix.domain.questionnaire.dto.request.QuestionnaireSubmitRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +30,12 @@ import java.util.List;
 
 import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentRequest;
 import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentResponse;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -129,5 +133,68 @@ public class QuestionnaireControllerTest extends ControllerTest {
             ));
 
         verify(questionnaireService).getQuestionnaireTemplate();
+    }
+
+    /**
+     * 문진표 제출
+     */
+    @Test
+    public void questionnaireSubmit() throws Exception{
+        QuestionnaireFormDto form = QuestionnaireFormDto.builder()
+            .q_1(1)
+            .q_2(2)
+            .q_3(new Integer[]{1, 2})
+            .q_4(3)
+            .q_5(new Integer[]{3, 4})
+            .q_6(new Integer[]{5, 6})
+            .q_7(0)
+            .q_8(new Integer[]{7, 8})
+            .q_9(4)
+            .q_10(1)
+            .build();
+
+        QuestionnaireSubmitRequest request = new QuestionnaireSubmitRequest(form);
+
+        // given
+        given(questionnaireService.questionnaireSubmit(any(HttpServletRequest.class), any(QuestionnaireSubmitRequest.class))).willReturn(new QuestionnaireIdDto(1L));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+            RestDocumentationRequestBuilders.post("/questionnaire/submit")
+                .content(objectMapper.writeValueAsString(request))
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "questionnaire-submit.이호준.AccessToken")
+                .with(user("user").roles("USER"))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+            .andExpect(jsonPath("rt").value(200))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andDo(document("questionnaire/submit",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                requestFields(
+                    fieldWithPath("form").type(JsonFieldType.OBJECT).description("문진표 항목"),
+                    fieldWithPath("form.q_1").type(JsonFieldType.NUMBER).description("문진표 1번 문항"),
+                    fieldWithPath("form.q_2").type(JsonFieldType.NUMBER).description("문진표 2번 문항"),
+                    fieldWithPath("form.q_3").type(JsonFieldType.ARRAY).description("문진표 3번 문항"),
+                    fieldWithPath("form.q_4").type(JsonFieldType.NUMBER).description("문진표 4번 문항"),
+                    fieldWithPath("form.q_5").type(JsonFieldType.ARRAY).description("문진표 5번 문항"),
+                    fieldWithPath("form.q_6").type(JsonFieldType.ARRAY).description("문진표 6번 문항"),
+                    fieldWithPath("form.q_7").type(JsonFieldType.NUMBER).description("문진표 7번 문항"),
+                    fieldWithPath("form.q_8").type(JsonFieldType.ARRAY).description("문진표 8번 문항"),
+                    fieldWithPath("form.q_9").type(JsonFieldType.NUMBER).description("문진표 9번 문항"),
+                    fieldWithPath("form.q_10").type(JsonFieldType.NUMBER).description("문진표 10번 문항")
+                ),
+                responseFields(
+                    fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
+                    fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
+                    fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
+                    fieldWithPath("response.questionnaireId").type(JsonFieldType.NUMBER).description("문진표 고유번호")
+                )
+            ));
+
+        verify(questionnaireService).questionnaireSubmit(any(HttpServletRequest.class), any(QuestionnaireSubmitRequest.class));
     }
 }

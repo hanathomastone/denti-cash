@@ -143,7 +143,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(FormValidationException.class)
     @ResponseStatus(HttpStatus.OK)
     public ErrorResponse FormValidationException(HttpServletRequest request, FormValidationException e) {
-        return ErrorResponse.of(HttpStatus.EXPECTATION_FAILED, ResponseMessage.EXPECTATION_FAILED_MSG.replace("{FieldName}", e.getMessage()));
+        return ErrorResponse.of(HttpStatus.EXPECTATION_FAILED, e.getMessage());
     }
 
     /**
