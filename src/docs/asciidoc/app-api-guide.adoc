@@ -392,3 +392,19 @@ include::{snippets}/questionnaire/submit/request-fields.adoc[]
 === Response
 include::{snippets}/questionnaire/submit/response-fields.adoc[]
 include::{snippets}/questionnaire/submit/response-body.adoc[]
+
+[[questionnaireResult]]
+== 문진표 결과 조회
+*문진표 결과 조회 API*
+
+*[ 개발 중 잘못된 Request나 데이터 오류로 인해 발생할 수 있는 경우 ]*::
+
+- 유효하지 않은 고유번호 : `"문진표가 존재하지 않습니다."`
+
+=== Http
+include::{snippets}/questionnaire/result/http-request.adoc[]
+=== Request
+include::{snippets}/questionnaire/result/query-parameters.adoc[]
+=== Response
+include::{snippets}/questionnaire/result/response-fields.adoc[]
+include::{snippets}/questionnaire/result/response-body.adoc[]

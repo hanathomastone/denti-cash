@@ -2,6 +2,7 @@ package com.kaii.dentix.domain.questionnaire.application;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kaii.dentix.domain.oralStatus.domain.OralStatus;
 import com.kaii.dentix.domain.questionnaire.dao.QuestionnaireRepository;
 import com.kaii.dentix.domain.questionnaire.domain.Questionnaire;
 import com.kaii.dentix.domain.questionnaire.dto.*;
@@ -10,6 +11,7 @@ import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.domain.User;
 import com.kaii.dentix.global.common.error.exception.BadRequestApiException;
 import com.kaii.dentix.global.common.error.exception.FormValidationException;
+import com.kaii.dentix.global.common.error.exception.NotFoundDataException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
@@ -19,10 +21,7 @@ import org.springframework.util.FileCopyUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -56,8 +55,42 @@ public class QuestionnaireService {
 
         this.questionnaireValidate(request.getForm());
 
-        Questionnaire questionnaire = questionnaireRepository.save(new Questionnaire(user.getUserId(), objectMapper.writeValueAsString(request.getForm())));
+        // TODO : AI 연동 및 상태값 도출
+        Random random = new Random();
+        int typeCount = random.nextInt(2) + 1;
+        String[] chars = new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"};
+        List<String> typeList = new ArrayList<>();
+        for (int i = 0; i < typeCount; i++) {
+            int randomIndex = random.nextInt(chars.length);
+            if (typeList.stream().anyMatch(type -> type.equals(chars[randomIndex]))) {
+                i--; continue;
+            }
+            typeList.add(chars[randomIndex]);
+        }
+
+        Questionnaire questionnaire = questionnaireRepository.save(new Questionnaire(user.getUserId(), objectMapper.writeValueAsString(request.getForm()), typeList));
+
         return new QuestionnaireIdDto(questionnaire.getQuestionnaireId());
+    }
+
+    /**
+     * 문진표 결과 조회
+     */
+    @Transactional(readOnly = true)
+    public QuestionnaireResultDto questionnaireResult(long questionnaireId) {
+        Questionnaire questionnaire = questionnaireRepository.findById(questionnaireId).orElseThrow(() -> new NotFoundDataException("문진표가 존재하지 않습니다."));
+
+        List<OralStatusTypeInfoDto> oralStatusList = questionnaire.getUserOralStatusList().stream()
+            .map(userOralStatus -> {
+                OralStatus oralStatus = userOralStatus.getOralStatus();
+                return OralStatusTypeInfoDto.builder()
+                    .type(oralStatus.getOralStatusType())
+                    .title(oralStatus.getOralStatusTitle())
+                    .description(oralStatus.getOralStatusDescription())
+                    .build();
+            }).toList();
+
+        return new QuestionnaireResultDto(questionnaire.getCreated(), oralStatusList);
     }
 
     /**
