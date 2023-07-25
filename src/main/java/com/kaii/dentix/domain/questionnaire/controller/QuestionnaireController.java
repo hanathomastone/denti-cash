@@ -2,7 +2,7 @@ package com.kaii.dentix.domain.questionnaire.controller;
 
 import com.kaii.dentix.domain.questionnaire.application.QuestionnaireService;
 import com.kaii.dentix.domain.questionnaire.dto.QuestionnaireIdDto;
-import com.kaii.dentix.domain.questionnaire.dto.QuestionnaireTemplateDtoList;
+import com.kaii.dentix.domain.questionnaire.dto.QuestionnaireTemplateJsonDto;
 import com.kaii.dentix.domain.questionnaire.dto.request.QuestionnaireSubmitRequest;
 import com.kaii.dentix.global.common.response.DataResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,8 +20,8 @@ public class QuestionnaireController {
     private final QuestionnaireService questionnaireService;
 
     @GetMapping(value = "/template", name = "문진표 양식 조회")
-    public DataResponse<QuestionnaireTemplateDtoList> questionnaireTemplate() throws IOException {
-        return new DataResponse<>(new QuestionnaireTemplateDtoList(questionnaireService.getQuestionnaireTemplate()));
+    public DataResponse<QuestionnaireTemplateJsonDto> questionnaireTemplate() throws IOException {
+        return new DataResponse<>(questionnaireService.getQuestionnaireTemplate());
     }
 
     @PostMapping(value = "/submit", name = "문진표 제출")

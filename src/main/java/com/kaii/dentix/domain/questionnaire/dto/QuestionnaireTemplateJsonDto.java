@@ -9,7 +9,8 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class QuestionnaireTemplateDtoList {
+public class QuestionnaireTemplateJsonDto {
 
+    private String version;
     private List<QuestionnaireTemplateDto> template;
 }

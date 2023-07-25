@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaii.dentix.common.ControllerTest;
 import com.kaii.dentix.domain.questionnaire.application.QuestionnaireService;
 import com.kaii.dentix.domain.questionnaire.controller.QuestionnaireController;
-import com.kaii.dentix.domain.questionnaire.dto.QuestionnaireFormDto;
-import com.kaii.dentix.domain.questionnaire.dto.QuestionnaireIdDto;
-import com.kaii.dentix.domain.questionnaire.dto.QuestionnaireTemplateContentDto;
-import com.kaii.dentix.domain.questionnaire.dto.QuestionnaireTemplateDto;
+import com.kaii.dentix.domain.questionnaire.dto.*;
 import com.kaii.dentix.domain.questionnaire.dto.request.QuestionnaireSubmitRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,39 +54,43 @@ public class QuestionnaireControllerTest extends ControllerTest {
     @MockBean
     private QuestionnaireService questionnaireService;
 
-    private List<QuestionnaireTemplateDto> questionnaireTemplateDtoList() {
-        return Arrays.asList(
+    private QuestionnaireTemplateJsonDto questionnaireTemplateJsonDto() {
+        List<QuestionnaireTemplateDto> list = Arrays.asList(
             QuestionnaireTemplateDto.builder()
+                .sort(1)
                 .key("q_1")
                 .number("01")
                 .title("현재 구강 건강 상태는 어떻다고 생각하십니까?")
                 .description(null)
                 .multiple(false)
                 .contents(Arrays.asList(
-                    new QuestionnaireTemplateContentDto(1, "매우 건강하다"),
-                    new QuestionnaireTemplateContentDto(2, "건강한 편이다"),
-                    new QuestionnaireTemplateContentDto(3, "보통이다"),
-                    new QuestionnaireTemplateContentDto(4, "건강하지 못한 편이다"),
-                    new QuestionnaireTemplateContentDto(5, "전혀 건강하지 않다")
+                    new QuestionnaireTemplateContentDto(1, 1, "매우 건강하다"),
+                    new QuestionnaireTemplateContentDto(2, 2, "건강한 편이다"),
+                    new QuestionnaireTemplateContentDto(3, 3, "보통이다"),
+                    new QuestionnaireTemplateContentDto(4, 4, "건강하지 못한 편이다"),
+                    new QuestionnaireTemplateContentDto(5, 5, "전혀 건강하지 않다")
                 ))
                 .build(),
             QuestionnaireTemplateDto.builder()
+                .sort(3)
                 .key("q_3")
                 .number("03")
                 .title("지난 12개월 동안 구강관련 불편감이 있었습니까?")
                 .description("(중복 표시 가능)")
                 .multiple(true)
                 .contents(Arrays.asList(
-                    new QuestionnaireTemplateContentDto(1, "아니요"),
-                    new QuestionnaireTemplateContentDto(2, "씹기 힘들다"),
-                    new QuestionnaireTemplateContentDto(3, "이가 아프다"),
-                    new QuestionnaireTemplateContentDto(4, "뜨겁고 찬 음식에 시리고 민감하다"),
-                    new QuestionnaireTemplateContentDto(5, "잇몸이 붓고 피가 난다"),
-                    new QuestionnaireTemplateContentDto(6, "입이 마른다"),
-                    new QuestionnaireTemplateContentDto(7, "입냄새가 난다")
+                    new QuestionnaireTemplateContentDto(1, 1, "아니요"),
+                    new QuestionnaireTemplateContentDto(2, 2, "씹기 힘들다"),
+                    new QuestionnaireTemplateContentDto(3, 3, "이가 아프다"),
+                    new QuestionnaireTemplateContentDto(4, 4, "뜨겁고 찬 음식에 시리고 민감하다"),
+                    new QuestionnaireTemplateContentDto(5, 5, "잇몸이 붓고 피가 난다"),
+                    new QuestionnaireTemplateContentDto(6, 6, "입이 마른다"),
+                    new QuestionnaireTemplateContentDto(7, 7, "입냄새가 난다")
                 ))
                 .build()
         );
+
+        return new QuestionnaireTemplateJsonDto("v1", list);
     }
 
     /**
@@ -98,7 +99,7 @@ public class QuestionnaireControllerTest extends ControllerTest {
     @Test
     public void questionnaireTemplate() throws Exception{
         // given
-        given(questionnaireService.getQuestionnaireTemplate()).willReturn(questionnaireTemplateDtoList());
+        given(questionnaireService.getQuestionnaireTemplate()).willReturn(questionnaireTemplateJsonDto());
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -120,14 +121,17 @@ public class QuestionnaireControllerTest extends ControllerTest {
                     fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
                     fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
                     fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
+                    fieldWithPath("response.version").type(JsonFieldType.STRING).description("템플릿 버전"),
                     fieldWithPath("response.template").type(JsonFieldType.ARRAY).description("문진표 양식"),
-                    fieldWithPath("response.template[].key").type(JsonFieldType.STRING).description("문항 key"),
-                    fieldWithPath("response.template[].number").type(JsonFieldType.STRING).description("문항 번호"),
+                    fieldWithPath("response.template[].sort").type(JsonFieldType.NUMBER).description("문항 정렬"),
+                    fieldWithPath("response.template[].key").type(JsonFieldType.STRING).description("문항 고유번호 (제출 시 필요)"),
+                    fieldWithPath("response.template[].number").type(JsonFieldType.STRING).description("문항 제목 번호"),
                     fieldWithPath("response.template[].title").type(JsonFieldType.STRING).description("문항 제목"),
                     fieldWithPath("response.template[].description").type(JsonFieldType.STRING).optional().description("문항 설명"),
                     fieldWithPath("response.template[].multiple").type(JsonFieldType.BOOLEAN).description("문항 중복 선택 가능 여부"),
                     fieldWithPath("response.template[].contents").type(JsonFieldType.ARRAY).description("문항 선택지"),
-                    fieldWithPath("response.template[].contents[].value").type(JsonFieldType.NUMBER).description("문항 선택지 value"),
+                    fieldWithPath("response.template[].contents[].sort").type(JsonFieldType.NUMBER).description("문항 선택지 정렬"),
+                    fieldWithPath("response.template[].contents[].id").type(JsonFieldType.NUMBER).description("문항 선택지 고유번호 (제출 시 필요)"),
                     fieldWithPath("response.template[].contents[].text").type(JsonFieldType.STRING).description("문항 선택지 내용")
                 )
             ));

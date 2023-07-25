@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaii.dentix.domain.questionnaire.dao.QuestionnaireRepository;
 import com.kaii.dentix.domain.questionnaire.domain.Questionnaire;
-import com.kaii.dentix.domain.questionnaire.dto.QuestionnaireFormDto;
-import com.kaii.dentix.domain.questionnaire.dto.QuestionnaireIdDto;
-import com.kaii.dentix.domain.questionnaire.dto.QuestionnaireTemplateContentDto;
-import com.kaii.dentix.domain.questionnaire.dto.QuestionnaireTemplateDto;
+import com.kaii.dentix.domain.questionnaire.dto.*;
 import com.kaii.dentix.domain.questionnaire.dto.request.QuestionnaireSubmitRequest;
 import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.domain.User;
@@ -38,7 +35,7 @@ public class QuestionnaireService {
     /**
      * 문진표 양식 조회
      */
-    public List<QuestionnaireTemplateDto> getQuestionnaireTemplate() throws IOException {
+    public QuestionnaireTemplateJsonDto getQuestionnaireTemplate() throws IOException {
         ClassPathResource classPathResource = new ClassPathResource("template/questionnaire.json");
         if (!classPathResource.exists()) throw new BadRequestApiException("파일이 존재하지 않습니다.");
 
@@ -69,7 +66,7 @@ public class QuestionnaireService {
     private void questionnaireValidate(QuestionnaireFormDto formDto) throws IOException {
         HashMap<String, Object> form = objectMapper.convertValue(formDto, HashMap.class);
 
-        List<QuestionnaireTemplateDto> questionnaireTemplate = this.getQuestionnaireTemplate();
+        List<QuestionnaireTemplateDto> questionnaireTemplate = this.getQuestionnaireTemplate().getTemplate();
         questionnaireTemplate.forEach(template -> {
             Object valueObj = form.getOrDefault(template.getKey(), null);
             // 값 존재 확인
@@ -77,7 +74,7 @@ public class QuestionnaireService {
                 throw new FormValidationException(String.format("%s번 문항을 입력해 주세요.", template.getNumber()));
             }
 
-            int[] normalValues = template.getContents().stream().mapToInt(QuestionnaireTemplateContentDto::getValue).toArray();
+            int[] normalValues = template.getContents().stream().mapToInt(QuestionnaireTemplateContentDto::getId).toArray();
             if (template.isMultiple()) {
                 // 중복 선택의 경우
                 Integer[] values = objectMapper.convertValue(valueObj, Integer[].class);

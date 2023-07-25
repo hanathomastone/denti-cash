@@ -8,6 +8,7 @@ import java.util.List;
 @AllArgsConstructor @NoArgsConstructor
 public class QuestionnaireTemplateDto {
 
+    private int sort;
     private String key;
     private String number;
     private String title;

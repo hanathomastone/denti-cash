@@ -9,6 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor @NoArgsConstructor
 public class QuestionnaireTemplateContentDto {
 
-    private int value;
+    private int sort;
+    private int id;
     private String text;
 }
