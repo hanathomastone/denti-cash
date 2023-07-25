@@ -13,9 +13,6 @@ import java.util.List;
 @AllArgsConstructor @NoArgsConstructor
 public class DailyOralCheckDto {
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-    private Date latestOralCheck; // 마지막 구강검진일
-
     private List<OralCheckListDto> oralCheckList; // 구강검진 리스트
 
     // TODO : 문진표 리스트, 양치질 리스트

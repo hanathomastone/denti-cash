@@ -53,7 +53,7 @@ public class OralCheckController {
      *  요일별 구강 상태 조회
      */
     @GetMapping(value = "/daily", name = "요일별 구강 상태 조회")
-    public DataResponse<DailyOralCheckDto> dailyOralCheck(HttpServletRequest httpServletRequest, String day){
+    public DataResponse<DailyOralCheckDto> dailyOralCheck(HttpServletRequest httpServletRequest, @RequestParam String day){
         DataResponse<DailyOralCheckDto> response = new DataResponse<>(oralCheckService.dailyOralCheck(httpServletRequest, day));
         return response;
     }
