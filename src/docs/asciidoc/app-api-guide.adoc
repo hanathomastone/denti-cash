@@ -362,3 +362,49 @@ include::{snippets}/oralCheck/result/query-parameters.adoc[]
 === Response
 include::{snippets}/oralCheck/result/response-fields.adoc[]
 include::{snippets}/oralCheck/result/response-body.adoc[]
+
+[[questionnaireTemplate]]
+== 문진표 양식 조회
+*문진표 양식 조회 API*
+
+: 문진표 이어작성 시 조회 결과 버전과 앱 내에서 작성중인 버전이 맞지 않은 경우 재작성 필요
+
+=== Http
+include::{snippets}/questionnaire/template/http-request.adoc[]
+=== Response
+include::{snippets}/questionnaire/template/response-fields.adoc[]
+include::{snippets}/questionnaire/template/response-body.adoc[]
+
+[[questionnaireSubmit]]
+== 문진표 제출
+*문진표 제출 API*
+
+*[ 개발 중 잘못된 Request나 데이터 오류로 인해 발생할 수 있는 경우 ]*::
+
+- 문진표 항목 누락 : `"~번 문항을 입력해 주세요."`
+- 유효하지 않은 값 : `"~번 문항에 ~ 값은 유효하지 않습니다."`
+- 중복 선택 시 동일 값 중복 : `"~번 문항에 ~ 값이 중복으로 존재합니다."`
+
+=== Http
+include::{snippets}/questionnaire/submit/http-request.adoc[]
+=== Request
+include::{snippets}/questionnaire/submit/request-fields.adoc[]
+=== Response
+include::{snippets}/questionnaire/submit/response-fields.adoc[]
+include::{snippets}/questionnaire/submit/response-body.adoc[]
+
+[[questionnaireResult]]
+== 문진표 결과 조회
+*문진표 결과 조회 API*
+
+*[ 개발 중 잘못된 Request나 데이터 오류로 인해 발생할 수 있는 경우 ]*::
+
+- 유효하지 않은 고유번호 : `"문진표가 존재하지 않습니다."`
+
+=== Http
+include::{snippets}/questionnaire/result/http-request.adoc[]
+=== Request
+include::{snippets}/questionnaire/result/query-parameters.adoc[]
+=== Response
+include::{snippets}/questionnaire/result/response-fields.adoc[]
+include::{snippets}/questionnaire/result/response-body.adoc[]
