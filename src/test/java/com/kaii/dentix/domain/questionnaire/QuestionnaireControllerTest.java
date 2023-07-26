@@ -152,19 +152,18 @@ public class QuestionnaireControllerTest extends ControllerTest {
      */
     @Test
     public void questionnaireSubmit() throws Exception{
-        QuestionnaireFormDto form = QuestionnaireFormDto.builder()
-            .q_1(new Integer[]{1})
-            .q_2(new Integer[]{2})
-            .q_3(new Integer[]{1, 2})
-            .q_4(new Integer[]{3})
-            .q_5(new Integer[]{3, 4})
-            .q_6(new Integer[]{5, 6})
-            .q_7(new Integer[]{0})
-            .q_8(new Integer[]{7, 8})
-            .q_9(new Integer[]{4})
-            .q_10(new Integer[]{1})
-            .build();
-
+        List<QuestionnaireKeyValueDto> form = Arrays.asList(
+            new QuestionnaireKeyValueDto("q_1", new Integer[]{1}),
+            new QuestionnaireKeyValueDto("q_2", new Integer[]{2}),
+            new QuestionnaireKeyValueDto("q_3", new Integer[]{1, 2}),
+            new QuestionnaireKeyValueDto("q_4", new Integer[]{3}),
+            new QuestionnaireKeyValueDto("q_5", new Integer[]{3, 4}),
+            new QuestionnaireKeyValueDto("q_6", new Integer[]{5, 6}),
+            new QuestionnaireKeyValueDto("q_7", new Integer[]{0}),
+            new QuestionnaireKeyValueDto("q_8", new Integer[]{7, 8}),
+            new QuestionnaireKeyValueDto("q_9", new Integer[]{4}),
+            new QuestionnaireKeyValueDto("q_10", new Integer[]{1})
+        );
         QuestionnaireSubmitRequest request = new QuestionnaireSubmitRequest(form);
 
         // given
@@ -187,17 +186,9 @@ public class QuestionnaireControllerTest extends ControllerTest {
                 getDocumentRequest(),
                 getDocumentResponse(),
                 requestFields(
-                    fieldWithPath("form").type(JsonFieldType.OBJECT).description("문진표 항목"),
-                    fieldWithPath("form.q_1").type(JsonFieldType.ARRAY).description("문진표 1번 문항"),
-                    fieldWithPath("form.q_2").type(JsonFieldType.ARRAY).description("문진표 2번 문항"),
-                    fieldWithPath("form.q_3").type(JsonFieldType.ARRAY).description("문진표 3번 문항"),
-                    fieldWithPath("form.q_4").type(JsonFieldType.ARRAY).description("문진표 4번 문항"),
-                    fieldWithPath("form.q_5").type(JsonFieldType.ARRAY).description("문진표 5번 문항"),
-                    fieldWithPath("form.q_6").type(JsonFieldType.ARRAY).description("문진표 6번 문항"),
-                    fieldWithPath("form.q_7").type(JsonFieldType.ARRAY).description("문진표 7번 문항"),
-                    fieldWithPath("form.q_8").type(JsonFieldType.ARRAY).description("문진표 8번 문항"),
-                    fieldWithPath("form.q_9").type(JsonFieldType.ARRAY).description("문진표 9번 문항"),
-                    fieldWithPath("form.q_10").type(JsonFieldType.ARRAY).description("문진표 10번 문항")
+                    fieldWithPath("form").type(JsonFieldType.ARRAY).description("문진표 항목"),
+                    fieldWithPath("form[].key").type(JsonFieldType.STRING).description("문진표 key"),
+                    fieldWithPath("form[].value").type(JsonFieldType.ARRAY).description("문진표 value")
                 ),
                 responseFields(
                     fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),

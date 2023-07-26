@@ -96,18 +96,14 @@ public class QuestionnaireService {
     /**
      * 문진표 양식 기준으로 validation 진행
      */
-    private void questionnaireValidate(QuestionnaireFormDto formDto) throws IOException {
-        HashMap<String, Object> form = objectMapper.convertValue(formDto, HashMap.class);
-
+    private void questionnaireValidate(List<QuestionnaireKeyValueDto> form) throws IOException {
         List<QuestionnaireTemplateDto> questionnaireTemplate = this.getQuestionnaireTemplate().getTemplate();
         questionnaireTemplate.forEach(template -> {
-            Object valueObj = form.getOrDefault(template.getKey(), null);
             // 값 존재 확인
-            if (valueObj == null) {
-                throw new FormValidationException(String.format("%s번 문항을 입력해 주세요.", template.getNumber()));
-            }
+            Integer[] values = form.stream().filter(o -> o.getKey().equals(template.getKey()))
+                .findAny().orElseThrow(() -> new FormValidationException(String.format("%s번 문항을 입력해 주세요.", template.getNumber())))
+                .getValue();
 
-            Integer[] values = objectMapper.convertValue(form.getOrDefault(template.getKey(), null), Integer[].class);
             // 개수 확인
             if (template.getMinimum() != null && values.length < template.getMinimum()) {
                 if (template.getMinimum() > 1) {
