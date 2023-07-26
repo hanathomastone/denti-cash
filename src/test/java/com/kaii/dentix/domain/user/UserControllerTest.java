@@ -111,7 +111,7 @@ public class UserControllerTest extends ControllerTest {
         UserAutoLoginRequest userAutoLoginRequest = UserAutoLoginRequest.builder()
                 .userDeviceModel("iPhone 14 Pro")
                 .userDeviceManufacturer("APPLE")
-                .userOsVersion("1.1")
+                .userOsVersion("1.1.1")
                 .userDeviceToken("DeviceToken")
                 .build();
 
@@ -121,7 +121,7 @@ public class UserControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsString(userAutoLoginRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("deviceType", "iOS")
-                        .header("appVersion", 1.1)
+                        .header("appVersion", "1.1.1")
                         .header(HttpHeaders.AUTHORIZATION, "user-info.고유경.AccessToken")
                         .with(user("user").roles("USER"))
         );

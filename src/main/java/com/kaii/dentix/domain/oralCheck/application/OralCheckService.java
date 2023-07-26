@@ -1,20 +1,34 @@
 package com.kaii.dentix.domain.oralCheck.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaii.dentix.domain.oralCheck.dao.OralCheckRepository;
 import com.kaii.dentix.domain.oralCheck.domain.OralCheck;
-import com.kaii.dentix.domain.oralCheck.dto.OralCheckAnalysisDivisionDto;
-import com.kaii.dentix.domain.oralCheck.dto.OralCheckAnalysisTotalDto;
-import com.kaii.dentix.domain.oralCheck.dto.OralCheckPhotoDto;
-import com.kaii.dentix.domain.oralCheck.dto.OralCheckResultDto;
+import com.kaii.dentix.domain.oralCheck.dto.*;
 import com.kaii.dentix.domain.oralCheck.dto.resoponse.OralCheckAnalysisResponse;
-import com.kaii.dentix.domain.type.oral.*;
+import com.kaii.dentix.domain.oralStatus.domain.OralStatus;
+import com.kaii.dentix.domain.oralStatus.jpa.OralStatusRepository;
+import com.kaii.dentix.domain.questionnaire.dao.QuestionnaireRepository;
+import com.kaii.dentix.domain.questionnaire.domain.Questionnaire;
+import com.kaii.dentix.domain.questionnaire.dto.OralStatusTypeDto;
+import com.kaii.dentix.domain.toothBrushing.dao.ToothBrushingRepository;
+import com.kaii.dentix.domain.toothBrushing.domain.ToothBrushing;
+import com.kaii.dentix.domain.toothBrushing.dto.ToothBrushingDto;
+import com.kaii.dentix.domain.type.OralDateStatusType;
+import com.kaii.dentix.domain.type.OralSectionType;
+import com.kaii.dentix.domain.type.oral.OralCheckAnalysisState;
+import com.kaii.dentix.domain.type.oral.OralCheckDivisionCommentType;
+import com.kaii.dentix.domain.type.oral.OralCheckDivisionScoreType;
+import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
 import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.domain.User;
+import com.kaii.dentix.domain.userOralStatus.dao.UserOralStatusRepository;
+import com.kaii.dentix.domain.userOralStatus.domain.UserOralStatus;
 import com.kaii.dentix.global.common.aws.AWSS3Service;
 import com.kaii.dentix.global.common.error.exception.BadRequestApiException;
 import com.kaii.dentix.global.common.error.exception.NotFoundDataException;
 import com.kaii.dentix.global.common.response.DataResponse;
+import com.kaii.dentix.global.common.util.DateFormatUtil;
 import com.kaii.dentix.global.common.util.LambdaService;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,15 +36,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.web.multipart.MultipartFile;
+import java.util.stream.Collectors;
 
 import static com.kaii.dentix.domain.type.oral.OralCheckDivisionCommentType.*;
 import static com.kaii.dentix.global.common.response.ResponseMessage.SUCCESS_MSG;
@@ -47,6 +61,10 @@ public class OralCheckService {
     private final LambdaService lambdaService;
 
     private final OralCheckRepository oralCheckRepository;
+    private final ToothBrushingRepository toothBrushingRepository;
+    private final QuestionnaireRepository questionnaireRepository;
+    private final OralStatusRepository oralStatusRepository;
+    private final UserOralStatusRepository userOralStatusRepository;
 
     private final ObjectMapper objectMapper;
 
@@ -309,4 +327,166 @@ public class OralCheckService {
 
     }
 
+    /**
+     *  구강 상태 조회
+     */
+    @Transactional(readOnly = true)
+    public OralCheckDto oralCheck(HttpServletRequest httpServletRequest){
+        User user = userService.getTokenUser(httpServletRequest);
+
+        List<OralCheck> oralCheckList = oralCheckRepository.findAllByUserIdOrderByCreatedDesc(user.getUserId());
+        List<ToothBrushing> toothBrushingList = toothBrushingRepository.findAllByUserIdOrderByCreatedDesc(user.getUserId());
+        List<Questionnaire> questionnaireList = questionnaireRepository.findAllByUserIdOrderByCreatedDesc(user.getUserId());
+        List<UserOralStatus> userOralStatusList = userOralStatusRepository.findAllByQuestionnaireIn(questionnaireList);
+        List<OralStatus> oralStatusList = oralStatusRepository.findAll();
+
+        Calendar calendar = Calendar.getInstance();
+        Date today = calendar.getTime();
+
+        final String datePattern = "yyyy-MM-dd";
+
+        // 구강 상태 화면 최상단 섹션 순서
+        List<OralCheckSectionListDto> sectionList = new ArrayList<>();
+        // 구강 촬영
+        OralCheck latestOralCheck = oralCheckList.size() > 0 ? oralCheckList.get(0) : null;
+        sectionList.add(OralCheckSectionListDto.builder()
+            .sectionType(OralSectionType.ORAL_CHECK)
+            .date(latestOralCheck != null ? latestOralCheck.getCreated() : null)
+            .timeInterval(latestOralCheck != null ? (today.getTime() - latestOralCheck.getCreated().getTime()) / 1000 : null)
+            .build());
+
+        // 권장 촬영 기간
+        String oralCheckPeriodBefore = null;
+        String oralCheckPeriodAfter = null;
+        if (latestOralCheck != null) {
+            calendar.setTime(latestOralCheck.getCreated());
+            calendar.add(Calendar.DATE, 6);
+            oralCheckPeriodBefore = DateFormatUtil.dateToString(datePattern, calendar.getTime());
+            calendar.add(Calendar.DATE, 2);
+            oralCheckPeriodAfter = DateFormatUtil.dateToString(datePattern, calendar.getTime());
+        }
+
+        calendar.setTime(today);
+        calendar.add(Calendar.DATE, -30); // 30일 전 기준
+
+        // 양치질
+        ToothBrushing latestToothBrushing = toothBrushingList.size() > 0 ? toothBrushingList.get(0) : null;
+        sectionList.add(OralCheckSectionListDto.builder()
+            .sectionType(OralSectionType.TOOTH_BRUSHING)
+            .date(latestToothBrushing != null ? latestToothBrushing.getCreated() : null)
+            .timeInterval(latestToothBrushing != null ? (today.getTime() - latestToothBrushing.getCreated().getTime()) / 1000 : null)
+            .toothBrushingList(toothBrushingList.stream()
+                .filter(toothBrushing -> DateFormatUtil.dateToString(datePattern, toothBrushing.getCreated())
+                    .equals(DateFormatUtil.dateToString(datePattern, today)))
+                .map(toothBrushing -> ToothBrushingDto.builder()
+                    .toothBrushingId(toothBrushing.getToothBrushingId())
+                    .created(toothBrushing.getCreated())
+                    .build())
+                .sorted(Comparator.comparing(ToothBrushingDto::getCreated))
+                .collect(Collectors.toList())
+            )
+            .build());
+        // 문진표
+        Questionnaire latestQuestionnaire = questionnaireList.size() > 0 ? questionnaireList.get(0) : null;
+        // 문진표 작성 이력이 없거나 30일이 지난 경우 두번째 아니면 세번째
+        sectionList.add(latestQuestionnaire == null || latestQuestionnaire.getCreated().before(calendar.getTime()) ? 1 : 2, OralCheckSectionListDto.builder()
+            .sectionType(OralSectionType.QUESTIONNAIRE)
+            .date(latestQuestionnaire != null ? latestQuestionnaire.getCreated() : null)
+            .timeInterval(latestQuestionnaire != null ? (today.getTime() - latestQuestionnaire.getCreated().getTime()) / 1000 : null)
+            .build());
+
+        // 요일별 나의 구강 상태
+        List<OralCheckDailyDto> dailyList = new ArrayList<>();
+        calendar.add(Calendar.DATE, 1 - calendar.get(Calendar.DAY_OF_WEEK)); // 30일 전날이 포함된 일요일부터 시작
+
+        while (calendar.getTime().before(today) || calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+            OralDateStatusType dailyStatusType = null;
+            List<OralCheckListDto> detailList = new ArrayList<>();
+            String dateString = DateFormatUtil.dateToString(datePattern, calendar.getTime());
+
+            // 구강 촬영
+            detailList.addAll(oralCheckList.stream()
+                .filter(oralCheck -> DateFormatUtil.dateToString(datePattern, oralCheck.getCreated()).equals(dateString))
+                .map(oralCheck -> OralCheckListDto.builder()
+                    .sectionType(OralSectionType.ORAL_CHECK)
+                    .date(oralCheck.getCreated())
+                    .identifier(oralCheck.getOralCheckId())
+                    .oralCheckResultTotalType(oralCheck.getOralCheckResultTotalType())
+                    .build()
+                ).toList());
+
+            // 양치질
+            List<ToothBrushing> dailyToothBrushingList = toothBrushingList.stream()
+                .filter(toothBrushing -> DateFormatUtil.dateToString(datePattern, toothBrushing.getCreated()).equals(dateString)).toList();
+            for (int i = 0; i < dailyToothBrushingList.size(); i++) {
+                ToothBrushing toothBrushing = dailyToothBrushingList.get(i);
+                detailList.add(OralCheckListDto.builder()
+                    .sectionType(OralSectionType.TOOTH_BRUSHING)
+                    .date(toothBrushing.getCreated())
+                    .identifier(toothBrushing.getToothBrushingId())
+                    .toothBrushingCount(dailyToothBrushingList.size() - i) // 역순
+                    .build()
+                );
+            }
+
+            // 문진표
+            List<Questionnaire> dailyQuestionnaireList = questionnaireList.stream()
+                .filter(questionnaire -> DateFormatUtil.dateToString(datePattern, questionnaire.getCreated()).equals(dateString)).toList();
+            detailList.addAll(dailyQuestionnaireList.stream()
+                .map(questionnaire -> OralCheckListDto.builder()
+                    .sectionType(OralSectionType.QUESTIONNAIRE)
+                    .date(questionnaire.getCreated())
+                    .identifier(questionnaire.getQuestionnaireId())
+                    .oralStatusList(userOralStatusList.stream()
+                        .filter(userOralStatus -> userOralStatus.getQuestionnaire().equals(questionnaire))
+                        .map(userOralStatus -> {
+                            OralStatus oralStatus = oralStatusList.stream()
+                                .filter(o -> o.equals(userOralStatus.getOralStatus()))
+                                .findAny().orElseThrow(() -> new NotFoundDataException("구강 상태 결과 정보가 없습니다."));
+
+                            return OralStatusTypeDto.builder()
+                                .type(oralStatus.getOralStatusType())
+                                .title(oralStatus.getOralStatusTitle())
+                                .build();
+                        })
+                        .toList())
+                    .build()
+                ).toList());
+
+            // 전체 목록을 역순으로 정렬 후 가장 최신의 상태값 적용
+            if (detailList.size() > 0) {
+                detailList.sort(Comparator.comparing(OralCheckListDto::getDate).reversed());
+                OralCheckListDto latestDto = detailList.get(0);
+                switch (latestDto.getSectionType()) {
+                    case ORAL_CHECK -> {
+                        switch (latestDto.getOralCheckResultTotalType()) {
+                            case HEALTHY -> dailyStatusType = OralDateStatusType.HEALTHY;
+                            case GOOD -> dailyStatusType = OralDateStatusType.GOOD;
+                            case ATTENTION -> dailyStatusType = OralDateStatusType.ATTENTION;
+                            case DANGER -> dailyStatusType = OralDateStatusType.DANGER;
+                        }
+                    }
+                    case QUESTIONNAIRE -> dailyStatusType = OralDateStatusType.QUESTIONNAIRE;
+                }
+            }
+            // 권장 촬영기간
+            if (dailyStatusType == null && latestOralCheck != null && dateString.compareTo(oralCheckPeriodBefore) >= 0 && dateString.compareTo(oralCheckPeriodAfter) <= 0) {
+                dailyStatusType = OralDateStatusType.ORAL_CHECK_PERIOD;
+            }
+
+            dailyList.add(OralCheckDailyDto.builder()
+                .date(calendar.getTime())
+                .status(dailyStatusType)
+                .questionnaire(dailyQuestionnaireList.size() > 0)
+                .detailList(detailList)
+                .build());
+
+            calendar.add(Calendar.DATE, 1);
+        }
+
+        return OralCheckDto.builder()
+                .sectionList(sectionList)
+                .dailyList(dailyList)
+                .build();
+    }
 }

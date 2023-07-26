@@ -363,6 +363,16 @@ include::{snippets}/oralCheck/result/query-parameters.adoc[]
 include::{snippets}/oralCheck/result/response-fields.adoc[]
 include::{snippets}/oralCheck/result/response-body.adoc[]
 
+[[toothBrushing]]
+== 양치질 기록
+*양치질 기록 API*
+
+=== Http
+include::{snippets}/toothBrushing/http-request.adoc[]
+=== Response
+include::{snippets}/toothBrushing/response-fields.adoc[]
+include::{snippets}/toothBrushing/response-body.adoc[]
+
 [[questionnaireTemplate]]
 == 문진표 양식 조회
 *문진표 양식 조회 API*
@@ -408,3 +418,13 @@ include::{snippets}/questionnaire/result/query-parameters.adoc[]
 === Response
 include::{snippets}/questionnaire/result/response-fields.adoc[]
 include::{snippets}/questionnaire/result/response-body.adoc[]
+
+[[oralCheck]]
+== 구강 상태 조회
+*구강 상태 조회 API*
+
+=== Http
+include::{snippets}/oralCheck/http-request.adoc[]
+=== Response
+include::{snippets}/oralCheck/response-fields.adoc[]
+include::{snippets}/oralCheck/response-body.adoc[]

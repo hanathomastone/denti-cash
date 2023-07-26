@@ -174,7 +174,7 @@ public class UserLoginControllerTest extends ControllerTest{
                 .findPwdAnswer("초록색")
                 .userDeviceModel("iPhone 14 Pro")
                 .userDeviceManufacturer("APPLE")
-                .userOsVersion("1.1")
+                .userOsVersion("1.1.1")
                 .userDeviceToken("DeviceToken")
                 .userPhoneNumber("01012345678")
                 .build();
@@ -184,7 +184,7 @@ public class UserLoginControllerTest extends ControllerTest{
                 RestDocumentationRequestBuilders.post("/login/signUp")
                         .content(objectMapper.writeValueAsString(userSignUpRequest))
                         .header("deviceType", "iOS")
-                        .header("appVersion", 1.1)
+                        .header("appVersion", "1.1.1")
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
@@ -281,7 +281,7 @@ public class UserLoginControllerTest extends ControllerTest{
                 .userPassword("password")
                 .userDeviceModel("iPhone 14 Pro")
                 .userDeviceManufacturer("APPLE")
-                .userOsVersion("1.1")
+                .userOsVersion("1.1.1")
                 .userDeviceToken("DeviceToken")
                 .build();
 
@@ -291,7 +291,7 @@ public class UserLoginControllerTest extends ControllerTest{
                         .content(objectMapper.writeValueAsString(userLoginRequest))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("deviceType", "iOS")
-                        .header("appVersion", 1.1)
+                        .header("appVersion", "1.1.1")
                         .with(user("user").roles("USER"))
         );
 
