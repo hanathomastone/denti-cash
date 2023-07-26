@@ -1,6 +1,5 @@
 package com.kaii.dentix.domain.contents.dto;
 
-import com.kaii.dentix.domain.contents.domain.ContentsList;
 import com.kaii.dentix.domain.type.ContentsType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,6 +27,6 @@ public class ContentsListDto {
 
     private String contentsPath;
 
-    private List<ContentsList> contentsLists;
+    private List<ContentsListResponseDto> contentsLists;
 
 }
