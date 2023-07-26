@@ -3,7 +3,7 @@ package com.kaii.dentix.domain.contents.application;
 import com.kaii.dentix.domain.contents.dao.ContentsCategoryRepository;
 import com.kaii.dentix.domain.contents.dao.ContentsListRepository;
 import com.kaii.dentix.domain.contents.dao.ContentsRepository;
-import com.kaii.dentix.domain.contents.domain.ContentsList;
+import com.kaii.dentix.domain.contents.dto.ContentsListResponseDto;
 import com.kaii.dentix.domain.contents.dto.ContentsCategories;
 import com.kaii.dentix.domain.contents.dto.ContentsCategoryListDto;
 import com.kaii.dentix.domain.contents.dto.ContentsListDto;
@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -68,21 +69,28 @@ public class ContentsService {
                                 .build()
                 ).toList();
 
-        List<ContentsListDto> contentsListDto = contentsRepository.findAll(Sort.by(Sort.Direction.ASC, "contentsSort")).stream()
+        List<ContentsListDto> contentsListDto = contentsRepository
+                .findAll(Sort.by(Sort.Direction.ASC, "contentsSort"))
+                .stream()
                 .map(contents -> {
-                    List<ContentsList> contentsLists = contentsListRepository.findByContentsId(contents.getContentsId());
-                    return ContentsListDto.builder()
-                            .contentsId(contents.getContentsId())
-                            .contentsTitle(contents.getContentsTitle())
-                            .contentsSort(contents.getContentsSort())
-                            .contentsType(contents.getContentsType())
-                            .contentsTitleColor(contents.getContentsTitleColor())
-                            .contentsThumbnail(contents.getContentsThumbnail())
-                            .contentsPath(contents.getContentsPath())
-                            .contentsLists(contentsLists)
-                            .build();
-                        }
-                ).toList();
+                    List<ContentsListResponseDto> contentsLists = contentsListRepository
+                            .findByContentsId(contents.getContentsId())
+                            .stream()
+                            .map(contentsList -> new ContentsListResponseDto(contentsList.getContentsCategoryId()))
+                            .collect(Collectors.toList());
+
+                    return new ContentsListDto(
+                            contents.getContentsId(),
+                            contents.getContentsTitle(),
+                            contents.getContentsSort(),
+                            contents.getContentsType(),
+                            contents.getContentsTitleColor(),
+                            contents.getContentsThumbnail(),
+                            contents.getContentsPath(),
+                            contentsLists
+                    );
+                })
+                .toList();
 
         // 로그인 한 사용자
         if (this.getTokenUser(httpServletRequest) != null){
