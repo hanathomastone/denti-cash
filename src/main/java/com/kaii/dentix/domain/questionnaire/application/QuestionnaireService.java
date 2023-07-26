@@ -107,34 +107,32 @@ public class QuestionnaireService {
                 throw new FormValidationException(String.format("%s번 문항을 입력해 주세요.", template.getNumber()));
             }
 
-            int[] normalValues = template.getContents().stream().mapToInt(QuestionnaireTemplateContentDto::getId).toArray();
-            if (template.isMultiple()) {
-                // 중복 선택의 경우
-                Integer[] values = objectMapper.convertValue(valueObj, Integer[].class);
-                if (values.length == 0) {
+            Integer[] values = objectMapper.convertValue(form.getOrDefault(template.getKey(), null), Integer[].class);
+            // 개수 확인
+            if (template.getMinimum() != null && values.length < template.getMinimum()) {
+                if (template.getMinimum() > 1) {
+                    throw new FormValidationException(String.format("%s번 문항을 %d개 이상 입력해 주세요.", template.getNumber(), template.getMinimum()));
+                } else {
                     throw new FormValidationException(String.format("%s번 문항을 입력해 주세요.", template.getNumber()));
                 }
+            }
+            if (template.getMaximum() != null && values.length > template.getMaximum()) {
+                throw new FormValidationException(String.format("%s번 문항은 %d개까지만 입력할 수 있습니다.", template.getNumber(), template.getMaximum()));
+            }
 
-                List<Integer> alreadyValues = new ArrayList<>();
-                Arrays.stream(values).forEach(value -> {
-                    // 유효하지 않은 값 존재 확인
-                    if (Arrays.stream(normalValues).noneMatch(nv -> nv == value)) {
-                        throw new FormValidationException(String.format("%s번 문항에 %d 값은 유효하지 않습니다.", template.getNumber(), value));
-                    }
-                    // 중복 값 존재 확인
-                    if (alreadyValues.stream().anyMatch(nv -> nv.equals(value))) {
-                        throw new FormValidationException(String.format("%s번 문항에 %d 값이 중복으로 존재합니다.", template.getNumber(), value));
-                    }
-                    alreadyValues.add(value);
-                });
-            } else {
-                // 중복 선택이 아닌 경우
-                int value = (int) valueObj;
+            int[] normalValues = template.getContents().stream().mapToInt(QuestionnaireTemplateContentDto::getId).toArray();
+            List<Integer> alreadyValues = new ArrayList<>();
+            Arrays.stream(values).forEach(value -> {
                 // 유효하지 않은 값 존재 확인
                 if (Arrays.stream(normalValues).noneMatch(nv -> nv == value)) {
                     throw new FormValidationException(String.format("%s번 문항에 %d 값은 유효하지 않습니다.", template.getNumber(), value));
                 }
-            }
+                // 중복 값 존재 확인
+                if (alreadyValues.stream().anyMatch(nv -> nv.equals(value))) {
+                    throw new FormValidationException(String.format("%s번 문항에 %d 값이 중복으로 존재합니다.", template.getNumber(), value));
+                }
+                alreadyValues.add(value);
+            });
         });
     }
 }

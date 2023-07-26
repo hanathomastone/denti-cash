@@ -7,7 +7,8 @@
       "number": "01",
       "title": "현재 구강 건강 상태는 어떻다고 생각하십니까?",
       "description": null,
-      "multiple": false,
+      "minimum": 1,
+      "maximum": 1,
       "contents": [
         {"sort": 1, "id": 1, "text": "매우 건강하다"},
         {"sort": 2, "id": 2, "text": "건강한 편이다"},
@@ -22,7 +23,8 @@
       "number": "02",
       "title": "현재 나이가 어떻게 되시나요?",
       "description": null,
-      "multiple": false,
+      "minimum": 1,
+      "maximum": 1,
       "contents": [
         {"sort": 1, "id": 1, "text": "만 2세 미만"},
         {"sort": 2, "id": 2, "text": "만 2-6세"},
@@ -36,7 +38,8 @@
       "number": "03",
       "title": "지난 12개월 동안 구강관련 불편감이 있었습니까?",
       "description": "(중복 표시 가능)",
-      "multiple": true,
+      "minimum": 1,
+      "maximum": null,
       "contents": [
         {"sort": 1, "id": 1, "text": "아니요"},
         {"sort": 2, "id": 2, "text": "씹기 힘들다"},
@@ -53,12 +56,14 @@
       "number": "04",
       "title": "어제 하루 동안 칫솔질을 몇 차례 하였습니까?",
       "description": null,
-      "multiple": false,
+      "minimum": 1,
+      "maximum": 1,
       "contents": [
-        {"sort": 1, "id": 1, "text": "1회"},
-        {"sort": 2, "id": 2, "text": "2회"},
-        {"sort": 3, "id": 3, "text": "3회"},
-        {"sort": 4, "id": 4, "text": "4회 이상"}
+        {"sort": 1, "id": 1, "text": "칫솔질을 하지 않았다"},
+        {"sort": 2, "id": 2, "text": "1회"},
+        {"sort": 3, "id": 3, "text": "2회"},
+        {"sort": 4, "id": 4, "text": "3회"},
+        {"sort": 5, "id": 5, "text": "4회 이상"}
       ]
     },
     {
@@ -67,7 +72,8 @@
       "number": "05",
       "title": "어제 칫솔질을 하신 때를 모두 표시하여 주십시오.",
       "description": null,
-      "multiple": true,
+      "minimum": 0,
+      "maximum": null,
       "contents": [
         {"sort": 1, "id": 1, "text": "아침 식사 전"},
         {"sort": 2, "id": 2, "text": "아침 식사 후"},
@@ -82,7 +88,8 @@
       "number": "06",
       "title": "치약과 칫솔 이외에 입안의 건강을 위해 귀하께서 사용하시는 용품이 있습니까?",
       "description": "사용하시는 용품에 모두 표시해 주세요.",
-      "multiple": true,
+      "minimum": 0,
+      "maximum": null,
       "contents": [
         {"sort": 1, "id": 1, "text": "치실(Floss)"},
         {"sort": 2, "id": 2, "text": "치간칫솔"},
@@ -98,10 +105,11 @@
       "number": "07",
       "title": "치아 닦는 방법을 (치과나 보건소 등에서) 배운 적이 있습니까?",
       "description": "사용하시는 용품에 모두 표시해 주세요.",
-      "multiple": false,
+      "minimum": 1,
+      "maximum": 1,
       "contents": [
         {"sort": 1, "id": 1, "text": "예"},
-        {"sort": 2, "id": 0, "text": "아니오"}
+        {"sort": 2, "id": 2, "text": "아니오"}
       ]
     },
     {
@@ -110,7 +118,8 @@
       "number": "08",
       "title": "가장 최근에 치과에서 받은 진료의 내용은 무엇입니까?",
       "description": "해당 사항 모두 선택",
-      "multiple": true,
+      "minimum": 1,
+      "maximum": null,
       "contents": [
         {"sort": 1, "id": 1, "text": "구강검사"},
         {"sort": 2, "id": 2, "text": "스케일링"},
@@ -129,7 +138,8 @@
       "number": "09",
       "title": "어제 단 음식(과자, 사탕, 케이크, 탄산음료등)을 몇 번 드셨습니까?",
       "description": null,
-      "multiple": false,
+      "minimum": 1,
+      "maximum": 1,
       "contents": [
         {"sort": 1, "id": 1, "text": "1번"},
         {"sort": 2, "id": 2, "text": "2번"},
@@ -145,7 +155,8 @@
       "number": "10",
       "title": "담배를 피우십니까?",
       "description": null,
-      "multiple": false,
+      "minimum": 1,
+      "maximum": 1,
       "contents": [
         {"sort": 1, "id": 1, "text": "전혀 피운 적 없다"},
         {"sort": 2, "id": 2, "text": "현재 피우고 있다"},

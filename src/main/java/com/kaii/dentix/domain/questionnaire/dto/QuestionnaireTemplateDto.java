@@ -13,6 +13,7 @@ public class QuestionnaireTemplateDto {
     private String number;
     private String title;
     private String description;
-    private boolean multiple;
+    private Integer minimum;
+    private Integer maximum;
     private List<QuestionnaireTemplateContentDto> contents;
 }
