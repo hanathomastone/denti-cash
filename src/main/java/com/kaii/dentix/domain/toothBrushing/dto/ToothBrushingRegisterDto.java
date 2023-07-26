@@ -1,4 +1,4 @@
-package com.kaii.dentix.domain.oralCheck.dto;
+package com.kaii.dentix.domain.toothBrushing.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,8 @@ import java.util.List;
 
 @Getter @Builder
 @AllArgsConstructor @NoArgsConstructor
-public class OralCheckDto {
+public class ToothBrushingRegisterDto {
 
-    List<OralCheckSectionListDto> sectionList;
-    List<OralCheckDailyDto> dailyList;
+    List<ToothBrushingDto> toothBrushingList;
+    Long timeInterval;
 }

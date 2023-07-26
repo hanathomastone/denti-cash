@@ -1,7 +1,6 @@
 package com.kaii.dentix.domain.oralCheck.controller;
 
 import com.kaii.dentix.domain.oralCheck.application.OralCheckService;
-import com.kaii.dentix.domain.oralCheck.dto.DailyOralCheckDto;
 import com.kaii.dentix.domain.oralCheck.dto.OralCheckDto;
 import com.kaii.dentix.domain.oralCheck.dto.OralCheckPhotoDto;
 import com.kaii.dentix.domain.oralCheck.dto.OralCheckResultDto;
@@ -48,14 +47,4 @@ public class OralCheckController {
         DataResponse<OralCheckDto> response = new DataResponse<>(oralCheckService.oralCheck(httpServletRequest));
         return response;
     }
-
-    /**
-     *  요일별 구강 상태 조회
-     */
-    @GetMapping(value = "/daily", name = "요일별 구강 상태 조회")
-    public DataResponse<DailyOralCheckDto> dailyOralCheck(HttpServletRequest httpServletRequest, @RequestParam String day){
-        DataResponse<DailyOralCheckDto> response = new DataResponse<>(oralCheckService.dailyOralCheck(httpServletRequest, day));
-        return response;
-    }
-
 }

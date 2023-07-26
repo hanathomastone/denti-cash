@@ -25,7 +25,7 @@ public class Questionnaire extends TimeEntity {
     @Column(name = "form", columnDefinition = "json")
     private String form;
 
-    @OneToMany(mappedBy = "questionnaire", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "questionnaire", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     List<UserOralStatus> userOralStatusList;
 
     public Questionnaire(Long userId, String form, List<String> oralStatusTypeList) {

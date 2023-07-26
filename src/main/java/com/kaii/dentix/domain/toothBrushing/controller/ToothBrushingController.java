@@ -1,7 +1,7 @@
 package com.kaii.dentix.domain.toothBrushing.controller;
 
 import com.kaii.dentix.domain.toothBrushing.application.ToothBrushingService;
-import com.kaii.dentix.domain.toothBrushing.dto.ToothBrushingDto;
+import com.kaii.dentix.domain.toothBrushing.dto.ToothBrushingRegisterDto;
 import com.kaii.dentix.global.common.response.DataResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +20,8 @@ public class ToothBrushingController {
      *  양치질 기록
      */
     @PostMapping(name = "양치질 기록")
-    public DataResponse<ToothBrushingDto> toothBrushing(HttpServletRequest httpServletRequest){
-        DataResponse<ToothBrushingDto> response = new DataResponse<>(toothBrushingService.toothBrushing(httpServletRequest));
+    public DataResponse<ToothBrushingRegisterDto> toothBrushing(HttpServletRequest httpServletRequest){
+        DataResponse<ToothBrushingRegisterDto> response = new DataResponse<>(toothBrushingService.toothBrushing(httpServletRequest));
         return response;
     }
 

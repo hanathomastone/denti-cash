@@ -30,6 +30,10 @@ public class DocumentOptionalGenerator {
         return setFormat("yyyy-MM-dd HH:mm:ss");
     }
 
+    public static Attributes.Attribute timeIntervalFormat() {
+        return setFormat("초 단위 interval");
+    }
+
     public static Attributes.Attribute oralCheckResultTotalFormat() {
         return setFormat("HEALTHY : 건강, GOOD : 양호, ATTENTION : 주의, DANGER : 위험");
     }
@@ -40,6 +44,14 @@ public class DocumentOptionalGenerator {
 
     public static Attributes.Attribute oralCheckDivisionCommentFormat() {
         return setFormat("HEALTHY : 모두 잘 닦인 경우, UR : 상악 우측, UL : 상악 좌측, DR : 하악 우측, DL : 하악 좌측");
+    }
+
+    public static Attributes.Attribute oralSectionTypeFormat() {
+        return setFormat("ORAL_CHECK : 구강 촬영, TOOTH_BRUSHING : 양치질, QUESTIONNAIRE : 문진표");
+    }
+
+    public static Attributes.Attribute oralDateStatusTypeFormat() {
+        return setFormat("HEALTHY : 건강, GOOD : 양호, ATTENTION : 주의, DANGER : 위험, QUESTIONNAIRE : 문진표, ORAL_CHECK_PERIOD : 권장 촬영 기간");
     }
 
 }

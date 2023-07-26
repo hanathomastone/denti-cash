@@ -4,8 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaii.dentix.common.ControllerTest;
 import com.kaii.dentix.domain.oralCheck.application.OralCheckService;
 import com.kaii.dentix.domain.oralCheck.controller.OralCheckController;
-import com.kaii.dentix.domain.oralCheck.dto.OralCheckPhotoDto;
-import com.kaii.dentix.domain.oralCheck.dto.OralCheckResultDto;
+import com.kaii.dentix.domain.oralCheck.dto.*;
+import com.kaii.dentix.domain.questionnaire.dto.OralStatusTypeDto;
+import com.kaii.dentix.domain.toothBrushing.dto.ToothBrushingDto;
+import com.kaii.dentix.domain.type.OralDateStatusType;
+import com.kaii.dentix.domain.type.OralSectionType;
 import com.kaii.dentix.domain.type.oral.OralCheckDivisionCommentType;
 import com.kaii.dentix.domain.type.oral.OralCheckDivisionScoreType;
 import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
@@ -27,6 +30,11 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentRequest;
 import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentResponse;
@@ -169,6 +177,121 @@ public class OralCheckControllerTest extends ControllerTest {
                 ));
 
         verify(oralCheckService).oralCheckResult(any(HttpServletRequest.class), any(Long.class));
+
+    }
+
+    /**
+     * 구강 상태 조회
+     */
+    @Test
+    public void oralCheck() throws Exception {
+        final int oneDay = 86400000;
+        Date date = new Date();
+        OralCheckDto oralCheckDto = new OralCheckDto(
+            Arrays.asList(
+                OralCheckSectionListDto.builder()
+                    .sectionType(OralSectionType.ORAL_CHECK)
+                    .date(date)
+                    .timeInterval(1000L)
+                    .build(),
+                OralCheckSectionListDto.builder()
+                    .sectionType(OralSectionType.TOOTH_BRUSHING)
+                    .date(date)
+                    .timeInterval(1000L)
+                    .toothBrushingList(List.of(new ToothBrushingDto(1L, date)))
+                    .build(),
+                OralCheckSectionListDto.builder()
+                    .sectionType(OralSectionType.ORAL_CHECK)
+                    .date(date)
+                    .timeInterval(1000L)
+                    .build()
+            ),
+            Arrays.asList(
+                OralCheckDailyDto.builder()
+                    .date(date)
+                    .status(OralDateStatusType.DANGER)
+                    .questionnaire(true)
+                    .detailList(Arrays.asList(
+                        OralCheckListDto.builder()
+                            .sectionType(OralSectionType.ORAL_CHECK)
+                            .date(date)
+                            .identifier(1)
+                            .oralCheckResultTotalType(OralCheckResultTotalType.DANGER)
+                            .build(),
+                        OralCheckListDto.builder()
+                            .sectionType(OralSectionType.TOOTH_BRUSHING)
+                            .date(date)
+                            .identifier(1)
+                            .toothBrushingCount(2)
+                            .build(),
+                        OralCheckListDto.builder()
+                            .sectionType(OralSectionType.QUESTIONNAIRE)
+                            .date(date)
+                            .identifier(1)
+                            .oralStatusList(Arrays.asList(
+                                new OralStatusTypeDto("D", "시린니 관리형"),
+                                new OralStatusTypeDto("E", "보철 관리형")
+                            ))
+                            .build()
+                    ))
+                    .build(),
+                OralCheckDailyDto.builder()
+                    .date(new Date(date.getTime() + oneDay))
+                    .status(OralDateStatusType.DANGER)
+                    .questionnaire(false)
+                    .detailList(new ArrayList<>())
+                    .build()
+            )
+        );
+
+        // given
+        given(oralCheckService.oralCheck(any(HttpServletRequest.class))).willReturn(oralCheckDto);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+            RestDocumentationRequestBuilders.get("/oralCheck")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "oralCheck.이호준.AccessToken")
+                .with(user("user").roles("USER"))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+            .andExpect(jsonPath("rt").value(200))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andDo(document("oralCheck",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                responseFields(
+                    fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
+                    fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
+                    fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
+                    fieldWithPath("response.sectionList").type(JsonFieldType.ARRAY).description("최상단 섹션 목록"),
+                    fieldWithPath("response.sectionList[].sectionType").type(JsonFieldType.STRING).attributes(oralSectionTypeFormat()).description("섹션 타입"),
+                    fieldWithPath("response.sectionList[].date").type(JsonFieldType.STRING).optional().description("최근 시각"),
+                    fieldWithPath("response.sectionList[].timeInterval").type(JsonFieldType.NUMBER).optional().attributes(timeIntervalFormat()).description("최근 시차"),
+                    fieldWithPath("response.sectionList[].toothBrushingList").type(JsonFieldType.ARRAY).optional().description("양치 목록 (양치일 때만 존재)"),
+                    fieldWithPath("response.sectionList[].toothBrushingList[].toothBrushingId").type(JsonFieldType.NUMBER).description("양치 고유번호"),
+                    fieldWithPath("response.sectionList[].toothBrushingList[].created").type(JsonFieldType.STRING).attributes(dateTimeFormat()).description("양치 시각"),
+                    fieldWithPath("response.dailyList").type(JsonFieldType.ARRAY).description("날짜별 목록"),
+                    fieldWithPath("response.dailyList[].date").type(JsonFieldType.STRING).attributes(dateFormat()).description("날짜"),
+                    fieldWithPath("response.dailyList[].status").type(JsonFieldType.STRING).attributes(oralDateStatusTypeFormat()).optional().description("섹션 타입"),
+                    fieldWithPath("response.dailyList[].questionnaire").type(JsonFieldType.BOOLEAN).description("문진표 작성 여부"),
+                    fieldWithPath("response.dailyList[].detailList").type(JsonFieldType.ARRAY).description("날짜별 상세 목록"),
+                    fieldWithPath("response.dailyList[].detailList[].sectionType").type(JsonFieldType.STRING).attributes(oralSectionTypeFormat()).description("섹션 타입"),
+                    fieldWithPath("response.dailyList[].detailList[].date").type(JsonFieldType.STRING).attributes(dateTimeFormat()).description("최근 시각"),
+                    fieldWithPath("response.dailyList[].detailList[].identifier").type(JsonFieldType.NUMBER).description("고유번호"),
+                    fieldWithPath("response.dailyList[].detailList[].oralCheckResultTotalType").type(JsonFieldType.STRING).optional().attributes(oralCheckResultTotalFormat()).description("전체 구강 상태"),
+                    fieldWithPath("response.dailyList[].detailList[].toothBrushingCount").type(JsonFieldType.NUMBER).optional().description("양치 횟수"),
+                    fieldWithPath("response.dailyList[].detailList[].oralCheckResultTotalType").type(JsonFieldType.STRING).optional().attributes(oralCheckResultTotalFormat()).description("전체 구강 상태"),
+                    fieldWithPath("response.dailyList[].detailList[].oralStatusList").type(JsonFieldType.ARRAY).optional().description("구강 상태 목록"),
+                    fieldWithPath("response.dailyList[].detailList[].oralStatusList[].type").type(JsonFieldType.STRING).description("구강 상태 타입"),
+                    fieldWithPath("response.dailyList[].detailList[].oralStatusList[].title").type(JsonFieldType.STRING).description("구강 상태 제목")
+                )
+            ));
+
+        verify(oralCheckService).oralCheck(any(HttpServletRequest.class));
 
     }
 
