@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class ContentsToCategory extends TimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long contentsListId;
+    private Long contentsToCategoryId;
 
     @Column(nullable = false)
     private Long contentsCategoryId;

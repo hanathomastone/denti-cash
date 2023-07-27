@@ -6,13 +6,9 @@ import com.kaii.dentix.domain.contents.dao.ContentsListRepository;
 import com.kaii.dentix.domain.contents.dao.ContentsRepository;
 import com.kaii.dentix.domain.contents.domain.Contents;
 import com.kaii.dentix.domain.contents.dto.*;
-import com.kaii.dentix.domain.jwt.JwtTokenUtil;
-import com.kaii.dentix.domain.jwt.TokenType;
-import com.kaii.dentix.domain.type.UserRole;
-import com.kaii.dentix.domain.user.dao.UserRepository;
+import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.domain.User;
 import com.kaii.dentix.global.common.error.exception.NotFoundDataException;
-import com.kaii.dentix.global.common.error.exception.UnauthorizedException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -31,27 +27,11 @@ public class ContentsService {
 
     private final ContentsRepository contentsRepository;
 
-    private final JwtTokenUtil jwtTokenUtil;
-
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     private final ContentsListRepository contentsListRepository;
 
     private final ContentsCardRepository contentsCardRepository;
-
-    public User getTokenUser(HttpServletRequest servletRequest) {
-        String token = jwtTokenUtil.getAccessToken(servletRequest);
-
-        if (token == null){ // 비로그인 사용자
-            return null;
-        }
-
-        UserRole roles = jwtTokenUtil.getRoles(token, TokenType.AccessToken);
-        if (!roles.equals(UserRole.ROLE_USER)) throw new UnauthorizedException("권한이 없는 사용자입니다.");
-
-        Long userId = jwtTokenUtil.getUserId(token, TokenType.AccessToken);
-        return userRepository.findById(userId).orElseThrow(() -> new NotFoundDataException("존재하지 않는 사용자입니다."));
-    }
 
     /**
      *  콘텐츠 조회
@@ -89,9 +69,10 @@ public class ContentsService {
                             contentsLists);
                 }).toList();
 
+        User user = userService.getTokenUserNullable(httpServletRequest);
+
         // 로그인 한 사용자
-        if (this.getTokenUser(httpServletRequest) != null){
-            User user = this.getTokenUser(httpServletRequest);
+        if (user != null){
 
             // 사용자 맞춤 카테고리 추가 - 인증된 사용자의 경우
             if (user.getPatientId() != null) {
