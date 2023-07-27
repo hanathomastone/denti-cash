@@ -6,10 +6,7 @@ import com.kaii.dentix.domain.type.GenderType;
 import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.domain.user.application.UserLoginService;
 import com.kaii.dentix.domain.user.controller.UserLoginController;
-import com.kaii.dentix.domain.user.dto.UserFindPasswordDto;
-import com.kaii.dentix.domain.user.dto.UserLoginDto;
-import com.kaii.dentix.domain.user.dto.UserSignUpDto;
-import com.kaii.dentix.domain.user.dto.UserVerifyDto;
+import com.kaii.dentix.domain.user.dto.*;
 import com.kaii.dentix.domain.user.dto.request.*;
 import com.kaii.dentix.domain.userServiceAgreement.dto.request.UserServiceAgreementRequest;
 import jakarta.servlet.http.HttpServletRequest;
@@ -94,6 +91,12 @@ public class UserLoginControllerTest extends ControllerTest{
     private UserFindPasswordDto userFindPasswordDto(){
         return UserFindPasswordDto.builder()
                 .userId(1L)
+                .build();
+    }
+
+    private AccessTokenDto accessTokenDto(){
+        return AccessTokenDto.builder()
+                .accessToken("AccessToken")
                 .build();
     }
 
@@ -410,6 +413,38 @@ public class UserLoginControllerTest extends ControllerTest{
                 ));
 
         verify(userLoginService).userModifyPassword(any(UserModifyPasswordRequest.class));
+    }
+
+    /**
+     *  AccessToken 재발급
+     */
+    @Test
+    public void accessTokenReissue() throws Exception{
+
+        // given
+        given(userLoginService.accessTokenReissue(any(HttpServletRequest.class))).willReturn(accessTokenDto());
+
+        // when
+        ResultActions result = mockMvc.perform(
+                RestDocumentationRequestBuilders.put("/login/access-token")
+                        .header("RefreshToken", "access-token.고유경.RefreshToken")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .with(user("user").roles("USER"))
+        );
+
+        // then
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("rt").value(200))
+                .andDo(document("login/access-token",
+                        getDocumentRequest(),
+                        getDocumentResponse(),
+                        responseFields(
+                                fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
+                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
+                                fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
+                                fieldWithPath("response.accessToken").type(JsonFieldType.STRING).description("Access Token")
+                        )
+                ));
     }
 
 }

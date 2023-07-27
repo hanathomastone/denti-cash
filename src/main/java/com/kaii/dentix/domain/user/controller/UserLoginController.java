@@ -1,10 +1,7 @@
 package com.kaii.dentix.domain.user.controller;
 
 import com.kaii.dentix.domain.user.application.UserLoginService;
-import com.kaii.dentix.domain.user.dto.UserFindPasswordDto;
-import com.kaii.dentix.domain.user.dto.UserLoginDto;
-import com.kaii.dentix.domain.user.dto.UserSignUpDto;
-import com.kaii.dentix.domain.user.dto.UserVerifyDto;
+import com.kaii.dentix.domain.user.dto.*;
 import com.kaii.dentix.domain.user.dto.request.*;
 import com.kaii.dentix.global.common.response.DataResponse;
 import com.kaii.dentix.global.common.response.SuccessResponse;
@@ -74,6 +71,15 @@ public class UserLoginController {
     public SuccessResponse userModifyPassword(@Valid @RequestBody UserModifyPasswordRequest request){
         userLoginService.userModifyPassword(request);
         return new SuccessResponse();
+    }
+
+    /**
+     * AccessToken 재발급
+     */
+    @PutMapping(value = "/access-token", name = "AccessToken 재발급")
+    public DataResponse<AccessTokenDto> accessTokenReissue(HttpServletRequest httpServletRequest) {
+        DataResponse<AccessTokenDto> response = new DataResponse<>(userLoginService.accessTokenReissue(httpServletRequest));
+        return response;
     }
 
 }

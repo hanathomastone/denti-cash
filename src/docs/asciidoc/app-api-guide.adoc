@@ -144,9 +144,18 @@ include::{snippets}/user/auto-login/request-fields.adoc[]
 include::{snippets}/user/auto-login/response-fields.adoc[]
 include::{snippets}/user/auto-login/response-body.adoc[]
 
+[[accessTokenReissue]]
+== 6. AccessToken 재발급
+*AccessToken 재발급 API*
+
+=== Http
+include::{snippets}/login/access-token/http-request.adoc[]
+=== Response
+include::{snippets}/login/access-token/response-fields.adoc[]
+include::{snippets}/login/access-token/response-body.adoc[]
 
 [[userFindPassword]]
-== 6. 사용자 비밀번호 찾기
+== 7. 사용자 비밀번호 찾기
 *비밀번호 재설정을 위한 아이디와 질문, 답변을 통한 비밀번호 찾기 API*
 
 *[ 비밀번호 찾기 실패 ]*::
@@ -163,7 +172,7 @@ include::{snippets}/login/find-password/response-fields.adoc[]
 include::{snippets}/login/find-password/response-body.adoc[]
 
 [[userModifyPassword]]
-== 7. 사용자 비밀번호 재설정
+== 8. 사용자 비밀번호 재설정
 *비밀번호 찾기 후 비밀번호 재설정 API*
 
 : 비밀번호 찾기 API 성공 시 return 된 `userId` 를 담아서 요청합니다.
@@ -181,7 +190,7 @@ include::{snippets}/login/password/response-fields.adoc[]
 include::{snippets}/login/password/response-body.adoc[]
 
 [[userPasswordVerify]]
-== 8. 사용자 비밀번호 확인
+== 9. 사용자 비밀번호 확인
 *보안정보 수정을 위한 비밀번호 확인 API*
 
 *[ 비밀번호 확인 실패 ]*::
@@ -201,7 +210,7 @@ include::{snippets}/user/password-verify/response-fields.adoc[]
 include::{snippets}/user/password-verify/response-body.adoc[]
 
 [[userInfoModifyPassword]]
-== 9. 사용자 보안정보 수정 - 비밀번호 변경
+== 10. 사용자 보안정보 수정 - 비밀번호 변경
 *보안정보 수정 시, 비밀번호 변경 API*
 
 *[ 비밀번호 변경 실패 ]*::
@@ -220,7 +229,7 @@ include::{snippets}/user/password/response-fields.adoc[]
 include::{snippets}/user/password/response-body.adoc[]
 
 [[userInfoModifyQnA]]
-== 10. 사용자 보안정보 수정 - 질문과 답변 수정
+== 11. 사용자 보안정보 수정 - 질문과 답변 수정
 *보안정보 수정 시, 질문과 답변 수정 API*
 
 *[ 개발 중 잘못된 Request나 데이터 오류로 인해 발생할 수 있는 경우 ]*::
@@ -238,7 +247,7 @@ include::{snippets}/user/qna/response-fields.adoc[]
 include::{snippets}/user/qna/response-body.adoc[]
 
 [[userModifyInfo]]
-== 11. 사용자 회원정보 수정
+== 12. 사용자 회원정보 수정
 *사용자 회원정보 수정 API*
 
 *[ 개발 중 잘못된 Request나 데이터 오류로 인해 발생할 수 있는 경우 ]*::
@@ -255,7 +264,7 @@ include::{snippets}/user/response-fields.adoc[]
 include::{snippets}/user/response-body.adoc[]
 
 [[userModifyServiceAgree]]
-== 12. 사용자 마케팅 동의 여부 수정
+== 13. 사용자 마케팅 동의 여부 수정
 *사용자 마케팅 동의 여부 수정 API*
 
 *[ 개발 중 잘못된 Request나 데이터 오류로 인해 발생할 수 있는 경우 ]*::
@@ -273,7 +282,7 @@ include::{snippets}/user/service-agreement/response-fields.adoc[]
 include::{snippets}/user/service-agreement/response-body.adoc[]
 
 [[userInfo]]
-== 13. 사용자 회원정보 조회
+== 14. 사용자 회원정보 조회
 *사용자 회원정보 조회 API*
 
 *[ 개발 중 잘못된 Request나 데이터 오류로 인해 발생할 수 있는 경우 ]*::
@@ -290,7 +299,7 @@ include::{snippets}/user/info/response-body.adoc[]
 
 
 [[userLogout]]
-== 14. 사용자 로그아웃
+== 15. 사용자 로그아웃
 *사용자 로그아웃 API*
 
 *[ 개발 중 잘못된 Request나 데이터 오류로 인해 발생할 수 있는 경우 ]*::
@@ -305,7 +314,7 @@ include::{snippets}/user/logout/response-fields.adoc[]
 include::{snippets}/user/logout/response-body.adoc[]
 
 [[userDelete]]
-== 15. 사용자 회원탈퇴
+== 16. 사용자 회원탈퇴
 *사용자 회원탈퇴 API*
 
 *[ 개발 중 잘못된 Request나 데이터 오류로 인해 발생할 수 있는 경우 ]*::
@@ -320,7 +329,7 @@ include::{snippets}/user/revoke/response-fields.adoc[]
 include::{snippets}/user/revoke/response-body.adoc[]
 
 [[oralCheckPhoto]]
-== 16. 구강검진 사진 촬영
+== 17. 구강검진 사진 촬영
 *구강검진 사진 촬영 API*
 
 *[ 구강검진 사진 촬영 실패 ]*::
@@ -343,7 +352,7 @@ include::{snippets}/oralCheck/photo/response-fields.adoc[]
 include::{snippets}/oralCheck/photo/response-body.adoc[]
 
 [[oralCheckResult]]
-== 17. 구강검진 결과
+== 18. 구강검진 결과
 *구강검진 결과 API*
 
 : 구강검진 사진 촬영 API 성공 시 return 된 `oralCheckId` 를 담아서 요청합니다.
@@ -364,7 +373,7 @@ include::{snippets}/oralCheck/result/response-fields.adoc[]
 include::{snippets}/oralCheck/result/response-body.adoc[]
 
 [[toothBrushing]]
-== 18. 양치질 기록
+== 19. 양치질 기록
 *양치질 기록 API*
 
 === Http
@@ -374,7 +383,7 @@ include::{snippets}/toothBrushing/response-fields.adoc[]
 include::{snippets}/toothBrushing/response-body.adoc[]
 
 [[questionnaireTemplate]]
-== 19. 문진표 양식 조회
+== 20. 문진표 양식 조회
 *문진표 양식 조회 API*
 
 : 문진표 이어작성 시 조회 결과 버전과 앱 내에서 작성중인 버전이 맞지 않은 경우 재작성 필요
@@ -386,7 +395,7 @@ include::{snippets}/questionnaire/template/response-fields.adoc[]
 include::{snippets}/questionnaire/template/response-body.adoc[]
 
 [[questionnaireSubmit]]
-== 20. 문진표 제출
+== 21. 문진표 제출
 *문진표 제출 API*
 
 *[ 개발 중 잘못된 Request나 데이터 오류로 인해 발생할 수 있는 경우 ]*::
@@ -404,7 +413,7 @@ include::{snippets}/questionnaire/submit/response-fields.adoc[]
 include::{snippets}/questionnaire/submit/response-body.adoc[]
 
 [[questionnaireResult]]
-== 21. 문진표 결과 조회
+== 22. 문진표 결과 조회
 *문진표 결과 조회 API*
 
 *[ 개발 중 잘못된 Request나 데이터 오류로 인해 발생할 수 있는 경우 ]*::
@@ -420,7 +429,7 @@ include::{snippets}/questionnaire/result/response-fields.adoc[]
 include::{snippets}/questionnaire/result/response-body.adoc[]
 
 [[oralCheck]]
-== 22. 구강 상태 조회
+== 23. 구강 상태 조회
 *구강 상태 조회 API*
 
 === Http
@@ -430,7 +439,7 @@ include::{snippets}/oralCheck/response-fields.adoc[]
 include::{snippets}/oralCheck/response-body.adoc[]
 
 [[contents]]
-== 23. 콘텐츠 조회
+== 24. 콘텐츠 조회
 *콘텐츠 조회 API*
 
 : 회원 상태에 따른 맞춤형 콘텐츠 여부는 다음과 같습니다.
@@ -450,7 +459,7 @@ include::{snippets}/contents/response-fields.adoc[]
 include::{snippets}/contents/response-body.adoc[]
 
 [[contentsCard]]
-== 24. 콘텐츠 카드뉴스 조회
+== 25. 콘텐츠 카드뉴스 조회
 *콘텐츠 카드뉴스 조회 API*
 
 *[ 개발 중 잘못된 Request나 데이터 오류로 인해 발생할 수 있는 경우 ]*::
