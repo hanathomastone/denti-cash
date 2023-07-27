@@ -20,7 +20,7 @@ import java.util.List;
 public class Contents extends TimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long contentsId;
+    private int contentsId;
 
     @Column(nullable = false)
     private int contentsSort;

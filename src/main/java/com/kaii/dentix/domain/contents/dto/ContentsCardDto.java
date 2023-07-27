@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor @NoArgsConstructor
 public class ContentsCardDto {
 
-    private int contentsCardNumber;
+    private int number;
 
-    private String contentsCardPath;
+    private String path;
 
 }

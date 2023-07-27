@@ -20,9 +20,9 @@ public class ContentsToCategory extends TimeEntity {
     private Long contentsToCategoryId;
 
     @Column(nullable = false)
-    private Long contentsCategoryId;
+    private int contentsCategoryId;
 
     @Column(nullable = false)
-    private Long contentsId;
+    private int contentsId;
 
 }

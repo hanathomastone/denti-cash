@@ -5,8 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface ContentsCardRepository extends JpaRepository<ContentsCard, Long> {
+public interface ContentsCardRepository extends JpaRepository<ContentsCard, Integer> {
 
-    List<ContentsCard> findAllByContentsId(Long contentsId);
+    List<ContentsCard> findAllByContentsId(int contentsId);
 
 }

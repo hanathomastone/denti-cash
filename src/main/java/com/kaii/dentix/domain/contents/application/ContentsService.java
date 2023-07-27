@@ -43,10 +43,10 @@ public class ContentsService {
         List<ContentsCategoryDto> categoryList = contentsCategoryRepository.findAll(Sort.by(Sort.Direction.ASC, "contentsCategorySort")).stream()
                 .map(contentsCategory ->
                         ContentsCategoryDto.builder()
-                                .contentsCategoryId(contentsCategory.getContentsCategoryId())
-                                .contentsCategorySort(contentsCategory.getContentsCategorySort())
-                                .contentsCategoryName(contentsCategory.getContentsCategoryName())
-                                .contentsCategoryColor(contentsCategory.getContentsCategoryColor())
+                                .id(contentsCategory.getContentsCategoryId())
+                                .sort(contentsCategory.getContentsCategorySort())
+                                .name(contentsCategory.getContentsCategoryName())
+                                .color(contentsCategory.getContentsCategoryColor())
                                 .build()
                 ).toList();
 
@@ -54,8 +54,8 @@ public class ContentsService {
         List<ContentsDto> contentsDto = contentsRepository.findAll(Sort.by(Sort.Direction.ASC, "contentsSort")).stream()
                 .map(contents -> {
                     // 콘텐츠 별 카테고리 Id 조회
-                    List<ContentsCategoryIdsDto> contentsLists = contentsListRepository.findByContentsId(contents.getContentsId()).stream()
-                            .map(contentsList -> new ContentsCategoryIdsDto(contentsList.getContentsCategoryId()))
+                    List<Integer> contentsLists = contentsListRepository.findByContentsId(contents.getContentsId()).stream()
+                            .map(contentsList -> contentsList.getContentsCategoryId())
                             .collect(Collectors.toList());
 
                     return new ContentsDto(
@@ -78,10 +78,10 @@ public class ContentsService {
             if (user.getPatientId() != null) {
                 List<ContentsCategoryDto> userCategoryList = new ArrayList<>(categoryList);
                 ContentsCategoryDto userCategory = ContentsCategoryDto.builder()
-                        .contentsCategoryId(0L)
-                        .contentsCategorySort(0)
-                        .contentsCategoryName(user.getUserName() + "님 맞춤")
-                        .contentsCategoryColor(null)
+                        .id(0)
+                        .sort(0)
+                        .name(user.getUserName() + "님 맞춤")
+                        .color(null)
                         .build();
                 userCategoryList.add(0, userCategory);
 
