@@ -83,7 +83,7 @@ public class ContentsService {
                             contents.getContentsTitle(),
                             contents.getContentsSort(),
                             contents.getContentsType(),
-                            contents.getContentsTitleColor(),
+                            contents.getContentsTypeColor(),
                             contents.getContentsThumbnail(),
                             contents.getContentsPath(),
                             contentsLists);

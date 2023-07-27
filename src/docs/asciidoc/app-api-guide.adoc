@@ -364,7 +364,7 @@ include::{snippets}/oralCheck/result/response-fields.adoc[]
 include::{snippets}/oralCheck/result/response-body.adoc[]
 
 [[toothBrushing]]
-== 양치질 기록
+== 18. 양치질 기록
 *양치질 기록 API*
 
 === Http
@@ -374,7 +374,7 @@ include::{snippets}/toothBrushing/response-fields.adoc[]
 include::{snippets}/toothBrushing/response-body.adoc[]
 
 [[questionnaireTemplate]]
-== 문진표 양식 조회
+== 19. 문진표 양식 조회
 *문진표 양식 조회 API*
 
 : 문진표 이어작성 시 조회 결과 버전과 앱 내에서 작성중인 버전이 맞지 않은 경우 재작성 필요
@@ -386,7 +386,7 @@ include::{snippets}/questionnaire/template/response-fields.adoc[]
 include::{snippets}/questionnaire/template/response-body.adoc[]
 
 [[questionnaireSubmit]]
-== 문진표 제출
+== 20. 문진표 제출
 *문진표 제출 API*
 
 *[ 개발 중 잘못된 Request나 데이터 오류로 인해 발생할 수 있는 경우 ]*::
@@ -404,7 +404,7 @@ include::{snippets}/questionnaire/submit/response-fields.adoc[]
 include::{snippets}/questionnaire/submit/response-body.adoc[]
 
 [[questionnaireResult]]
-== 문진표 결과 조회
+== 21. 문진표 결과 조회
 *문진표 결과 조회 API*
 
 *[ 개발 중 잘못된 Request나 데이터 오류로 인해 발생할 수 있는 경우 ]*::
@@ -420,7 +420,7 @@ include::{snippets}/questionnaire/result/response-fields.adoc[]
 include::{snippets}/questionnaire/result/response-body.adoc[]
 
 [[oralCheck]]
-== 구강 상태 조회
+== 22. 구강 상태 조회
 *구강 상태 조회 API*
 
 === Http
@@ -428,3 +428,38 @@ include::{snippets}/oralCheck/http-request.adoc[]
 === Response
 include::{snippets}/oralCheck/response-fields.adoc[]
 include::{snippets}/oralCheck/response-body.adoc[]
+
+[[contents]]
+== 23. 콘텐츠 조회
+*콘텐츠 조회 API*
+
+: 회원 상태에 따른 맞춤형 콘텐츠 여부는 다음과 같습니다.
+
+[비로그인, 미인증 사용자]::
+- 사용자 맞춤 콘텐츠 카테고리가 조회되지 않습니다.
+- 전체 > 질병 > 양치 > 예방 > 기타 순
+
+[인증된 사용자]::
+- 사용자 맞춤 콘텐츠 카테고리가 조회됩니다.
+- 전체 > [사용자 이름]님 맞춤 > 질병 > 양치 > 예방 > 기타 순
+
+=== Http
+include::{snippets}/contents/http-request.adoc[]
+=== Response
+include::{snippets}/contents/response-fields.adoc[]
+include::{snippets}/contents/response-body.adoc[]
+
+[[contentsCard]]
+== 24. 콘텐츠 카드뉴스 조회
+*콘텐츠 카드뉴스 조회 API*
+
+*[ 개발 중 잘못된 Request나 데이터 오류로 인해 발생할 수 있는 경우 ]*::
+- 존재하지 않는 콘텐츠의 경우 : `"존재하지 않는 콘텐츠입니다."`
+
+=== Http
+include::{snippets}/contents/card/http-request.adoc[]
+=== Request
+include::{snippets}/contents/card/query-parameters.adoc[]
+=== Response
+include::{snippets}/contents/card/response-fields.adoc[]
+include::{snippets}/contents/card/response-body.adoc[]

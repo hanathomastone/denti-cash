@@ -33,7 +33,7 @@ public class Contents extends TimeEntity {
     private String contentsTitle;
 
     @Column(length = 7, nullable = false)
-    private String contentsTitleColor;
+    private String contentsTypeColor;
 
     @Column(nullable = false)
     private String contentsThumbnail;
@@ -42,7 +42,7 @@ public class Contents extends TimeEntity {
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "contentsId")
-    private List<ContentsList> categoryIds;
+    private List<ContentsToCategory> categoryIds;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "contentsId")

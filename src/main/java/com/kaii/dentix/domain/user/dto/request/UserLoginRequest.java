@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor @NoArgsConstructor
 public class UserLoginRequest {
 
-    @NotBlank @Size(min = 4, max = 12)
+    @NotBlank
     private String userLoginIdentifier;
 
-    @NotBlank @Size(min = 8, max = 20)
+    @NotBlank
     private String userPassword;
 
     private String userDeviceModel;

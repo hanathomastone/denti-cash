@@ -1,7 +1,6 @@
 package com.kaii.dentix.domain.contents.controller;
 
 import com.kaii.dentix.domain.contents.application.ContentsService;
-import com.kaii.dentix.domain.contents.dto.ContentsCardDto;
 import com.kaii.dentix.domain.contents.dto.ContentsCardListDto;
 import com.kaii.dentix.domain.contents.dto.ContentsListDto;
 import com.kaii.dentix.global.common.response.DataResponse;

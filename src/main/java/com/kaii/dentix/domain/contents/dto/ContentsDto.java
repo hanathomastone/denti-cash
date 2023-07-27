@@ -20,7 +20,7 @@ public class ContentsDto {
 
     private ContentsType contentsType;
 
-    private String contentsTitleColor;
+    private String contentsTypeColor;
 
     private String contentsThumbnail;
 
