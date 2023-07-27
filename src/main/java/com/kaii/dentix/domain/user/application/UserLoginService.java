@@ -3,6 +3,7 @@ package com.kaii.dentix.domain.user.application;
 import com.kaii.dentix.domain.findPwdQuestion.dao.FindPwdQuestionRepository;
 import com.kaii.dentix.domain.jwt.JwtTokenUtil;
 import com.kaii.dentix.domain.jwt.TokenType;
+import com.kaii.dentix.domain.type.UserRole;
 import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.domain.patient.dao.PatientRepository;
 import com.kaii.dentix.domain.patient.domain.Patient;
@@ -17,6 +18,7 @@ import com.kaii.dentix.domain.userServiceAgreement.dao.UserServiceAgreementRepos
 import com.kaii.dentix.domain.userServiceAgreement.domain.UserServiceAgreement;
 import com.kaii.dentix.domain.userServiceAgreement.dto.request.UserServiceAgreementRequest;
 import com.kaii.dentix.global.common.error.exception.*;
+import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -268,6 +270,30 @@ public class UserLoginService {
     public void userModifyPassword(UserModifyPasswordRequest request){
         User user = userRepository.findById(request.getUserId()).orElseThrow(() -> new NotFoundDataException("존재하지 않는 회원입니다."));
         user.modifyUserPassword(passwordEncoder, request.getUserPassword());
+    }
+
+    /**
+     *  AccessToken 재발급
+     */
+    public AccessTokenDto accessTokenReissue(HttpServletRequest request) {
+
+        String refreshToken = jwtTokenUtil.getRefreshToken(request);
+
+        if (jwtTokenUtil.isExpired(refreshToken, TokenType.RefreshToken)) throw new TokenExpiredException();
+        Long userId = jwtTokenUtil.getUserId(refreshToken, TokenType.RefreshToken);
+        UserRole roles = jwtTokenUtil.getRoles(refreshToken, TokenType.RefreshToken);
+
+        switch (roles) {
+            case ROLE_USER:
+                User user = userRepository.findById(userId).orElseThrow(TokenExpiredException::new);
+                if (StringUtils.isBlank(user.getUserRefreshToken()) || !user.getUserRefreshToken().equals(refreshToken))
+                    throw new UnauthorizedException();
+
+                return AccessTokenDto.builder().accessToken(jwtTokenUtil.createToken(user, TokenType.AccessToken)).build();
+
+            default:
+                throw new TokenExpiredException();
+        }
     }
 
 }
