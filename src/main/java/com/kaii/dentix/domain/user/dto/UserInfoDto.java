@@ -15,6 +15,6 @@ public class UserInfoDto {
 
     private String userPhoneNumber;
 
-    private YnType isUserServiceAgree;
+    private YnType isUserMarketingAgree;
 
 }

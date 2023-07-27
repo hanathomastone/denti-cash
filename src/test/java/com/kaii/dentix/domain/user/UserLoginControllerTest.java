@@ -84,7 +84,7 @@ public class UserLoginControllerTest extends ControllerTest{
                 .accessToken("Access Token")
                 .refreshToken("Refresh Token")
                 .userId(1L)
-                .userLoginIdentifier("dentix123")
+                .userName("김덴티")
                 .build();
     }
 
@@ -320,7 +320,7 @@ public class UserLoginControllerTest extends ControllerTest{
                                 fieldWithPath("response.accessToken").type(JsonFieldType.STRING).description("Access Token"),
                                 fieldWithPath("response.refreshToken").type(JsonFieldType.STRING).description("Refresh Token"),
                                 fieldWithPath("response.userId").type(JsonFieldType.NUMBER).description("사용자 고유 번호"),
-                                fieldWithPath("response.userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디")
+                                fieldWithPath("response.userName").type(JsonFieldType.STRING).description("사용자 이름")
                         )
                 ));
 
