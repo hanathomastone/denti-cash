@@ -5,10 +5,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter @Builder
 @AllArgsConstructor @NoArgsConstructor
-public class ContentsListResponseDto {
+public class ContentsCardListDto {
 
-    private Long contentsCategoryId;
+    List<ContentsCardDto> cardList;
 
 }
