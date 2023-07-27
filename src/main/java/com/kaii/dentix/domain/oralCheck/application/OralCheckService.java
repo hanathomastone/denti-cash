@@ -395,6 +395,11 @@ public class OralCheckService {
             .timeInterval(latestQuestionnaire != null ? (today.getTime() - latestQuestionnaire.getCreated().getTime()) / 1000 : null)
             .build());
 
+        // sectionList에 sort 값 추가
+        for (int i = 0; i < sectionList.size(); i++) {
+            sectionList.get(i).setSort(i + 1);
+        }
+
         // 요일별 나의 구강 상태
         List<OralCheckDailyDto> dailyList = new ArrayList<>();
         calendar.add(Calendar.DATE, 1 - calendar.get(Calendar.DAY_OF_WEEK)); // 30일 전날이 포함된 일요일부터 시작

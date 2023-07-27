@@ -190,17 +190,20 @@ public class OralCheckControllerTest extends ControllerTest {
         OralCheckDto oralCheckDto = new OralCheckDto(
             Arrays.asList(
                 OralCheckSectionListDto.builder()
+                    .sort(1)
                     .sectionType(OralSectionType.ORAL_CHECK)
                     .date(date)
                     .timeInterval(1000L)
                     .build(),
                 OralCheckSectionListDto.builder()
+                    .sort(2)
                     .sectionType(OralSectionType.TOOTH_BRUSHING)
                     .date(date)
                     .timeInterval(1000L)
                     .toothBrushingList(List.of(new ToothBrushingDto(1L, date)))
                     .build(),
                 OralCheckSectionListDto.builder()
+                    .sort(3)
                     .sectionType(OralSectionType.ORAL_CHECK)
                     .date(date)
                     .timeInterval(1000L)
@@ -268,10 +271,11 @@ public class OralCheckControllerTest extends ControllerTest {
                     fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
                     fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
                     fieldWithPath("response.sectionList").type(JsonFieldType.ARRAY).description("최상단 섹션 목록"),
+                    fieldWithPath("response.sectionList[].sort").type(JsonFieldType.NUMBER).description("섹션 정렬"),
                     fieldWithPath("response.sectionList[].sectionType").type(JsonFieldType.STRING).attributes(oralSectionTypeFormat()).description("섹션 타입"),
                     fieldWithPath("response.sectionList[].date").type(JsonFieldType.STRING).optional().description("최근 시각"),
                     fieldWithPath("response.sectionList[].timeInterval").type(JsonFieldType.NUMBER).optional().attributes(timeIntervalFormat()).description("최근 시차"),
-                    fieldWithPath("response.sectionList[].toothBrushingList").type(JsonFieldType.ARRAY).optional().description("양치 목록 (양치일 때만 존재)"),
+                    fieldWithPath("response.sectionList[].toothBrushingList").type(JsonFieldType.ARRAY).description("양치 목록"),
                     fieldWithPath("response.sectionList[].toothBrushingList[].toothBrushingId").type(JsonFieldType.NUMBER).description("양치 고유번호"),
                     fieldWithPath("response.sectionList[].toothBrushingList[].created").type(JsonFieldType.STRING).attributes(dateTimeFormat()).description("양치 시각"),
                     fieldWithPath("response.dailyList").type(JsonFieldType.ARRAY).description("날짜별 목록"),
@@ -285,7 +289,7 @@ public class OralCheckControllerTest extends ControllerTest {
                     fieldWithPath("response.dailyList[].detailList[].oralCheckResultTotalType").type(JsonFieldType.STRING).optional().attributes(oralCheckResultTotalFormat()).description("전체 구강 상태"),
                     fieldWithPath("response.dailyList[].detailList[].toothBrushingCount").type(JsonFieldType.NUMBER).optional().description("양치 횟수"),
                     fieldWithPath("response.dailyList[].detailList[].oralCheckResultTotalType").type(JsonFieldType.STRING).optional().attributes(oralCheckResultTotalFormat()).description("전체 구강 상태"),
-                    fieldWithPath("response.dailyList[].detailList[].oralStatusList").type(JsonFieldType.ARRAY).optional().description("구강 상태 목록"),
+                    fieldWithPath("response.dailyList[].detailList[].oralStatusList").type(JsonFieldType.ARRAY).description("구강 상태 목록"),
                     fieldWithPath("response.dailyList[].detailList[].oralStatusList[].type").type(JsonFieldType.STRING).description("구강 상태 타입"),
                     fieldWithPath("response.dailyList[].detailList[].oralStatusList[].title").type(JsonFieldType.STRING).description("구강 상태 제목")
                 )

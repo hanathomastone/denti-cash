@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -27,5 +28,7 @@ public class OralCheckListDto {
     private long identifier;
     private OralCheckResultTotalType oralCheckResultTotalType;
     private Integer toothBrushingCount;
-    private List<OralStatusTypeDto> oralStatusList;
+
+    @Builder.Default
+    private List<OralStatusTypeDto> oralStatusList = new ArrayList<>();
 }
