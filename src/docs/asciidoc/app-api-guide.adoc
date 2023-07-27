@@ -438,8 +438,18 @@ include::{snippets}/oralCheck/http-request.adoc[]
 include::{snippets}/oralCheck/response-fields.adoc[]
 include::{snippets}/oralCheck/response-body.adoc[]
 
+[[dashboard]]
+== 24. 대시보드 조회
+*대시보드 조회 API*
+
+=== Http
+include::{snippets}/oralCheck/dashboard/http-request.adoc[]
+=== Response
+include::{snippets}/oralCheck/dashboard/response-fields.adoc[]
+include::{snippets}/oralCheck/dashboard/response-body.adoc[]
+
 [[contents]]
-== 24. 콘텐츠 조회
+== 25. 콘텐츠 조회
 *콘텐츠 조회 API*
 
 : 회원 상태에 따른 맞춤형 콘텐츠 여부는 다음과 같습니다.
@@ -459,7 +469,7 @@ include::{snippets}/contents/response-fields.adoc[]
 include::{snippets}/contents/response-body.adoc[]
 
 [[contentsCard]]
-== 25. 콘텐츠 카드뉴스 조회
+== 26. 콘텐츠 카드뉴스 조회
 *콘텐츠 카드뉴스 조회 API*
 
 *[ 개발 중 잘못된 Request나 데이터 오류로 인해 발생할 수 있는 경우 ]*::

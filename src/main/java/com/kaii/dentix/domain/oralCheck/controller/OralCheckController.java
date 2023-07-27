@@ -1,6 +1,7 @@
 package com.kaii.dentix.domain.oralCheck.controller;
 
 import com.kaii.dentix.domain.oralCheck.application.OralCheckService;
+import com.kaii.dentix.domain.oralCheck.dto.DashboardDto;
 import com.kaii.dentix.domain.oralCheck.dto.OralCheckDto;
 import com.kaii.dentix.domain.oralCheck.dto.OralCheckPhotoDto;
 import com.kaii.dentix.domain.oralCheck.dto.OralCheckResultDto;
@@ -36,6 +37,15 @@ public class OralCheckController {
     @GetMapping(value = "/result", name = "구강검진 결과")
     public DataResponse<OralCheckResultDto> oralCheckResult(HttpServletRequest httpServletRequest, @RequestParam Long oralCheckId){
         DataResponse<OralCheckResultDto> response = new DataResponse<>(oralCheckService.oralCheckResult(httpServletRequest, oralCheckId));
+        return response;
+    }
+
+    /**
+     * 대시보드 조회
+     */
+    @GetMapping(value = "/dashboard", name = "대시보드 조회")
+    public DataResponse<DashboardDto> dashboard(HttpServletRequest httpServletRequest){
+        DataResponse<DashboardDto> response = new DataResponse<>(oralCheckService.dashboard(httpServletRequest));
         return response;
     }
 

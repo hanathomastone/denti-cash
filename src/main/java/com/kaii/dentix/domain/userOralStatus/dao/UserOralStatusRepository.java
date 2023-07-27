@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface UserOralStatusRepository extends JpaRepository<UserOralStatus, Long> {
 
+    List<UserOralStatus> findAllByQuestionnaire(Questionnaire questionnaire);
     List<UserOralStatus> findAllByQuestionnaireIn(List<Questionnaire> questionnaireList);
 }

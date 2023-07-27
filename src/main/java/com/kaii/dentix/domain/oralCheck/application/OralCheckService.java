@@ -8,11 +8,15 @@ import com.kaii.dentix.domain.oralCheck.dto.*;
 import com.kaii.dentix.domain.oralCheck.dto.resoponse.OralCheckAnalysisResponse;
 import com.kaii.dentix.domain.oralStatus.domain.OralStatus;
 import com.kaii.dentix.domain.oralStatus.jpa.OralStatusRepository;
+import com.kaii.dentix.domain.questionnaire.dao.QuestionnaireCustomRepository;
 import com.kaii.dentix.domain.questionnaire.dao.QuestionnaireRepository;
 import com.kaii.dentix.domain.questionnaire.domain.Questionnaire;
 import com.kaii.dentix.domain.questionnaire.dto.OralStatusTypeDto;
+import com.kaii.dentix.domain.questionnaire.dto.QuestionnaireAndStatusDto;
+import com.kaii.dentix.domain.toothBrushing.dao.ToothBrushingCustomRepository;
 import com.kaii.dentix.domain.toothBrushing.dao.ToothBrushingRepository;
 import com.kaii.dentix.domain.toothBrushing.domain.ToothBrushing;
+import com.kaii.dentix.domain.toothBrushing.dto.ToothBrushingDailyCountDto;
 import com.kaii.dentix.domain.toothBrushing.dto.ToothBrushingDto;
 import com.kaii.dentix.domain.type.OralDateStatusType;
 import com.kaii.dentix.domain.type.OralSectionType;
@@ -30,6 +34,7 @@ import com.kaii.dentix.global.common.error.exception.NotFoundDataException;
 import com.kaii.dentix.global.common.response.DataResponse;
 import com.kaii.dentix.global.common.util.DateFormatUtil;
 import com.kaii.dentix.global.common.util.LambdaService;
+import com.kaii.dentix.global.common.util.Utils;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -62,7 +67,9 @@ public class OralCheckService {
 
     private final OralCheckRepository oralCheckRepository;
     private final ToothBrushingRepository toothBrushingRepository;
+    private final ToothBrushingCustomRepository toothBrushingCustomRepository;
     private final QuestionnaireRepository questionnaireRepository;
+    private final QuestionnaireCustomRepository questionnaireCustomRepository;
     private final OralStatusRepository oralStatusRepository;
     private final UserOralStatusRepository userOralStatusRepository;
 
@@ -493,5 +500,84 @@ public class OralCheckService {
                 .sectionList(sectionList)
                 .dailyList(dailyList)
                 .build();
+    }
+
+    /**
+     * 대시보드 조회
+     */
+    public DashboardDto dashboard(HttpServletRequest httpServletRequest) {
+        User user = userService.getTokenUser(httpServletRequest);
+
+        List<OralCheck> oralCheckList = oralCheckRepository.findAllByUserIdOrderByCreatedDesc(user.getUserId());
+
+        // 구강 촬영을 한 번이라도 하지 않으면 아무 데이터도 보이지 않음
+        if (oralCheckList.size() == 0) {
+            return new DashboardDto();
+        }
+
+        OralCheck latestOralCheck = oralCheckList.get(0);
+
+        List<ToothBrushingDailyCountDto> toothBrushingDailyCountList = toothBrushingCustomRepository.getDailyCount(user.getUserId());
+        // 양치 수
+        int toothBrushingTotalCount = toothBrushingDailyCountList.stream().mapToInt(ToothBrushingDailyCountDto::getCount).sum();
+
+        QuestionnaireAndStatusDto latestQuestionnaire = questionnaireCustomRepository.getLatestQuestionnaireAndHigherStatus(user.getUserId());
+
+        Calendar calendar = Calendar.getInstance();
+        Date today = calendar.getTime();
+
+        int oralCheckHealthyCount = 0;
+        int oralCheckGoodCount = 0;
+        int oralCheckAttentionCount = 0;
+        int oralCheckDangerCount = 0;
+        List<OralCheckDailyChangeDto> oralCheckDailyChangeList = new ArrayList<>();
+
+        String beforeDate = "";
+        for (int i = 0; i < oralCheckList.size(); i++) {
+            OralCheck oralCheck = oralCheckList.get(i);
+            // 구강 상태값 카운트
+            switch (oralCheck.getOralCheckResultTotalType()) {
+                case HEALTHY -> oralCheckHealthyCount++;
+                case GOOD -> oralCheckGoodCount++;
+                case ATTENTION -> oralCheckAttentionCount++;
+                case DANGER -> oralCheckDangerCount++;
+            }
+
+            // 구강 상태 변화 추이
+            if (oralCheckDailyChangeList.size() >= 10) {
+                continue;
+            }
+            String dateString = DateFormatUtil.dateToString("yyyy-MM-dd", oralCheck.getCreated());
+            if (beforeDate.equals(dateString)) {
+                continue;
+            }
+
+            oralCheckDailyChangeList.add(0, new OralCheckDailyChangeDto(oralCheckList.size() - i, oralCheck.getOralCheckResultTotalType()));
+            beforeDate = dateString;
+        }
+
+        // 5개 미만인 경우 미노출
+        if (oralCheckDailyChangeList.size() < 5) {
+            oralCheckDailyChangeList = new ArrayList<>();
+        }
+
+        return DashboardDto.builder()
+            .oralCheckTimeInterval((today.getTime() - latestOralCheck.getCreated().getTime()) / 1000)
+            .oralCheckTotalCount(oralCheckList.size())
+            .oralCheckHealthyCount(oralCheckHealthyCount)
+            .oralCheckGoodCount(oralCheckGoodCount)
+            .oralCheckAttentionCount(oralCheckAttentionCount)
+            .oralCheckDangerCount(oralCheckDangerCount)
+            .toothBrushingTotalCount(toothBrushingTotalCount)
+            .toothBrushingAverage(Utils.getDeleteDecimalValue((float) toothBrushingTotalCount / toothBrushingDailyCountList.size(), 1))
+            .oralStatus(latestQuestionnaire != null ? new OralStatusTypeDto(latestQuestionnaire.getOralStatusType(), latestQuestionnaire.getOralStatusTitle()) : null)
+            .questionnaireCreated(latestQuestionnaire != null ? latestQuestionnaire.getQuestionnaireCreated() : null)
+            .oralCheckResultTotalType(latestOralCheck.getOralCheckResultTotalType())
+            .oralCheckUpRightScoreType(latestOralCheck.getOralCheckUpRightScoreType())
+            .oralCheckUpLeftScoreType(latestOralCheck.getOralCheckUpLeftScoreType())
+            .oralCheckDownLeftScoreType(latestOralCheck.getOralCheckDownLeftScoreType())
+            .oralCheckDownRightScoreType(latestOralCheck.getOralCheckDownRightScoreType())
+            .oralCheckDailyList(oralCheckDailyChangeList)
+            .build();
     }
 }

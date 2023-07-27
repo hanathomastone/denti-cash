@@ -299,4 +299,84 @@ public class OralCheckControllerTest extends ControllerTest {
 
     }
 
+    /**
+     * 대시보드 조회
+     */
+    @Test
+    public void dashboard() throws Exception {
+        DashboardDto dashboardDto = DashboardDto.builder()
+            .oralCheckTimeInterval(1000L)
+            .oralCheckTotalCount(10)
+            .oralCheckHealthyCount(4)
+            .oralCheckGoodCount(3)
+            .oralCheckAttentionCount(2)
+            .oralCheckDangerCount(1)
+            .toothBrushingTotalCount(100)
+            .toothBrushingAverage(1.5F)
+            .oralStatus(new OralStatusTypeDto("A", "양치 관리형"))
+            .questionnaireCreated(new Date())
+            .oralCheckResultTotalType(OralCheckResultTotalType.GOOD)
+            .oralCheckUpRightScoreType(OralCheckDivisionScoreType.HEALTHY)
+            .oralCheckUpLeftScoreType(OralCheckDivisionScoreType.GOOD)
+            .oralCheckDownLeftScoreType(OralCheckDivisionScoreType.ATTENTION)
+            .oralCheckDownRightScoreType(OralCheckDivisionScoreType.DANGER)
+            .oralCheckDailyList(Arrays.asList(
+                new OralCheckDailyChangeDto(1, OralCheckResultTotalType.HEALTHY),
+                new OralCheckDailyChangeDto(2, OralCheckResultTotalType.GOOD),
+                new OralCheckDailyChangeDto(4, OralCheckResultTotalType.ATTENTION),
+                new OralCheckDailyChangeDto(8, OralCheckResultTotalType.DANGER),
+                new OralCheckDailyChangeDto(10, OralCheckResultTotalType.HEALTHY)
+            ))
+            .build();
+
+        // given
+        given(oralCheckService.dashboard(any(HttpServletRequest.class))).willReturn(dashboardDto);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+            RestDocumentationRequestBuilders.get("/oralCheck/dashboard")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "oralCheck-dashboard.이호준.AccessToken")
+                .with(user("user").roles("USER"))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+            .andExpect(jsonPath("rt").value(200))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andDo(document("oralCheck/dashboard",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                responseFields(
+                    fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
+                    fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
+                    fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
+                    fieldWithPath("response.oralCheckTimeInterval").type(JsonFieldType.NUMBER).optional().attributes(timeIntervalFormat()).description("구강 촬영 시차 (촬영 이력 없는 경우 null)"),
+                    fieldWithPath("response.oralCheckTotalCount").type(JsonFieldType.NUMBER).description("구강 촬영 횟수"),
+                    fieldWithPath("response.oralCheckHealthyCount").type(JsonFieldType.NUMBER).description("구강 촬영 건강 횟수"),
+                    fieldWithPath("response.oralCheckGoodCount").type(JsonFieldType.NUMBER).description("구강 촬영 양호 횟수"),
+                    fieldWithPath("response.oralCheckAttentionCount").type(JsonFieldType.NUMBER).description("구강 촬영 주의 횟수"),
+                    fieldWithPath("response.oralCheckDangerCount").type(JsonFieldType.NUMBER).description("구강 촬영 위험 횟수"),
+                    fieldWithPath("response.toothBrushingTotalCount").type(JsonFieldType.NUMBER).description("양치 횟수"),
+                    fieldWithPath("response.toothBrushingAverage").type(JsonFieldType.NUMBER).description("양치 일 평균"),
+                    fieldWithPath("response.oralStatus").type(JsonFieldType.OBJECT).optional().description("구강 상태"),
+                    fieldWithPath("response.oralStatus.type").type(JsonFieldType.STRING).description("구강 상태 타입"),
+                    fieldWithPath("response.oralStatus.title").type(JsonFieldType.STRING).description("구강 상태 제목"),
+                    fieldWithPath("response.questionnaireCreated").type(JsonFieldType.STRING).optional().attributes(dateTimeFormat()).description("최근 문진표 검사일"),
+                    fieldWithPath("response.oralCheckResultTotalType").type(JsonFieldType.STRING).optional().attributes(oralCheckResultTotalFormat()).description("최근 구강상태"),
+                    fieldWithPath("response.oralCheckUpRightScoreType").type(JsonFieldType.STRING).optional().attributes(oralCheckDivisionScoreFormat()).description("상악우측 상태"),
+                    fieldWithPath("response.oralCheckUpLeftScoreType").type(JsonFieldType.STRING).optional().attributes(oralCheckDivisionScoreFormat()).description("상악좌측 상태"),
+                    fieldWithPath("response.oralCheckDownLeftScoreType").type(JsonFieldType.STRING).optional().attributes(oralCheckDivisionScoreFormat()).description("하악좌측 상태"),
+                    fieldWithPath("response.oralCheckDownRightScoreType").type(JsonFieldType.STRING).optional().attributes(oralCheckDivisionScoreFormat()).description("하악우측 상태"),
+                    fieldWithPath("response.oralCheckDailyList").type(JsonFieldType.ARRAY).description("구강 상태 변화 추이"),
+                    fieldWithPath("response.oralCheckDailyList[].oralCheckNumber").type(JsonFieldType.NUMBER).description("회차"),
+                    fieldWithPath("response.oralCheckDailyList[].oralCheckResultTotalType").attributes(oralCheckResultTotalFormat()).description("구강상태")
+                )
+            ));
+
+        verify(oralCheckService).dashboard(any(HttpServletRequest.class));
+
+    }
+
 }

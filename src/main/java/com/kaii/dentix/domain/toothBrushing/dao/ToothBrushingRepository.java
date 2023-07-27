@@ -1,6 +1,5 @@
 package com.kaii.dentix.domain.toothBrushing.dao;
 
-import com.kaii.dentix.domain.oralCheck.domain.OralCheck;
 import com.kaii.dentix.domain.toothBrushing.domain.ToothBrushing;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
