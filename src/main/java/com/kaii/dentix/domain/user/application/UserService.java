@@ -74,6 +74,25 @@ public class UserService {
     }
 
     /**
+     * 토큰에서 User 추출 - 토큰 NULL 허용
+     */
+    public User getTokenUserNullable(HttpServletRequest servletRequest) {
+
+        String token = jwtTokenUtil.getAccessToken(servletRequest);
+
+        if (token == null){ // 비로그인 사용자
+            return null;
+        }
+
+        UserRole roles = jwtTokenUtil.getRoles(token, TokenType.AccessToken);
+        if (!roles.equals(UserRole.ROLE_USER)) throw new UnauthorizedException("권한이 없는 사용자입니다.");
+
+        Long userId = jwtTokenUtil.getUserId(token, TokenType.AccessToken);
+        return userRepository.findById(userId).orElseThrow(() -> new NotFoundDataException("존재하지 않는 사용자입니다."));
+
+    }
+
+    /**
      *  사용자 앱 정보 업데이트
      */
     @EventListener

@@ -54,4 +54,8 @@ public class DocumentOptionalGenerator {
         return setFormat("HEALTHY : 건강, GOOD : 양호, ATTENTION : 주의, DANGER : 위험, QUESTIONNAIRE : 문진표, ORAL_CHECK_PERIOD : 권장 촬영 기간");
     }
 
+    public static Attributes.Attribute contentsTypeFormat() {
+        return setFormat("CARD : 카드뉴스, VIDEO : 동영상, ANIMATION : 애니메이션");
+    }
+
 }
