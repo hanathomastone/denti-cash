@@ -53,7 +53,8 @@ public class QuestionnaireService {
     public QuestionnaireIdDto questionnaireSubmit(HttpServletRequest httpServletRequest, QuestionnaireSubmitRequest request) throws IOException {
         User user = userService.getTokenUser(httpServletRequest);
 
-        this.questionnaireValidate(request.getForm());
+        QuestionnaireTemplateJsonDto questionnaireTemplate = this.getQuestionnaireTemplate();
+        this.questionnaireValidate(questionnaireTemplate.getTemplate(), request.getForm());
 
         // TODO : AI 연동 및 상태값 도출
         Random random = new Random();
@@ -68,7 +69,14 @@ public class QuestionnaireService {
             typeList.add(chars[randomIndex]);
         }
 
-        Questionnaire questionnaire = questionnaireRepository.save(new Questionnaire(user.getUserId(), objectMapper.writeValueAsString(request.getForm()), typeList));
+        Questionnaire questionnaire = questionnaireRepository.save(
+            new Questionnaire(
+                user.getUserId(),
+                questionnaireTemplate.getVersion(),
+                objectMapper.writeValueAsString(request.getForm()),
+                typeList
+            )
+        );
 
         return new QuestionnaireIdDto(questionnaire.getQuestionnaireId());
     }
@@ -96,8 +104,7 @@ public class QuestionnaireService {
     /**
      * 문진표 양식 기준으로 validation 진행
      */
-    private void questionnaireValidate(List<QuestionnaireKeyValueDto> form) throws IOException {
-        List<QuestionnaireTemplateDto> questionnaireTemplate = this.getQuestionnaireTemplate().getTemplate();
+    private void questionnaireValidate(List<QuestionnaireTemplateDto> questionnaireTemplate, List<QuestionnaireKeyValueDto> form) {
         questionnaireTemplate.forEach(template -> {
             // 값 존재 확인
             Integer[] values = form.stream().filter(o -> o.getKey().equals(template.getKey()))

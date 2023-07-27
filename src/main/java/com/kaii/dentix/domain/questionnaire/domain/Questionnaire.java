@@ -22,14 +22,18 @@ public class Questionnaire extends TimeEntity {
     @Column(nullable = false)
     private Long userId;
 
+    @Column(nullable = false)
+    private String questionnaireVersion;
+
     @Column(name = "form", columnDefinition = "json")
     private String form;
 
     @OneToMany(mappedBy = "questionnaire", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     List<UserOralStatus> userOralStatusList;
 
-    public Questionnaire(Long userId, String form, List<String> oralStatusTypeList) {
+    public Questionnaire(Long userId, String questionnaireVersion, String form, List<String> oralStatusTypeList) {
         this.userId = userId;
+        this.questionnaireVersion = questionnaireVersion;
         this.form = form;
         userOralStatusList = oralStatusTypeList.stream()
             .map(oralStatusType -> new UserOralStatus(this, new OralStatus(oralStatusType)))
