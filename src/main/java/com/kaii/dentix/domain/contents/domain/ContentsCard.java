@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ *  콘텐츠 카드 뉴스
+ */
 @Entity
 @Getter @Builder
 @AllArgsConstructor @NoArgsConstructor

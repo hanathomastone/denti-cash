@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ *  콘텐츠 카테고리
+ */
 @Entity
 @Getter @Builder
 @AllArgsConstructor @NoArgsConstructor

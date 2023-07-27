@@ -5,14 +5,16 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Getter @Builder
 @AllArgsConstructor @NoArgsConstructor
-public class ContentsListDto {
+public class ContentsCategoryDto {
 
-    List<ContentsCategoryDto> categories;
+    private Long contentsCategoryId;
 
-    List<ContentsDto> contents;
+    private String contentsCategoryName;
+
+    private String contentsCategoryColor;
+
+    private int contentsCategorySort;
 
 }

@@ -7,14 +7,10 @@ import lombok.NoArgsConstructor;
 
 @Getter @Builder
 @AllArgsConstructor @NoArgsConstructor
-public class ContentsCategories {
+public class ContentsCardDto {
 
-    private Long contentsCategoryId;
+    private int contentsCardNumber;
 
-    private String contentsCategoryName;
-
-    private String contentsCategoryColor;
-
-    private int contentsCategorySort;
+    private String contentsCardPath;
 
 }

@@ -1,12 +1,11 @@
 package com.kaii.dentix.domain.contents.application;
 
+import com.kaii.dentix.domain.contents.dao.ContentsCardRepository;
 import com.kaii.dentix.domain.contents.dao.ContentsCategoryRepository;
 import com.kaii.dentix.domain.contents.dao.ContentsListRepository;
 import com.kaii.dentix.domain.contents.dao.ContentsRepository;
-import com.kaii.dentix.domain.contents.dto.ContentsListResponseDto;
-import com.kaii.dentix.domain.contents.dto.ContentsCategories;
-import com.kaii.dentix.domain.contents.dto.ContentsCategoryListDto;
-import com.kaii.dentix.domain.contents.dto.ContentsListDto;
+import com.kaii.dentix.domain.contents.domain.Contents;
+import com.kaii.dentix.domain.contents.dto.*;
 import com.kaii.dentix.domain.jwt.JwtTokenUtil;
 import com.kaii.dentix.domain.jwt.TokenType;
 import com.kaii.dentix.domain.type.UserRole;
@@ -38,10 +37,12 @@ public class ContentsService {
 
     private final ContentsListRepository contentsListRepository;
 
+    private final ContentsCardRepository contentsCardRepository;
+
     public User getTokenUser(HttpServletRequest servletRequest) {
         String token = jwtTokenUtil.getAccessToken(servletRequest);
 
-        if (token == null){
+        if (token == null){ // 비로그인 사용자
             return null;
         }
 
@@ -53,15 +54,15 @@ public class ContentsService {
     }
 
     /**
-     *  콘텐츠 카테고리 목록 조회
+     *  콘텐츠 조회
      */
     @Transactional
-    public ContentsCategoryListDto contentsCategoryList(HttpServletRequest httpServletRequest){
+    public ContentsListDto contentsList(HttpServletRequest httpServletRequest){
 
-        // 미로그인 사용자
-        List<ContentsCategories> categoryList = contentsCategoryRepository.findAll(Sort.by(Sort.Direction.ASC, "contentsCategorySort")).stream()
+        // 카테고리 리스트 - 비로그인 사용자의 경우
+        List<ContentsCategoryDto> categoryList = contentsCategoryRepository.findAll(Sort.by(Sort.Direction.ASC, "contentsCategorySort")).stream()
                 .map(contentsCategory ->
-                        ContentsCategories.builder()
+                        ContentsCategoryDto.builder()
                                 .contentsCategoryId(contentsCategory.getContentsCategoryId())
                                 .contentsCategorySort(contentsCategory.getContentsCategorySort())
                                 .contentsCategoryName(contentsCategory.getContentsCategoryName())
@@ -69,17 +70,15 @@ public class ContentsService {
                                 .build()
                 ).toList();
 
-        List<ContentsListDto> contentsListDto = contentsRepository
-                .findAll(Sort.by(Sort.Direction.ASC, "contentsSort"))
-                .stream()
+        // 콘텐츠 리스트 - 비로그인 사용자의 경우
+        List<ContentsDto> contentsDto = contentsRepository.findAll(Sort.by(Sort.Direction.ASC, "contentsSort")).stream()
                 .map(contents -> {
-                    List<ContentsListResponseDto> contentsLists = contentsListRepository
-                            .findByContentsId(contents.getContentsId())
-                            .stream()
-                            .map(contentsList -> new ContentsListResponseDto(contentsList.getContentsCategoryId()))
+                    // 콘텐츠 별 카테고리 Id 조회
+                    List<ContentsCategoryIdsDto> contentsLists = contentsListRepository.findByContentsId(contents.getContentsId()).stream()
+                            .map(contentsList -> new ContentsCategoryIdsDto(contentsList.getContentsCategoryId()))
                             .collect(Collectors.toList());
 
-                    return new ContentsListDto(
+                    return new ContentsDto(
                             contents.getContentsId(),
                             contents.getContentsTitle(),
                             contents.getContentsSort(),
@@ -87,32 +86,46 @@ public class ContentsService {
                             contents.getContentsTitleColor(),
                             contents.getContentsThumbnail(),
                             contents.getContentsPath(),
-                            contentsLists
-                    );
-                })
-                .toList();
+                            contentsLists);
+                }).toList();
 
         // 로그인 한 사용자
         if (this.getTokenUser(httpServletRequest) != null){
             User user = this.getTokenUser(httpServletRequest);
 
-            // 인증된 사용자
+            // 사용자 맞춤 카테고리 추가 - 인증된 사용자의 경우
             if (user.getPatientId() != null) {
-                List<ContentsCategories> newCategoryList = new ArrayList<>(categoryList);
-                ContentsCategories userCategory = ContentsCategories.builder()
+                List<ContentsCategoryDto> userCategoryList = new ArrayList<>(categoryList);
+                ContentsCategoryDto userCategory = ContentsCategoryDto.builder()
                         .contentsCategoryId(0L)
                         .contentsCategorySort(0)
                         .contentsCategoryName(user.getUserName() + "님 맞춤")
                         .contentsCategoryColor(null)
                         .build();
-                newCategoryList.add(0, userCategory);
+                userCategoryList.add(0, userCategory);
 
-                List<ContentsListDto> newwCategoryList = new ArrayList<>(contentsListDto);
+                List<ContentsDto> userContentsList = new ArrayList<>(contentsDto);
 
-                return new ContentsCategoryListDto(newCategoryList, newwCategoryList);
+                return new ContentsListDto(userCategoryList, userContentsList);
+
+                // TODO : 사용자 맞춤 콘텐츠 리스트 조회
             }
         }
-        return new ContentsCategoryListDto(categoryList, contentsListDto);
+        return new ContentsListDto(categoryList, contentsDto);
+    }
+
+    /**
+     *  콘텐츠 카드뉴스
+     */
+    @Transactional
+    public ContentsCardListDto contentsCard(Long contentsId){
+        Contents contents = contentsRepository.findById(contentsId).orElseThrow(() -> new NotFoundDataException("존재하지 않는 콘텐츠입니다."));
+
+        List<ContentsCardDto> contentsCardList = contentsCardRepository.findAllByContentsId(contents.getContentsId()).stream()
+                .map(contentsList -> new ContentsCardDto(contentsList.getContentsCardNumber(), contentsList.getContentsCardPath()))
+                .collect(Collectors.toList());
+
+        return new ContentsCardListDto(contentsCardList);
     }
 
 }

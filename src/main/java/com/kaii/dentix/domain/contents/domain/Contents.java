@@ -10,7 +10,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-
+/**
+ *  콘텐츠
+ */
 @Entity
 @Getter @Builder
 @AllArgsConstructor @NoArgsConstructor
@@ -41,5 +43,9 @@ public class Contents extends TimeEntity {
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "contentsId")
     private List<ContentsList> categoryIds;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "contentsId")
+    private List<ContentsCard> contentsCards;
 
 }
