@@ -11,6 +11,6 @@ import java.util.List;
 @AllArgsConstructor @NoArgsConstructor
 public class ServiceAgreementListDto {
 
-    private List<ServiceAgreementPathDto> serviceAgreement;
+    private List<ServiceAgreementDto> serviceAgreement;
 
 }

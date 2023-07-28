@@ -9,23 +9,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ServiceAgreementDto {
 
-    private Long serviceAgreeId;
-    private String serviceAgreeName;
-    private String serviceAgreeMenuName;
-    private String serviceAgreeFooterName;
+    private Long id;
+    private String name;
+    private String menuName;
+    private String footerName;
     private YnType isServiceAgreeRequired;
-    private String serviceAgreePath;
-
-    @Override
-    public String toString() {
-        return "{"
-                + "\"serviceAgreeId\":" + serviceAgreeId
-                + ", \"serviceAgreeName\":\"" + serviceAgreeName + "\""
-                + ", \"serviceAgreeMenuName\":\"" + serviceAgreeMenuName + "\""
-                + ", \"serviceAgreeFooterName\":\"" + serviceAgreeFooterName + "\""
-                + ", \"isServiceAgreeRequired\":\"" + isServiceAgreeRequired + "\""
-                + ", \"serviceAgreePath\":\"" + serviceAgreePath + "\""
-                + "}";
-    }
+    private String path;
 
 }

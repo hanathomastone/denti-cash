@@ -3,12 +3,12 @@ package com.kaii.dentix.domain.user.application;
 import com.kaii.dentix.domain.findPwdQuestion.dao.FindPwdQuestionRepository;
 import com.kaii.dentix.domain.jwt.JwtTokenUtil;
 import com.kaii.dentix.domain.jwt.TokenType;
+import com.kaii.dentix.domain.serviceAgreement.dto.ServiceAgreementListDto;
 import com.kaii.dentix.domain.type.UserRole;
 import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.domain.patient.dao.PatientRepository;
 import com.kaii.dentix.domain.patient.domain.Patient;
 import com.kaii.dentix.domain.serviceAgreement.application.ServiceAgreementService;
-import com.kaii.dentix.domain.serviceAgreement.dto.ServiceAgreementDto;
 import com.kaii.dentix.domain.user.dao.UserRepository;
 import com.kaii.dentix.domain.user.domain.User;
 import com.kaii.dentix.domain.user.dto.*;
@@ -86,18 +86,18 @@ public class UserLoginService {
         if (userRepository.findByPatientId(patient.getPatientId()).isPresent()) throw new AlreadyDataException("이미 가입한 사용자입니다.");
 
         // 서비스 이용 동의
-        List<ServiceAgreementDto> serviceAgreementList = serviceAgreementService.serviceAgreementList();
-        if (serviceAgreementList.size() != request.getUserServiceAgreementRequest().size())
+        ServiceAgreementListDto serviceAgreementList = serviceAgreementService.serviceAgreementList();
+        if (serviceAgreementList.getServiceAgreement().size() != request.getUserServiceAgreementRequest().size())
             throw new ValidationException("서비스 동의 개수 불일치");
 
-        serviceAgreementList.forEach(serviceAgreementDTO -> {
+        serviceAgreementList.getServiceAgreement().forEach(serviceAgreementDTO -> {
             UserServiceAgreementRequest userServiceAgreementRequest = request.getUserServiceAgreementRequest().stream()
-                    .filter(userServiceAgreementDTO -> serviceAgreementDTO.getServiceAgreeId().equals(userServiceAgreementDTO.getUserServiceAgreeId()))
+                    .filter(userServiceAgreementDTO -> serviceAgreementDTO.getId().equals(userServiceAgreementDTO.getUserServiceAgreeId()))
                     .findAny().orElseThrow(() -> new ValidationException("동의 항목 누락"));
 
             // 필수 동의 확인
             if (serviceAgreementDTO.getIsServiceAgreeRequired().equals(YnType.Y) && !userServiceAgreementRequest.getIsUserServiceAgree().equals(YnType.Y)) {
-                throw new BadRequestApiException(serviceAgreementDTO.getServiceAgreeName() + " : 필수 동의 항목입니다.");
+                throw new BadRequestApiException(serviceAgreementDTO.getName() + " : 필수 동의 항목입니다.");
             }
 
         });
@@ -148,25 +148,25 @@ public class UserLoginService {
         user.updateLogin(refreshToken);
 
         // 서비스 이용 동의
-        List<ServiceAgreementDto> serviceAgreementList = serviceAgreementService.serviceAgreementList();
-        if (serviceAgreementList.size() != request.getUserServiceAgreementRequest().size())
+        ServiceAgreementListDto serviceAgreementList = serviceAgreementService.serviceAgreementList();
+        if (serviceAgreementList.getServiceAgreement().size() != request.getUserServiceAgreementRequest().size())
             throw new ValidationException("서비스 동의 개수 불일치");
 
-        serviceAgreementList.forEach(serviceAgreementDTO -> {
+        serviceAgreementList.getServiceAgreement().forEach(serviceAgreementDTO -> {
             UserServiceAgreementRequest userServiceAgreementRequest = request.getUserServiceAgreementRequest().stream()
-                    .filter(userServiceAgreementDTO -> serviceAgreementDTO.getServiceAgreeId().equals(userServiceAgreementDTO.getUserServiceAgreeId()))
+                    .filter(userServiceAgreementDTO -> serviceAgreementDTO.getId().equals(userServiceAgreementDTO.getUserServiceAgreeId()))
                     .findAny().orElseThrow(() -> new ValidationException("동의 항목 누락"));
 
             Date now = new Date();
 
             // 필수 동의 확인
             if (serviceAgreementDTO.getIsServiceAgreeRequired().equals(YnType.Y) && !userServiceAgreementRequest.getIsUserServiceAgree().equals(YnType.Y)) {
-                throw new BadRequestApiException(serviceAgreementDTO.getServiceAgreeName() + " : 필수 동의 항목입니다.");
+                throw new BadRequestApiException(serviceAgreementDTO.getName() + " : 필수 동의 항목입니다.");
             }
 
             userServiceAgreementRepository.save(UserServiceAgreement.builder()
                     .userId(userId)
-                    .serviceAgreeId(serviceAgreementDTO.getServiceAgreeId())
+                    .serviceAgreeId(serviceAgreementDTO.getId())
                     .isUserServiceAgree(userServiceAgreementRequest.getIsUserServiceAgree())
                     .userServiceAgreeDate(now)
                     .build());

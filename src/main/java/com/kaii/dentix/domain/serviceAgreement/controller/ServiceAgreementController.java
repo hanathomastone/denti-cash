@@ -19,7 +19,7 @@ public class ServiceAgreementController {
      */
     @GetMapping(name = "약관 전체 조회")
     public DataResponse<ServiceAgreementListDto> serviceAgreementPath() {
-        DataResponse<ServiceAgreementListDto> response = new DataResponse<>(serviceAgreementService.serviceAgreementPath());
+        DataResponse<ServiceAgreementListDto> response = new DataResponse<>(serviceAgreementService.serviceAgreementList());
         return response;
     }
 
