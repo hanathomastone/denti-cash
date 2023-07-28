@@ -58,4 +58,8 @@ public class DocumentOptionalGenerator {
         return setFormat("CARD : 카드뉴스, VIDEO : 동영상, ANIMATION : 애니메이션");
     }
 
+    public static Attributes.Attribute isRequiredFormat() {
+        return setFormat("Y: 필수, N: 선택");
+    }
+
 }

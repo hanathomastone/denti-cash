@@ -482,3 +482,21 @@ include::{snippets}/contents/card/query-parameters.adoc[]
 === Response
 include::{snippets}/contents/card/response-fields.adoc[]
 include::{snippets}/contents/card/response-body.adoc[]
+
+[[serviceAgreement]]
+== 27. 약관 조회
+*약관 조회 API*
+
+: 테스트 시, 적용되는 링크는 다음과 같습니다.
+
+- *서비스 이용약관 경로* : `덴티하이 관리자 페이지`
+
+- *개인정보 수집 경로* : `덴티로카 관리자 페이지`
+
+- *마케팅 경로* : `덴티엑스 API 문서`
+
+=== Http
+include::{snippets}/service-agreement/http-request.adoc[]
+=== Response
+include::{snippets}/service-agreement/response-fields.adoc[]
+include::{snippets}/service-agreement/response-body.adoc[]

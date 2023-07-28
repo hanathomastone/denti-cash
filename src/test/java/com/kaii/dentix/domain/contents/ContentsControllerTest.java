@@ -154,15 +154,15 @@ public class ContentsControllerTest extends ControllerTest {
         List<ContentsCardDto> contentsCardList = Arrays.asList(
                 ContentsCardDto.builder()
                         .number(1)
-                        .path("http://dentix-api-dev.kai-i.com")
+                        .path("https://www.naver.com/")
                         .build(),
                 ContentsCardDto.builder()
                         .number(2)
-                        .path("http://dentix-api-dev.kai-i.com")
+                        .path("https://www.google.com/")
                         .build(),
                 ContentsCardDto.builder()
                         .number(3)
-                        .path("http://dentix-api-dev.kai-i.com")
+                        .path("https://www.daum.net/")
                         .build()
         );
 
