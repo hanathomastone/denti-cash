@@ -20,7 +20,7 @@ public class ContentsCard extends TimeEntity {
     private Long contentsCardId;
 
     @Column(nullable = false)
-    private Long contentsId;
+    private int contentsId;
 
     @Column(nullable = false)
     private int contentsCardNumber;

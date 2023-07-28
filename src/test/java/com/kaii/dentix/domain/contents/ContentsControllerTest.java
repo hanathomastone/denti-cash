@@ -66,39 +66,36 @@ public class ContentsControllerTest extends ControllerTest {
         // given
         List<ContentsCategoryDto> categories = Arrays.asList(
                 ContentsCategoryDto.builder()
-                        .contentsCategoryId(0L)
-                        .contentsCategoryName("김덴티님 맞춤")
-                        .contentsCategoryColor(null)
-                        .contentsCategorySort(0)
+                        .id(0)
+                        .name("김덴티님 맞춤")
+                        .color(null)
+                        .sort(0)
                         .build(),
                 ContentsCategoryDto.builder()
-                        .contentsCategoryId(1L)
-                        .contentsCategoryName("질병")
-                        .contentsCategoryColor("#98B4ED")
-                        .contentsCategorySort(1)
+                        .id(1)
+                        .name("질병")
+                        .color("#98B4ED")
+                        .sort(1)
                         .build(),
                 ContentsCategoryDto.builder()
-                        .contentsCategoryId(2L)
-                        .contentsCategoryName("양치")
-                        .contentsCategoryColor("#4B79EC")
-                        .contentsCategorySort(2)
+                        .id(2)
+                        .name("양치")
+                        .color("#4B79EC")
+                        .sort(2)
                         .build()
         );
 
-        List<ContentsCategoryIdsDto> contentsLists = Arrays.asList(
-                ContentsCategoryIdsDto.builder().contentsCategoryId(1L).build(),
-                ContentsCategoryIdsDto.builder().contentsCategoryId(2L).build()
-        );
+        List<Integer> contentsLists = Arrays.asList(1, 2);
 
         List<ContentsDto> contents = Arrays.asList(
                 ContentsDto.builder()
-                        .contentsId(1L)
-                        .contentsSort(1)
-                        .contentsTitle("백살도 거뜬한 건강한 치아관리 방법")
-                        .contentsType(ContentsType.CARD)
-                        .contentsTypeColor("#FF9F06")
-                        .contentsThumbnail("http://dentix-api-dev.kai-i.com")
-                        .contentsPath(null)
+                        .id(1)
+                        .sort(1)
+                        .title("백살도 거뜬한 건강한 치아관리 방법")
+                        .type(ContentsType.CARD)
+                        .typeColor("#FF9F06")
+                        .thumbnail("http://dentix-api-dev.kai-i.com")
+                        .videoURL(null)
                         .categoryIds(contentsLists)
                         .build()
         );
@@ -126,20 +123,20 @@ public class ContentsControllerTest extends ControllerTest {
                                 fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
                                 fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
                                 fieldWithPath("response.categories").type(JsonFieldType.ARRAY).description("콘텐츠 카테고리 목록"),
-                                fieldWithPath("response.categories[].contentsCategoryId").type(JsonFieldType.NUMBER).description("콘텐츠 카테고리 고유 번호"),
-                                fieldWithPath("response.categories[].contentsCategoryName").type(JsonFieldType.STRING).description("콘텐츠 카테고리 이름"),
-                                fieldWithPath("response.categories[].contentsCategoryColor").type(JsonFieldType.STRING).optional().description("콘텐츠 카테고리 색상"),
-                                fieldWithPath("response.categories[].contentsCategorySort").type(JsonFieldType.NUMBER).description("콘텐츠 카테고리 정렬 순서"),
+                                fieldWithPath("response.categories[].id").type(JsonFieldType.NUMBER).description("콘텐츠 카테고리 고유 번호"),
+                                fieldWithPath("response.categories[].name").type(JsonFieldType.STRING).description("콘텐츠 카테고리 이름"),
+                                fieldWithPath("response.categories[].color").type(JsonFieldType.STRING).optional().description("콘텐츠 카테고리 색상"),
+                                fieldWithPath("response.categories[].sort").type(JsonFieldType.NUMBER).description("콘텐츠 카테고리 정렬 순서"),
                                 fieldWithPath("response.contents").type(JsonFieldType.ARRAY).description("콘텐츠 목록"),
-                                fieldWithPath("response.contents[].contentsId").type(JsonFieldType.NUMBER).description("콘텐츠 고유 번호"),
-                                fieldWithPath("response.contents[].contentsTitle").type(JsonFieldType.STRING).description("콘텐츠 제목"),
-                                fieldWithPath("response.contents[].contentsSort").type(JsonFieldType.NUMBER).description("콘텐츠 정렬 순서"),
-                                fieldWithPath("response.contents[].contentsType").type(JsonFieldType.STRING).attributes(contentsTypeFormat()).description("콘텐츠 타입"),
-                                fieldWithPath("response.contents[].contentsTypeColor").type(JsonFieldType.STRING).description("콘텐츠 제목 색상"),
-                                fieldWithPath("response.contents[].contentsThumbnail").type(JsonFieldType.STRING).description("콘텐츠 썸네일"),
-                                fieldWithPath("response.contents[].contentsPath").type(JsonFieldType.STRING).optional().description("콘텐츠 경로"),
+                                fieldWithPath("response.contents[].id").type(JsonFieldType.NUMBER).description("콘텐츠 고유 번호"),
+                                fieldWithPath("response.contents[].title").type(JsonFieldType.STRING).description("콘텐츠 제목"),
+                                fieldWithPath("response.contents[].sort").type(JsonFieldType.NUMBER).description("콘텐츠 정렬 순서"),
+                                fieldWithPath("response.contents[].type").type(JsonFieldType.STRING).attributes(contentsTypeFormat()).description("콘텐츠 타입"),
+                                fieldWithPath("response.contents[].typeColor").type(JsonFieldType.STRING).description("콘텐츠 제목 색상"),
+                                fieldWithPath("response.contents[].thumbnail").type(JsonFieldType.STRING).description("콘텐츠 썸네일"),
+                                fieldWithPath("response.contents[].videoURL").type(JsonFieldType.STRING).optional().description("콘텐츠 동영상 경로"),
                                 fieldWithPath("response.contents[].categoryIds").type(JsonFieldType.ARRAY).description("콘텐츠 카테고리"),
-                                fieldWithPath("response.contents[].categoryIds[].contentsCategoryId").type(JsonFieldType.NUMBER).description("콘텐츠 카테고리 고유 번호")
+                                fieldWithPath("response.contents[].categoryIds[]").type(JsonFieldType.ARRAY).description("콘텐츠 카테고리 고유 번호")
                         )
                 ));
 
@@ -156,16 +153,16 @@ public class ContentsControllerTest extends ControllerTest {
         // given
         List<ContentsCardDto> contentsCardList = Arrays.asList(
                 ContentsCardDto.builder()
-                        .contentsCardNumber(1)
-                        .contentsCardPath("http://dentix-api-dev.kai-i.com")
+                        .number(1)
+                        .path("http://dentix-api-dev.kai-i.com")
                         .build(),
                 ContentsCardDto.builder()
-                        .contentsCardNumber(2)
-                        .contentsCardPath("http://dentix-api-dev.kai-i.com")
+                        .number(2)
+                        .path("http://dentix-api-dev.kai-i.com")
                         .build(),
                 ContentsCardDto.builder()
-                        .contentsCardNumber(3)
-                        .contentsCardPath("http://dentix-api-dev.kai-i.com")
+                        .number(3)
+                        .path("http://dentix-api-dev.kai-i.com")
                         .build()
         );
 
@@ -193,8 +190,8 @@ public class ContentsControllerTest extends ControllerTest {
                                 fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
                                 fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
                                 fieldWithPath("response.cardList").type(JsonFieldType.ARRAY).description("콘텐츠 카드뉴스 목록"),
-                                fieldWithPath("response.cardList[].contentsCardNumber").type(JsonFieldType.NUMBER).description("콘텐츠 카드뉴스 카드 번호"),
-                                fieldWithPath("response.cardList[].contentsCardPath").type(JsonFieldType.STRING).description("콘텐츠 카드뉴스 경로")
+                                fieldWithPath("response.cardList[].number").type(JsonFieldType.NUMBER).description("콘텐츠 카드뉴스 카드 번호"),
+                                fieldWithPath("response.cardList[].path").type(JsonFieldType.STRING).description("콘텐츠 카드뉴스 경로")
                         )
                 ));
 

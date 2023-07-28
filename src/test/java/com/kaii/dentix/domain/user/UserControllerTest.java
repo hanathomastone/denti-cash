@@ -66,7 +66,7 @@ public class UserControllerTest extends ControllerTest {
                 .accessToken("Access Token")
                 .refreshToken("Refresh Token")
                 .userId(1L)
-                .userLoginIdentifier("dentix123")
+                .userName("김덴티")
                 .build();
     }
 
@@ -95,7 +95,7 @@ public class UserControllerTest extends ControllerTest {
                 .userName("김덴티")
                 .userLoginIdentifier("detix123")
                 .userPhoneNumber("01012345678")
-                .isUserServiceAgree(YnType.Y)
+                .isUserMarketingAgree(YnType.Y)
                 .build();
     }
 
@@ -146,7 +146,7 @@ public class UserControllerTest extends ControllerTest {
                                 fieldWithPath("response.accessToken").type(JsonFieldType.STRING).description("Access Token"),
                                 fieldWithPath("response.refreshToken").type(JsonFieldType.STRING).description("Refresh Token"),
                                 fieldWithPath("response.userId").type(JsonFieldType.NUMBER).description("사용자 고유 번호"),
-                                fieldWithPath("response.userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디")
+                                fieldWithPath("response.userName").type(JsonFieldType.STRING).description("사용자 이름")
                         )
                 ));
 
@@ -476,7 +476,7 @@ public class UserControllerTest extends ControllerTest {
                                 fieldWithPath("response.userName").type(JsonFieldType.STRING).description("사용자 이름"),
                                 fieldWithPath("response.userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디"),
                                 fieldWithPath("response.userPhoneNumber").type(JsonFieldType.STRING).attributes(userNumberFormat()).description("사용자 연락처"),
-                                fieldWithPath("response.isUserServiceAgree").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("사용자 마케팅 동의 여부")
+                                fieldWithPath("response.isUserMarketingAgree").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("사용자 마케팅 동의 여부")
                         )
                 ));
 

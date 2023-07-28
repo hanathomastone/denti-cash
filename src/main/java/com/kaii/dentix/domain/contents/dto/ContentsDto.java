@@ -12,20 +12,20 @@ import java.util.List;
 @AllArgsConstructor @NoArgsConstructor
 public class ContentsDto {
 
-    private Long contentsId;
+    private int id;
 
-    private String contentsTitle;
+    private String title;
 
-    private int contentsSort;
+    private int sort;
 
-    private ContentsType contentsType;
+    private ContentsType type;
 
-    private String contentsTypeColor;
+    private String typeColor;
 
-    private String contentsThumbnail;
+    private String thumbnail;
 
-    private String contentsPath;
+    private String videoURL;
 
-    private List<ContentsCategoryIdsDto> categoryIds;
+    private List<Integer> categoryIds;
 
 }

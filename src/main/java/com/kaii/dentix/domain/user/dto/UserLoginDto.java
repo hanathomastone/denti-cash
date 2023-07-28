@@ -10,6 +10,6 @@ public class UserLoginDto extends TokenDto{
 
     private Long userId;
 
-    private String userLoginIdentifier;
+    private String userName;
 
 }

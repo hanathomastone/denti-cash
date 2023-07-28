@@ -9,12 +9,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor @NoArgsConstructor
 public class ContentsCategoryDto {
 
-    private Long contentsCategoryId;
+    private int id;
 
-    private String contentsCategoryName;
+    private String name;
 
-    private String contentsCategoryColor;
+    private String color;
 
-    private int contentsCategorySort;
+    private int sort;
 
 }

@@ -234,7 +234,7 @@ public class UserLoginService {
 
         return UserLoginDto.builder()
                 .userId(user.getUserId())
-                .userLoginIdentifier(user.getUserLoginIdentifier())
+                .userName(user.getUserName())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();

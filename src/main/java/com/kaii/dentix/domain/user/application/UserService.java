@@ -4,7 +4,6 @@ import com.kaii.dentix.domain.findPwdQuestion.dao.FindPwdQuestionRepository;
 import com.kaii.dentix.domain.jwt.JwtTokenUtil;
 import com.kaii.dentix.domain.jwt.TokenType;
 import com.kaii.dentix.domain.patient.dao.PatientRepository;
-import com.kaii.dentix.domain.patient.domain.Patient;
 import com.kaii.dentix.domain.serviceAgreement.dao.ServiceAgreementRepository;
 import com.kaii.dentix.domain.serviceAgreement.domain.ServiceAgreement;
 import com.kaii.dentix.domain.type.DeviceType;
@@ -54,8 +53,6 @@ public class UserService {
     private final UserServiceAgreementRepository userServiceAgreementRepository;
 
     private final ServiceAgreementRepository serviceAgreementRepository;
-
-    private final PatientRepository patientRepository;
 
 
     /**
@@ -147,7 +144,7 @@ public class UserService {
 
         return UserLoginDto.builder()
                 .userId(user.getUserId())
-                .userLoginIdentifier(user.getUserLoginIdentifier())
+                .userName(user.getUserName())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
@@ -237,9 +234,6 @@ public class UserService {
     public UserInfoDto userInfo(HttpServletRequest httpServletRequest){
         User user = this.getTokenUser(httpServletRequest);
 
-        // 사용자 연락처 조회를 위해 patientId 조회
-        Patient patient = patientRepository.findById(user.getPatientId()).orElseThrow(() -> new NotFoundDataException("회원 정보를 조회할 수 없습니다."));
-
         // 사용자 마케팅 동의 여부 조회를 위해 serviceAgreementId 조회
         ServiceAgreement serviceAgreement = serviceAgreementRepository.findByServiceAgreeType(ServiceAgreeType.MARKETING)
                 .orElseThrow(() -> new NotFoundDataException("존재하지 않는 서비스 이용 동의입니다."));
@@ -249,8 +243,8 @@ public class UserService {
         return UserInfoDto.builder()
                 .userName(user.getUserName())
                 .userLoginIdentifier(user.getUserLoginIdentifier())
-                .userPhoneNumber(patient.getPatientPhoneNumber())
-                .isUserServiceAgree(userServiceAgreement.getIsUserServiceAgree())
+                .userPhoneNumber(user.getUserPhoneNumber())
+                .isUserMarketingAgree(userServiceAgreement.getIsUserServiceAgree())
                 .build();
     }
 
