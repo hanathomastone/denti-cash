@@ -21,20 +21,20 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
-    
+
     private final JwtTokenUtil jwtTokenUtil;
 
     private final UserDeviceTypeService userDeviceTypeService;
 
     public static String[] EXCLUDE_URLS = {
-        "/actuator/health", // health check
-        "/docs/*", // restdocs
-        "/resources/edu/thumbnail/*",
-        "/corps",
-        "/login/*", "/login",
-        "/test/",
-        "/service-agreement/list",
-        "/contents", "/contents/*"
+            "/actuator/health", // health check
+            "/docs/*", // restdocs
+            "/resources/edu/thumbnail/*",
+            "/corps",
+            "/login/*", "/login",
+            "/test/",
+            "/service-agreement/*",
+            "/contents", "/contents/*"
     };
 
     /**
@@ -49,16 +49,16 @@ public class WebSecurityConfig {
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
 
         http.httpBasic(AbstractHttpConfigurer::disable) // rest api 만을 고려하여 기본 설정은 해제하겠습니다.
-            .cors(withDefaults())
-            .csrf(AbstractHttpConfigurer::disable) // csrf 보안 토큰 disable 처리
-            .sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 토큰 기반 인증이므로 세션 역시 사용하지 않습니다.
-            .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests // 권한 설정
-                    .requestMatchers(EXCLUDE_URLS).permitAll()
-                    .anyRequest().hasAnyRole("USER")
-            )
-            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenUtil), UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(new VersionCheckFilter(userDeviceTypeService), JwtAuthenticationFilter.class);
+                .cors(withDefaults())
+                .csrf(AbstractHttpConfigurer::disable) // csrf 보안 토큰 disable 처리
+                .sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 토큰 기반 인증이므로 세션 역시 사용하지 않습니다.
+                .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests // 권한 설정
+                        .requestMatchers(EXCLUDE_URLS).permitAll()
+                        .anyRequest().hasAnyRole("USER")
+                )
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new VersionCheckFilter(userDeviceTypeService), JwtAuthenticationFilter.class);
         return http.build();
     }
-    
+
 }

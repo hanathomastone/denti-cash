@@ -482,3 +482,18 @@ include::{snippets}/contents/card/query-parameters.adoc[]
 === Response
 include::{snippets}/contents/card/response-fields.adoc[]
 include::{snippets}/contents/card/response-body.adoc[]
+
+[[serviceAgreement]]
+== 27. 약관 조회
+*약관 조회 API*
+
+*[ 개발 중 잘못된 Request나 데이터 오류로 인해 발생할 수 있는 경우 ]*::
+- 존재하지 않는 약관의 경우 : `"존재하지 않는 약관입니다."`
+
+=== Http
+include::{snippets}/service-agreement/list/http-request.adoc[]
+=== Request
+include::{snippets}/service-agreement/list/query-parameters.adoc[]
+=== Response
+include::{snippets}/service-agreement/list/response-fields.adoc[]
+include::{snippets}/service-agreement/list/response-body.adoc[]
