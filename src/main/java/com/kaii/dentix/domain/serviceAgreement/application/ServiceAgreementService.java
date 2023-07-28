@@ -1,10 +1,9 @@
 package com.kaii.dentix.domain.serviceAgreement.application;
 
 import com.kaii.dentix.domain.serviceAgreement.dao.ServiceAgreementRepository;
-import com.kaii.dentix.domain.serviceAgreement.domain.ServiceAgreement;
 import com.kaii.dentix.domain.serviceAgreement.dto.ServiceAgreementDto;
 import com.kaii.dentix.domain.serviceAgreement.dto.ServiceAgreementListDto;
-import com.kaii.dentix.global.common.error.exception.NotFoundDataException;
+import com.kaii.dentix.domain.serviceAgreement.dto.ServiceAgreementPathDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -19,7 +18,7 @@ public class ServiceAgreementService {
     private final ServiceAgreementRepository serviceAgreementRepository;
 
     /**
-     * 서비스 동의 전체 조회
+     * 서비스 동의 목록
      */
     public List<ServiceAgreementDto> serviceAgreementList() {
 
@@ -36,11 +35,17 @@ public class ServiceAgreementService {
     }
 
     /**
-     *  약관 조회
+     *  약관 전체 조회
      */
-    public ServiceAgreementListDto serviceAgreement(Long serviceAgreeId){
-        ServiceAgreement serviceAgreement = serviceAgreementRepository.findById(serviceAgreeId).orElseThrow(() -> new NotFoundDataException("존재하지 않는 약관입니다."));
-        return ServiceAgreementListDto.builder().serviceAgreePath(serviceAgreement.getServiceAgreePath()).build();
+    public ServiceAgreementListDto serviceAgreementPath(){
+
+        List<ServiceAgreementPathDto> serviceAgreement = serviceAgreementRepository.findAll(Sort.by(Sort.Direction.ASC, "serviceAgreeSort")).stream()
+                .map(path -> ServiceAgreementPathDto.builder()
+                        .path(path.getServiceAgreePath())
+                        .build())
+                .collect(Collectors.toList());
+
+        return ServiceAgreementListDto.builder().serviceAgreement(serviceAgreement).build();
     }
 
 }

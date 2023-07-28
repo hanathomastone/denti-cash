@@ -5,12 +5,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Getter @Builder
 @AllArgsConstructor @NoArgsConstructor
-public class ServiceAgreementListDto {
+public class ServiceAgreementPathDto {
 
-    private List<ServiceAgreementPathDto> serviceAgreement;
+    private String path;
 
 }
