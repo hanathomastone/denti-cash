@@ -53,11 +53,13 @@ public class UserLoginService {
     /**
      * 사용자 서비스 이용동의 여부 확인 및 저장
      */
-    public void isUserServiceAgree(List<UserServiceAgreementRequest> request, Long userId){
+    public void userServiceAgreeCheckAndSave(List<UserServiceAgreementRequest> request, Long userId){
 
         List<ServiceAgreementDto> serviceAgreementList = serviceAgreementService.serviceAgreementList().getServiceAgreement();
         if (serviceAgreementList.size() != request.size())
             throw new ValidationException("서비스 동의 개수 불일치");
+
+        Date now = new Date();
 
         serviceAgreementList.forEach(serviceAgreementDTO -> {
             UserServiceAgreementRequest userServiceAgreementRequest = request.stream()
@@ -70,7 +72,6 @@ public class UserLoginService {
             }
 
             if (userId != null) { // 회원가입 시, 서비스 동의 목록 저장
-                Date now = new Date();
 
                 userServiceAgreementRepository.save(UserServiceAgreement.builder()
                         .userId(userId)
@@ -112,7 +113,7 @@ public class UserLoginService {
         }
 
         // 서비스 이용 동의
-        this.isUserServiceAgree(request.getUserServiceAgreementRequest(), null);
+        this.userServiceAgreeCheckAndSave(request.getUserServiceAgreementRequest(), null);
 
         return UserVerifyDto.builder()
                 .patientId(patient != null ? patient.getPatientId() : null) // true : 인증된 사용자, false : 미인증 사용자
@@ -160,7 +161,7 @@ public class UserLoginService {
         user.updateLogin(refreshToken);
 
         // 서비스 이용 동의
-        this.isUserServiceAgree(request.getUserServiceAgreementRequest(), userId);
+        this.userServiceAgreeCheckAndSave(request.getUserServiceAgreementRequest(), userId);
 
         publisher.publishEvent(new UserModifyDeviceInfoEvent(
                 user.getUserId(),
