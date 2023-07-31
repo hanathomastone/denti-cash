@@ -50,6 +50,40 @@ public class UserLoginService {
 
     private final ApplicationEventPublisher publisher;
 
+    /**
+     * 서비스 이용 동의
+     */
+    public void userServiceAgree(List<UserServiceAgreementRequest> request, Long userId){
+
+        List<ServiceAgreementDto> serviceAgreementList = serviceAgreementService.serviceAgreementList().getServiceAgreement();
+        if (serviceAgreementList.size() != request.size())
+            throw new ValidationException("서비스 동의 개수 불일치");
+
+        serviceAgreementList.forEach(serviceAgreementDTO -> {
+            UserServiceAgreementRequest userServiceAgreementRequest = request.stream()
+                    .filter(userServiceAgreementDTO -> serviceAgreementDTO.getId().equals(userServiceAgreementDTO.getUserServiceAgreeId()))
+                    .findAny().orElseThrow(() -> new ValidationException("동의 항목 누락"));
+
+            // 필수 동의 확인
+            if (serviceAgreementDTO.getIsServiceAgreeRequired().equals(YnType.Y) && !userServiceAgreementRequest.getIsUserServiceAgree().equals(YnType.Y)) {
+                throw new BadRequestApiException(serviceAgreementDTO.getName() + " : 필수 동의 항목입니다.");
+            }
+
+            if (userId != null) { // 회원가입 시, 서비스 동의 목록 저장
+                Date now = new Date();
+
+                userServiceAgreementRepository.save(UserServiceAgreement.builder()
+                        .userId(userId)
+                        .serviceAgreeId(serviceAgreementDTO.getId())
+                        .isUserServiceAgree(userServiceAgreementRequest.getIsUserServiceAgree())
+                        .userServiceAgreeDate(now)
+                        .build());
+            }
+
+        });
+
+    }
+
 
     /**
      *  사용자 회원 확인
@@ -76,6 +110,9 @@ public class UserLoginService {
 
         // 미인증 회원 (연락처 불일치 && 실명 불일치)
         if (patientList.size() == 0) {
+            // 서비스 이용 동의
+            this.userServiceAgree(request.getUserServiceAgreementRequest(), null);
+
             return UserVerifyDto.builder()
                     .patientId(null)
                     .patientPhoneNumber(request.getPatientPhoneNumber())
@@ -86,21 +123,7 @@ public class UserLoginService {
         if (userRepository.findByPatientId(patient.getPatientId()).isPresent()) throw new AlreadyDataException("이미 가입한 사용자입니다.");
 
         // 서비스 이용 동의
-        List<ServiceAgreementDto> serviceAgreementList = serviceAgreementService.serviceAgreementList().getServiceAgreement();
-        if (serviceAgreementList.size() != request.getUserServiceAgreementRequest().size())
-            throw new ValidationException("서비스 동의 개수 불일치");
-
-        serviceAgreementList.forEach(serviceAgreementDTO -> {
-            UserServiceAgreementRequest userServiceAgreementRequest = request.getUserServiceAgreementRequest().stream()
-                .filter(userServiceAgreementDTO -> serviceAgreementDTO.getId().equals(userServiceAgreementDTO.getUserServiceAgreeId()))
-                .findAny().orElseThrow(() -> new ValidationException("동의 항목 누락"));
-
-            // 필수 동의 확인
-            if (serviceAgreementDTO.getIsServiceAgreeRequired().equals(YnType.Y) && !userServiceAgreementRequest.getIsUserServiceAgree().equals(YnType.Y)) {
-                throw new BadRequestApiException(serviceAgreementDTO.getName() + " : 필수 동의 항목입니다.");
-            }
-
-        });
+        this.userServiceAgree(request.getUserServiceAgreementRequest(), null);
 
         return UserVerifyDto.builder()
                 .patientId(patient.getPatientId())
@@ -148,29 +171,7 @@ public class UserLoginService {
         user.updateLogin(refreshToken);
 
         // 서비스 이용 동의
-        List<ServiceAgreementDto> serviceAgreementList = serviceAgreementService.serviceAgreementList().getServiceAgreement();
-        if (serviceAgreementList.size() != request.getUserServiceAgreementRequest().size())
-            throw new ValidationException("서비스 동의 개수 불일치");
-
-        serviceAgreementList.forEach(serviceAgreementDTO -> {
-            UserServiceAgreementRequest userServiceAgreementRequest = request.getUserServiceAgreementRequest().stream()
-                    .filter(userServiceAgreementDTO -> serviceAgreementDTO.getId().equals(userServiceAgreementDTO.getUserServiceAgreeId()))
-                    .findAny().orElseThrow(() -> new ValidationException("동의 항목 누락"));
-
-            // 필수 동의 확인
-            if (serviceAgreementDTO.getIsServiceAgreeRequired().equals(YnType.Y) && !userServiceAgreementRequest.getIsUserServiceAgree().equals(YnType.Y)) {
-                throw new BadRequestApiException(serviceAgreementDTO.getName() + " : 필수 동의 항목입니다.");
-            }
-
-            Date now = new Date();
-
-            userServiceAgreementRepository.save(UserServiceAgreement.builder()
-                    .userId(userId)
-                    .serviceAgreeId(serviceAgreementDTO.getId())
-                    .isUserServiceAgree(userServiceAgreementRequest.getIsUserServiceAgree())
-                    .userServiceAgreeDate(now)
-                    .build());
-        });
+        this.userServiceAgree(request.getUserServiceAgreementRequest(), userId);
 
         publisher.publishEvent(new UserModifyDeviceInfoEvent(
                 user.getUserId(),
