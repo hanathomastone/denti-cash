@@ -51,9 +51,9 @@ public class UserLoginService {
     private final ApplicationEventPublisher publisher;
 
     /**
-     * 서비스 이용 동의
+     * 사용자 서비스 이용동의 여부 확인 및 저장
      */
-    public void userServiceAgree(List<UserServiceAgreementRequest> request, Long userId){
+    public void isUserServiceAgree(List<UserServiceAgreementRequest> request, Long userId){
 
         List<ServiceAgreementDto> serviceAgreementList = serviceAgreementService.serviceAgreementList().getServiceAgreement();
         if (serviceAgreementList.size() != request.size())
@@ -111,23 +111,12 @@ public class UserLoginService {
             }
         }
 
-        // 미인증 회원 (연락처 불일치 && 실명 불일치 || 연락처 불일치 && 실명 일치)
-        if (patientList.size() == 0 || patientList.stream().anyMatch(p -> p.getPatientName().equals(request.getPatientName()))) {
-            // 서비스 이용 동의
-            this.userServiceAgree(request.getUserServiceAgreementRequest(), null);
-
-            return UserVerifyDto.builder()
-                    .patientId(null)
-                    .patientPhoneNumber(request.getPatientPhoneNumber())
-                    .build();
-        }
-
         // 서비스 이용 동의
-        this.userServiceAgree(request.getUserServiceAgreementRequest(), null);
+        this.isUserServiceAgree(request.getUserServiceAgreementRequest(), null);
 
         return UserVerifyDto.builder()
-                .patientId(patient.getPatientId())
-                .patientPhoneNumber(patient.getPatientPhoneNumber())
+                .patientId(patient != null ? patient.getPatientId() : null) // true : 인증된 사용자, false : 미인증 사용자
+                .patientPhoneNumber(request.getPatientPhoneNumber())
                 .build();
     }
 
@@ -171,7 +160,7 @@ public class UserLoginService {
         user.updateLogin(refreshToken);
 
         // 서비스 이용 동의
-        this.userServiceAgree(request.getUserServiceAgreementRequest(), userId);
+        this.isUserServiceAgree(request.getUserServiceAgreementRequest(), userId);
 
         publisher.publishEvent(new UserModifyDeviceInfoEvent(
                 user.getUserId(),
