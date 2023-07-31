@@ -50,6 +50,40 @@ public class UserLoginService {
 
     private final ApplicationEventPublisher publisher;
 
+    /**
+     * 사용자 서비스 이용동의 여부 확인 및 저장
+     */
+    public void userServiceAgreeCheckAndSave(List<UserServiceAgreementRequest> request, Long userId){
+
+        List<ServiceAgreementDto> serviceAgreementList = serviceAgreementService.serviceAgreementList().getServiceAgreement();
+        if (serviceAgreementList.size() != request.size())
+            throw new ValidationException("서비스 동의 개수 불일치");
+
+        Date now = new Date();
+
+        serviceAgreementList.forEach(serviceAgreementDTO -> {
+            UserServiceAgreementRequest userServiceAgreementRequest = request.stream()
+                    .filter(userServiceAgreementDTO -> serviceAgreementDTO.getId().equals(userServiceAgreementDTO.getUserServiceAgreeId()))
+                    .findAny().orElseThrow(() -> new ValidationException("동의 항목 누락"));
+
+            // 필수 동의 확인
+            if (serviceAgreementDTO.getIsServiceAgreeRequired().equals(YnType.Y) && !userServiceAgreementRequest.getIsUserServiceAgree().equals(YnType.Y)) {
+                throw new BadRequestApiException(serviceAgreementDTO.getName() + " : 필수 동의 항목입니다.");
+            }
+
+            if (userId != null) { // 회원가입 시, 서비스 동의 목록 저장
+
+                userServiceAgreementRepository.save(UserServiceAgreement.builder()
+                        .userId(userId)
+                        .serviceAgreeId(serviceAgreementDTO.getId())
+                        .isUserServiceAgree(userServiceAgreementRequest.getIsUserServiceAgree())
+                        .userServiceAgreeDate(now)
+                        .build());
+            }
+
+        });
+
+    }
 
     /**
      *  사용자 회원 확인
@@ -63,6 +97,10 @@ public class UserLoginService {
                 .filter(p -> p.getPatientName().equals(request.getPatientName()) && p.getPatientPhoneNumber().equals(request.getPatientPhoneNumber()))
                 .findAny().orElse(null);
 
+        // 이미 가입된 사용자의 경우
+        if (patient != null && userRepository.findByPatientId(patient.getPatientId()).isPresent()) throw new AlreadyDataException("이미 가입한 사용자입니다.");
+
+        // 이미 사용 중인 연락처의 경우
         if (userRepository.findByUserPhoneNumber(request.getPatientPhoneNumber()).isPresent()) throw new AlreadyDataException("이미 사용중인 번호에요.\n번호를 다시 확인해 주세요.");
 
         if (patient == null) {
@@ -74,37 +112,12 @@ public class UserLoginService {
             }
         }
 
-        // 미인증 회원 (연락처 불일치 && 실명 불일치)
-        if (patientList.size() == 0) {
-            return UserVerifyDto.builder()
-                    .patientId(null)
-                    .patientPhoneNumber(request.getPatientPhoneNumber())
-                    .build();
-        }
-
-        // 이미 인증된 사용자
-        if (userRepository.findByPatientId(patient.getPatientId()).isPresent()) throw new AlreadyDataException("이미 가입한 사용자입니다.");
-
         // 서비스 이용 동의
-        List<ServiceAgreementDto> serviceAgreementList = serviceAgreementService.serviceAgreementList().getServiceAgreement();
-        if (serviceAgreementList.size() != request.getUserServiceAgreementRequest().size())
-            throw new ValidationException("서비스 동의 개수 불일치");
-
-        serviceAgreementList.forEach(serviceAgreementDTO -> {
-            UserServiceAgreementRequest userServiceAgreementRequest = request.getUserServiceAgreementRequest().stream()
-                .filter(userServiceAgreementDTO -> serviceAgreementDTO.getId().equals(userServiceAgreementDTO.getUserServiceAgreeId()))
-                .findAny().orElseThrow(() -> new ValidationException("동의 항목 누락"));
-
-            // 필수 동의 확인
-            if (serviceAgreementDTO.getIsServiceAgreeRequired().equals(YnType.Y) && !userServiceAgreementRequest.getIsUserServiceAgree().equals(YnType.Y)) {
-                throw new BadRequestApiException(serviceAgreementDTO.getName() + " : 필수 동의 항목입니다.");
-            }
-
-        });
+        this.userServiceAgreeCheckAndSave(request.getUserServiceAgreementRequest(), null);
 
         return UserVerifyDto.builder()
-                .patientId(patient.getPatientId())
-                .patientPhoneNumber(patient.getPatientPhoneNumber())
+                .patientId(patient != null ? patient.getPatientId() : null) // true : 인증된 사용자, false : 미인증 사용자
+                .patientPhoneNumber(request.getPatientPhoneNumber())
                 .build();
     }
 
@@ -130,15 +143,15 @@ public class UserLoginService {
         if (findPwdQuestionRepository.findById(request.getFindPwdQuestionId()).isEmpty()) throw new NotFoundDataException("존재하지 않는 질문입니다.");
 
         User user = userRepository.save(User.builder()
-            .userLoginIdentifier(request.getUserLoginIdentifier())
-            .userName(request.getUserName())
-            .userGender(request.getUserGender())
-            .userPassword(passwordEncoder.encode(request.getUserPassword()))
-            .findPwdQuestionId(request.getFindPwdQuestionId())
-            .findPwdAnswer(request.getFindPwdAnswer())
-            .patientId(request.getPatientId())
-            .userPhoneNumber(request.getUserPhoneNumber())
-        .build());
+                    .userLoginIdentifier(request.getUserLoginIdentifier())
+                    .userName(request.getUserName())
+                    .userGender(request.getUserGender())
+                    .userPassword(passwordEncoder.encode(request.getUserPassword()))
+                    .findPwdQuestionId(request.getFindPwdQuestionId())
+                    .findPwdAnswer(request.getFindPwdAnswer())
+                    .patientId(request.getPatientId())
+                    .userPhoneNumber(request.getUserPhoneNumber())
+                .build());
 
         Long userId = user.getUserId();
 
@@ -148,29 +161,7 @@ public class UserLoginService {
         user.updateLogin(refreshToken);
 
         // 서비스 이용 동의
-        List<ServiceAgreementDto> serviceAgreementList = serviceAgreementService.serviceAgreementList().getServiceAgreement();
-        if (serviceAgreementList.size() != request.getUserServiceAgreementRequest().size())
-            throw new ValidationException("서비스 동의 개수 불일치");
-
-        serviceAgreementList.forEach(serviceAgreementDTO -> {
-            UserServiceAgreementRequest userServiceAgreementRequest = request.getUserServiceAgreementRequest().stream()
-                    .filter(userServiceAgreementDTO -> serviceAgreementDTO.getId().equals(userServiceAgreementDTO.getUserServiceAgreeId()))
-                    .findAny().orElseThrow(() -> new ValidationException("동의 항목 누락"));
-
-            // 필수 동의 확인
-            if (serviceAgreementDTO.getIsServiceAgreeRequired().equals(YnType.Y) && !userServiceAgreementRequest.getIsUserServiceAgree().equals(YnType.Y)) {
-                throw new BadRequestApiException(serviceAgreementDTO.getName() + " : 필수 동의 항목입니다.");
-            }
-
-            Date now = new Date();
-
-            userServiceAgreementRepository.save(UserServiceAgreement.builder()
-                    .userId(userId)
-                    .serviceAgreeId(serviceAgreementDTO.getId())
-                    .isUserServiceAgree(userServiceAgreementRequest.getIsUserServiceAgree())
-                    .userServiceAgreeDate(now)
-                    .build());
-        });
+        this.userServiceAgreeCheckAndSave(request.getUserServiceAgreementRequest(), userId);
 
         publisher.publishEvent(new UserModifyDeviceInfoEvent(
                 user.getUserId(),
