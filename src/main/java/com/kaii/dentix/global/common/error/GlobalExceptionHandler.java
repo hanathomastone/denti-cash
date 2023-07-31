@@ -29,6 +29,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadRequestApiException.class)
     @ResponseStatus(HttpStatus.OK)
     public ErrorResponse BadRequestApiException(HttpServletRequest request, BadRequestApiException e) {
+        log.info("error : ", e);
         if (e.getMessage().isEmpty()) {
             return ErrorResponse.of(HttpStatus.BAD_REQUEST, ResponseMessage.BAD_REQUEST_MSG);
         } else {
@@ -43,6 +44,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnauthorizedException.class)
     @ResponseStatus(HttpStatus.OK)
     public ErrorResponse UnauthorizedException(HttpServletRequest request, UnauthorizedException e) {
+        log.info("error : ", e);
         return ErrorResponse.of(HttpStatus.UNAUTHORIZED, ResponseMessage.UNAUTHORIZED_MSG.replace("{Msg}", e.getMessage()));
     }
     
@@ -53,6 +55,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TokenExpiredException.class)
     @ResponseStatus(HttpStatus.OK)
     public ErrorResponse TokenExpiredException(HttpServletRequest request, TokenExpiredException e) {
+        log.info("error : ", e);
         return ErrorResponse.of(HttpStatus.FORBIDDEN, ResponseMessage.FORBIDDEN_MSG);
     }
     
@@ -63,6 +66,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     public ErrorResponse HttpRequestMethodNotSupportedException(HttpServletRequest request, HttpRequestMethodNotSupportedException e) {
+        log.info("error : ", e);
         return ErrorResponse.of(HttpStatus.METHOD_NOT_ALLOWED, ResponseMessage.METHOD_NOT_ALLOWED_MSG);
     }
 
@@ -73,6 +77,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.OK)
     public ErrorResponse HttpMessageNotReadableException(HttpServletRequest request, HttpMessageNotReadableException e) {
+        log.info("error : ", e);
         return ErrorResponse.of(HttpStatus.METHOD_NOT_ALLOWED, ResponseMessage.HTTP_MESSAGE_NOT_READABLE_MSG.replace("{msg}", Objects.requireNonNull(e.getMessage())));
     }
 
@@ -83,6 +88,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RequiredVersionInfoException.class)
     @ResponseStatus(HttpStatus.OK)
     public ErrorResponse RequiredVersionInfoException(HttpServletRequest request, RequiredVersionInfoException e) {
+        log.info("error : ", e);
         return ErrorResponse.of(HttpStatus.NOT_ACCEPTABLE, ResponseMessage.REQUIRED_VERSION_INFO_MSG);
     }
 
@@ -93,6 +99,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotFoundDataException.class)
     @ResponseStatus(HttpStatus.OK)
     public ErrorResponse NotFoundDataException(HttpServletRequest request, NotFoundDataException e) {
+        log.info("error : ", e);
         return ErrorResponse.of(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE, ResponseMessage.UNPROCESSABLE_ENTITY_MSG.replace("{DataName}", e.getMessage()));
     }
     
@@ -103,6 +110,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.OK)
     public ErrorResponse MethodArgumentNotValidException(HttpServletRequest request, MethodArgumentNotValidException e) {
+        log.info("error : ", e);
         return ErrorResponse.of(HttpStatus.EXPECTATION_FAILED, ResponseMessage.EXPECTATION_FAILED_MSG.replace("{FieldName}", e.getBindingResult().getFieldError().getField()));
     }
     
@@ -113,6 +121,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.OK)
     public ErrorResponse MissingServletRequestParameterException(HttpServletRequest request, MissingServletRequestParameterException e) {
+        log.info("error : ", e);
         return ErrorResponse.of(HttpStatus.EXPECTATION_FAILED, ResponseMessage.EXPECTATION_FAILED_MSG.replace("{FieldName}", e.getParameterName()));
     }
 
@@ -123,6 +132,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MissingServletRequestPartException.class)
     @ResponseStatus(HttpStatus.OK)
     public ErrorResponse MissingServletRequestPartException(HttpServletRequest request, MissingServletRequestPartException e) {
+        log.info("error : ", e);
         return ErrorResponse.of(HttpStatus.EXPECTATION_FAILED, ResponseMessage.EXPECTATION_FAILED_MSG.replace("{FieldName}", e.getRequestPartName()));
     }
     
@@ -133,6 +143,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BindException.class)
     @ResponseStatus(HttpStatus.OK)
     public ErrorResponse BindException(HttpServletRequest request, BindException e) {
+        log.info("error : ", e);
         return ErrorResponse.of(HttpStatus.EXPECTATION_FAILED, ResponseMessage.EXPECTATION_FAILED_MSG.replace("{FieldName}", e.getFieldError().getField()));
     }
     
@@ -143,6 +154,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(FormValidationException.class)
     @ResponseStatus(HttpStatus.OK)
     public ErrorResponse FormValidationException(HttpServletRequest request, FormValidationException e) {
+        log.info("error : ", e);
         return ErrorResponse.of(HttpStatus.EXPECTATION_FAILED, e.getMessage());
     }
 
@@ -153,6 +165,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.OK)
     public ErrorResponse ValidationException(HttpServletRequest request, ValidationException e) {
+        log.info("error : ", e);
         return ErrorResponse.of(HttpStatus.EXPECTATION_FAILED, e.getMessage());
     }
 
@@ -163,6 +176,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.OK)
     public ErrorResponse ConstraintViolationException(HttpServletRequest request, ConstraintViolationException e) {
+        log.info("error : ", e);
         return ErrorResponse.of(HttpStatus.EXPECTATION_FAILED, e.getMessage());
     }
     
@@ -173,6 +187,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AlreadyDataException.class)
     @ResponseStatus(HttpStatus.OK)
     public ErrorResponse AlreadyDataException(HttpServletRequest request, AlreadyDataException e) {
+        log.info("error : ", e);
         if (e.getMessage().isEmpty()) {
             return ErrorResponse.of(HttpStatus.UNPROCESSABLE_ENTITY, ResponseMessage.ALREADY_DATA_MSG);
         } else {
@@ -184,10 +199,11 @@ public class GlobalExceptionHandler {
      * 알수 없는 오류(내부 서버 오류)
      * httpStatus 500
      */
-    @ExceptionHandler(RuntimeException.class)
+    @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.OK)
-    public ErrorResponse handleRuntimeException(HttpServletRequest request, RuntimeException e) {
-        log.info("error : " + e.toString());
+    public ErrorResponse Exception(HttpServletRequest request, Exception e) {
+        log.error("error : " + e);
+        log.info("error : ", e);
         return ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, ResponseMessage.INTERNAL_SERVER_ERROR_MSG);
     }
 }
