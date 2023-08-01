@@ -21,7 +21,7 @@ public class AdminController {
     /**
      *  관리자 등록
      */
-    @PostMapping(name = "관리자 등록")
+    @PostMapping(value = "/signUp", name = "관리자 등록")
     public DataResponse<AdminSignUpDto> adminSignUp(@Valid @RequestBody AdminSignUpRequest request){
         DataResponse<AdminSignUpDto> response = new DataResponse<>(adminService.adminSignUp(request));
         return response;
