@@ -11,8 +11,6 @@ public class AdminSignUpDto {
 
     private Long adminId;
 
-    private String adminPassword;
-
-    private String adminPassword;
+    private String adminName;
 
 }
