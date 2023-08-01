@@ -13,4 +13,6 @@ public class AdminSignUpDto {
 
     private String adminName;
 
+    private String adminPassword;
+
 }
