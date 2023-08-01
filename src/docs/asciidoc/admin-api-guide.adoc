@@ -1,0 +1,41 @@
+ifndef::snippets[]
+:snippets: build/generated-snippets
+endif::[]
+ifndef::doc[]
+:doc: src/docs/asciidoc
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+:operation-http-request-title: Example Request
+:operation-http-response-title: Example Response
+ifndef::snippets-custom[]
+:snippets-custom: ../../../src/docs/custom
+
+
+
+[[title]]
+= DTX 관리자 API 문서
+
+include::admin-common.adoc[]
+
+[[signUp]]
+== 1. 관리자 등록
+
+*관리자 등록 API*
+
+*[ 등록 실패 ]* ::
+
+- 아이디 중복 : `"이미 존재하는 아이디입니다."`
+- 이미 가입된 관리자 : `"이미 존재하는 관리자 정보입니다."`
+
+=== Http
+include::{snippets}/admin/signUp/http-request.adoc[]
+=== Request
+include::{snippets}/admin/signUp/request-fields.adoc[]
+=== Response
+include::{snippets}/admin/signUp/response-fields.adoc[]
+include::{snippets}/admin/signUp/response-body.adoc[]
