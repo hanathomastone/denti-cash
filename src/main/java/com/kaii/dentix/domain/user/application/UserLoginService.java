@@ -112,9 +112,6 @@ public class UserLoginService {
             }
         }
 
-        // 서비스 이용 동의
-        this.userServiceAgreeCheckAndSave(request.getUserServiceAgreementRequest(), null);
-
         return UserVerifyDto.builder()
                 .patientId(patient != null ? patient.getPatientId() : null) // true : 인증된 사용자, false : 미인증 사용자
                 .patientPhoneNumber(request.getPatientPhoneNumber())

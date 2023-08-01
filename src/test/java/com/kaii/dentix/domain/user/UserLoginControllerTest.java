@@ -113,11 +113,6 @@ public class UserLoginControllerTest extends ControllerTest{
         UserVerifyRequest userVerifyRequest = UserVerifyRequest.builder()
                 .patientPhoneNumber("01012345678")
                 .patientName("김덴티")
-                .userServiceAgreementRequest(Arrays.asList(
-                        new UserServiceAgreementRequest(1L, YnType.Y),
-                        new UserServiceAgreementRequest(2L, YnType.Y),
-                        new UserServiceAgreementRequest(3L, YnType.N)
-                ))
                 .build();
 
         // when
@@ -136,10 +131,7 @@ public class UserLoginControllerTest extends ControllerTest{
                         getDocumentResponse(),
                         requestFields(
                                 fieldWithPath("patientPhoneNumber").type(JsonFieldType.STRING).attributes(userNumberFormat()).description("사용자(환자) 연락처"),
-                                fieldWithPath("patientName").type(JsonFieldType.STRING).description("사용자(환자) 실명"),
-                                fieldWithPath("userServiceAgreementRequest[]").type(JsonFieldType.ARRAY).description("사용자 서비스 동의"),
-                                fieldWithPath("userServiceAgreementRequest[].userServiceAgreeId").type(JsonFieldType.NUMBER).description("사용자 서비스 동의 고유 번호"),
-                                fieldWithPath("userServiceAgreementRequest[].isUserServiceAgree").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("사용자 서비스 동의 여부")
+                                fieldWithPath("patientName").type(JsonFieldType.STRING).description("사용자(환자) 실명")
                         ),
                         responseFields(
                                 fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
