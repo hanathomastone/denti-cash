@@ -1,6 +1,7 @@
 package com.kaii.dentix.domain.user.domain;
 
 import com.kaii.dentix.domain.type.GenderType;
+import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.global.common.entity.TimeEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -31,9 +32,6 @@ public class User extends TimeEntity {
     @Column(length = 45, nullable = false)
     private String userName;
 
-    @Column(length = 11, nullable = false)
-    private String userPhoneNumber;
-
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum", nullable = false)
     private GenderType userGender;
@@ -53,6 +51,10 @@ public class User extends TimeEntity {
     public Date userLastLoginDate;
 
     private Long patientId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "enum", nullable = false)
+    private YnType isVerify;
 
     private Long userDeviceTypeId;
 

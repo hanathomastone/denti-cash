@@ -147,7 +147,7 @@ public class UserLoginService {
                     .findPwdQuestionId(request.getFindPwdQuestionId())
                     .findPwdAnswer(request.getFindPwdAnswer())
                     .patientId(request.getPatientId())
-                    .userPhoneNumber(request.getUserPhoneNumber())
+                    .isVerify(request.getPatientId() == null ? YnType.N : YnType.Y)
                 .build());
 
         Long userId = user.getUserId();
@@ -177,7 +177,6 @@ public class UserLoginService {
                 .userLoginIdentifier(request.getUserLoginIdentifier())
                 .userName(request.getUserName())
                 .userGender(request.getUserGender())
-                .userPhoneNumber(request.getUserPhoneNumber())
                 .build();
     }
 
