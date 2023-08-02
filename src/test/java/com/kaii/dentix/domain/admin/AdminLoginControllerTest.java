@@ -2,8 +2,8 @@ package com.kaii.dentix.domain.admin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaii.dentix.common.ControllerTest;
-import com.kaii.dentix.domain.admin.admin.application.AdminService;
-import com.kaii.dentix.domain.admin.admin.controller.AdminController;
+import com.kaii.dentix.domain.admin.admin.application.AdminLoginService;
+import com.kaii.dentix.domain.admin.admin.controller.AdminLoginController;
 import com.kaii.dentix.domain.admin.admin.dto.AdminSignUpDto;
 import com.kaii.dentix.domain.admin.admin.dto.request.AdminSignUpRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,8 +32,8 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(AdminController.class)
-public class AdminControllerTest extends ControllerTest {
+@WebMvcTest(AdminLoginController.class)
+public class AdminLoginControllerTest extends ControllerTest {
 
     private MockMvc mockMvc;
 
@@ -48,7 +48,7 @@ public class AdminControllerTest extends ControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private AdminService adminService;
+    private AdminLoginService adminLoginService;
 
     public AdminSignUpDto adminSignUpDto(){
         return AdminSignUpDto.builder()
@@ -65,7 +65,7 @@ public class AdminControllerTest extends ControllerTest {
     public void adminSignUp() throws Exception{
 
         // given
-        given(adminService.adminSignUp(any(AdminSignUpRequest.class))).willReturn(adminSignUpDto());
+        given(adminLoginService.adminSignUp(any(AdminSignUpRequest.class))).willReturn(adminSignUpDto());
 
         AdminSignUpRequest adminSignUpRequest = AdminSignUpRequest.builder()
                 .adminName("홍길동")
@@ -102,7 +102,7 @@ public class AdminControllerTest extends ControllerTest {
                         )
                 ));
 
-        verify(adminService).adminSignUp(any(AdminSignUpRequest.class));
+        verify(adminLoginService).adminSignUp(any(AdminSignUpRequest.class));
 
     }
 
