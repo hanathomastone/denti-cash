@@ -77,7 +77,7 @@ public class UserService {
 
         String token = jwtTokenUtil.getAccessToken(servletRequest);
 
-        if (token == null){ // 비로그인 사용자
+        if (token.isEmpty()){ // 비로그인 사용자
             return null;
         }
 
