@@ -4,6 +4,7 @@ import com.kaii.dentix.domain.findPwdQuestion.dao.FindPwdQuestionRepository;
 import com.kaii.dentix.domain.jwt.JwtTokenUtil;
 import com.kaii.dentix.domain.jwt.TokenType;
 import com.kaii.dentix.domain.patient.dao.PatientRepository;
+import com.kaii.dentix.domain.patient.domain.Patient;
 import com.kaii.dentix.domain.serviceAgreement.dao.ServiceAgreementRepository;
 import com.kaii.dentix.domain.serviceAgreement.domain.ServiceAgreement;
 import com.kaii.dentix.domain.type.DeviceType;
@@ -54,6 +55,8 @@ public class UserService {
     private final UserServiceAgreementRepository userServiceAgreementRepository;
 
     private final ServiceAgreementRepository serviceAgreementRepository;
+
+    private final PatientRepository patientRepository;
 
 
     /**
@@ -244,7 +247,7 @@ public class UserService {
         return UserInfoDto.builder()
                 .userName(user.getUserName())
                 .userLoginIdentifier(user.getUserLoginIdentifier())
-                .userPhoneNumber(user.getUserPhoneNumber())
+                .userPhoneNumber(user.getPatientId() == null ? null : patientRepository.findById(user.getPatientId()).get().getPatientPhoneNumber())
                 .isUserMarketingAgree(userServiceAgreement.getIsUserServiceAgree())
                 .build();
     }
