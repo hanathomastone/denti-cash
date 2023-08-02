@@ -1,7 +1,6 @@
 package com.kaii.dentix.domain.admin.admin.dao;
 
 import com.kaii.dentix.domain.admin.admin.domain.Admin;
-import com.kaii.dentix.domain.type.YnType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
