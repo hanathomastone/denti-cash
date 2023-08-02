@@ -26,6 +26,7 @@ import com.kaii.dentix.domain.userServiceAgreement.dto.request.UserModifyService
 import com.kaii.dentix.global.common.error.exception.NotFoundDataException;
 import com.kaii.dentix.global.common.error.exception.RequiredVersionInfoException;
 import com.kaii.dentix.global.common.error.exception.UnauthorizedException;
+import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -77,7 +78,7 @@ public class UserService {
 
         String token = jwtTokenUtil.getAccessToken(servletRequest);
 
-        if (token.isEmpty()){ // 비로그인 사용자
+        if (StringUtils.isEmpty(token)){ // 비로그인 사용자
             return null;
         }
 
