@@ -4,8 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaii.dentix.common.ControllerTest;
 import com.kaii.dentix.domain.admin.admin.application.AdminLoginService;
 import com.kaii.dentix.domain.admin.admin.controller.AdminLoginController;
+import com.kaii.dentix.domain.admin.admin.dto.AdminLoginDto;
 import com.kaii.dentix.domain.admin.admin.dto.AdminSignUpDto;
+import com.kaii.dentix.domain.admin.admin.dto.request.AdminLoginRequest;
 import com.kaii.dentix.domain.admin.admin.dto.request.AdminSignUpRequest;
+import com.kaii.dentix.domain.type.YnType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +61,17 @@ public class AdminLoginControllerTest extends ControllerTest {
                 .build();
     }
 
+    public AdminLoginDto adminLoginDto(){
+        return AdminLoginDto.builder()
+                .adminId(1L)
+                .isFirstLogin(YnType.Y)
+                .adminName("홍길동")
+                .accessToken("AccessToken")
+                .refreshToken("RefreshToken")
+                .isSuper(YnType.N)
+                .build();
+    }
+
     /**
      *  관리자 등록
      */
@@ -103,6 +117,55 @@ public class AdminLoginControllerTest extends ControllerTest {
                 ));
 
         verify(adminLoginService).adminSignUp(any(AdminSignUpRequest.class));
+
+    }
+
+    /**
+     *  관리자 로그인
+     */
+    @Test
+    public void adminLogin() throws Exception{
+
+        // given
+        given(adminLoginService.adminLogin(any(AdminLoginRequest.class))).willReturn(adminLoginDto());
+
+        AdminLoginRequest adminLoginRequest = AdminLoginRequest.builder()
+                .adminLoginIdentifier("adminhong")
+                .adminPassword("2023")
+                .build();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                RestDocumentationRequestBuilders.post("/admin/login")
+                        .content(objectMapper.writeValueAsString(adminLoginRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("rt").value(200))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andDo(document("admin/login",
+                        getDocumentRequest(),
+                        getDocumentResponse(),
+                        requestFields(
+                                fieldWithPath("adminLoginIdentifier").type(JsonFieldType.STRING).description("관리자 아이디"),
+                                fieldWithPath("adminPassword").type(JsonFieldType.STRING).description("관리자 비밀번호")
+                        ),
+                        responseFields(
+                                fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
+                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
+                                fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
+                                fieldWithPath("response.adminId").type(JsonFieldType.NUMBER).description("관리자 고유 번호"),
+                                fieldWithPath("response.adminName").type(JsonFieldType.STRING).description("관리자 이름"),
+                                fieldWithPath("response.accessToken").type(JsonFieldType.STRING).description("Access Token"),
+                                fieldWithPath("response.refreshToken").type(JsonFieldType.STRING).description("Refresh Token"),
+                                fieldWithPath("response.isFirstLogin").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("최초 로그인 여부"),
+                                fieldWithPath("response.isSuper").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("관리자 슈퍼계정 여부")
+                        )
+                ));
+
+        verify(adminLoginService).adminLogin(any(AdminLoginRequest.class));
 
     }
 

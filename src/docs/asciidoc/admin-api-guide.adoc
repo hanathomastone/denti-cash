@@ -24,7 +24,6 @@ include::admin-common.adoc[]
 
 [[signUp]]
 == 1. 관리자 등록
-
 *관리자 등록 API*
 
 *[ 등록 실패 ]* ::
@@ -39,3 +38,21 @@ include::{snippets}/admin/signUp/request-fields.adoc[]
 === Response
 include::{snippets}/admin/signUp/response-fields.adoc[]
 include::{snippets}/admin/signUp/response-body.adoc[]
+
+[[login]]
+== 2. 관리자 로그인
+*관리자 로그인 API*
+
+*[ 로그인 실패 ]*::
+
+- 존재하지 않는 아이디, 비밀번호 불일치 : `"입력하신 정보가 일치하지 않습니다. 다시 확인해주세요."`
+
+=== Http
+include::{snippets}/admin/login/http-request.adoc[]
+=== Request
+include::{snippets}/admin/login/request-fields.adoc[]
+=== Response
+include::{snippets}/admin/login/response-fields.adoc[]
+include::{snippets}/admin/login/response-body.adoc[]
+
+
