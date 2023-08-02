@@ -63,7 +63,7 @@ public class AdminLoginService {
      */
     @Transactional
     public AdminLoginDto adminLogin(AdminLoginRequest request){
-        Admin admin = adminRepository.findByAdminLoginIdentifier(request.getAdminLoginIdentifier()).orElseThrow(() -> new NotFoundDataException("아이디 혹은 비밀번호가 올바르지 않습니다."));
+        Admin admin = adminRepository.findByAdminLoginIdentifier(request.getAdminLoginIdentifier()).orElseThrow(() -> new NotFoundDataException("입력하신 정보가 일치하지 않습니다. 다시 확인해주세요."));
 
         YnType isFirstLogin = admin.getAdminLastLoginDate() == null ? YnType.Y : YnType.N;
 
@@ -74,7 +74,7 @@ public class AdminLoginService {
         }
 
         if (!passwordEncoder.matches(request.getAdminPassword(), admin.getAdminPassword())){
-            throw new UnauthorizedException("아이디 혹은 비밀번호가 올바르지 않습니다.");
+            throw new UnauthorizedException("입력하신 정보가 일치하지 않습니다. 다시 확인해주세요.");
         }
 
         String accessToken = jwtTokenUtil.createToken(admin, TokenType.AccessToken);
