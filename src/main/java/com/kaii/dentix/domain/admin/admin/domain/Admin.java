@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Date;
 
@@ -43,5 +44,20 @@ public class Admin extends TimeEntity {
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date deleted;
+
+    /**
+     *  관리자 로그인
+     */
+    public void updateAdminLogin(String refreshToken) {
+        this.adminRefreshToken = refreshToken;
+        this.adminLastLoginDate = new Date();
+    }
+
+    /**
+     *  관리자 비밀번호 변경
+     */
+    public void modifyAdminPassword(PasswordEncoder passwordEncoder, String adminPassword) {
+        this.adminPassword = passwordEncoder.encode(adminPassword);
+    }
 
 }
