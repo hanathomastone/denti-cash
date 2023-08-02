@@ -37,9 +37,8 @@ public class AdminLoginService {
         // 아이디 중복 확인
         if (adminRepository.findByAdminLoginIdentifier(request.getAdminLoginIdentifier()).isPresent()) throw new AlreadyDataException("이미 존재하는 아이디입니다.");
 
-        // 이름, 연락처 중복 확인
-        if (adminRepository.findByAdminNameAndAdminPhoneNumberAndAdminIsSuper(request.getAdminName(), request.getAdminPhoneNumber(), YnType.N).isPresent())
-            throw new AlreadyDataException("이미 존재하는 관리자 정보입니다.");
+        // 연락처 중복 확인
+        if (adminRepository.findByAdminPhoneNumber(request.getAdminPhoneNumber()).isPresent()) throw new AlreadyDataException("이미 사용 중인 연락처입니다.");
 
         Admin admin = Admin.builder()
                 .adminName(request.getAdminName())
@@ -52,7 +51,6 @@ public class AdminLoginService {
 
         return AdminSignUpDto.builder()
                 .adminId(admin.getAdminId())
-                .adminName(admin.getAdminName())
                 .adminPassword(SecurityUtil.defaultPassword)
                 .build();
 

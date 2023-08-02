@@ -56,7 +56,6 @@ public class AdminLoginControllerTest extends ControllerTest {
     public AdminSignUpDto adminSignUpDto(){
         return AdminSignUpDto.builder()
                 .adminId(1L)
-                .adminName("홍길동")
                 .adminPassword("2023")
                 .build();
     }
@@ -111,7 +110,6 @@ public class AdminLoginControllerTest extends ControllerTest {
                                 fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
                                 fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
                                 fieldWithPath("response.adminId").type(JsonFieldType.NUMBER).description("관리자 고유 번호"),
-                                fieldWithPath("response.adminName").type(JsonFieldType.STRING).description("관리자 이름"),
                                 fieldWithPath("response.adminPassword").type(JsonFieldType.STRING).description("관리자 초기 비밀번호")
                         )
                 ));

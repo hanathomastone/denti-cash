@@ -10,6 +10,6 @@ public interface AdminRepository extends JpaRepository<Admin, Long> {
 
     Optional<Admin> findByAdminLoginIdentifier(String adminIdentifier);
 
-    Optional<Admin> findByAdminNameAndAdminPhoneNumberAndAdminIsSuper(String adminName, String adminPhoneNumber, YnType adminIsSuper);
+    Optional<Admin> findByAdminPhoneNumber(String adminPhoneNumber);
 
 }
