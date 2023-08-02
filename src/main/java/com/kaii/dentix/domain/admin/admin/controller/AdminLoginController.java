@@ -29,7 +29,7 @@ public class AdminLoginController {
     /**
      *  관리자 로그인
      */
-    @PutMapping(value = "/login", name = "관리자 로그인")
+    @PostMapping(value = "/login", name = "관리자 로그인")
     public DataResponse<AdminLoginDto> adminLogin(@Valid @RequestBody AdminLoginRequest request){
         DataResponse<AdminLoginDto> response = new DataResponse<>(adminLoginService.adminLogin(request));
         return response;
