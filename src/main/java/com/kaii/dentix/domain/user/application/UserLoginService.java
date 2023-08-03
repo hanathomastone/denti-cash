@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -100,10 +101,18 @@ public class UserLoginService {
         // 이미 가입된 사용자의 경우
         if (patient != null && userRepository.findByPatientId(patient.getPatientId()).isPresent()) throw new AlreadyDataException("이미 가입한 사용자입니다.");
 
-        // 이미 사용 중인 연락처의 경우
-        if (userRepository.findByUserPhoneNumber(request.getPatientPhoneNumber()).isPresent()) throw new AlreadyDataException("이미 사용중인 번호에요.\n번호를 다시 확인해 주세요.");
-
         if (patient == null) {
+
+            // 동일한 연락처가 이미 가입되어 있는 경우
+            Optional<Patient> isExistPatientPhoneNumber = patientList.stream()
+                    .filter(p -> p.getPatientPhoneNumber().equals(request.getPatientPhoneNumber()))
+                    .findAny();
+
+            if (isExistPatientPhoneNumber.isPresent()){
+                Long patientId = isExistPatientPhoneNumber.get().getPatientId();
+                if (userRepository.findByPatientId(patientId).isPresent()) throw new AlreadyDataException("이미 사용중인 번호에요.\n번호를 다시 확인해 주세요.");
+            }
+
             boolean isSamePhoneNumber = patientList.stream()
                     .anyMatch(p -> p.getPatientPhoneNumber().equals(request.getPatientPhoneNumber()));
 
@@ -114,7 +123,6 @@ public class UserLoginService {
 
         return UserVerifyDto.builder()
                 .patientId(patient != null ? patient.getPatientId() : null) // true : 인증된 사용자, false : 미인증 사용자
-                .patientPhoneNumber(request.getPatientPhoneNumber())
                 .build();
     }
 
@@ -132,9 +140,6 @@ public class UserLoginService {
 
         // 아이디 중복 확인
         this.loginIdCheck(request.getUserLoginIdentifier());
-
-        // 연락처 중복 확인
-        if (userRepository.findByUserPhoneNumber(request.getUserPhoneNumber()).isPresent()) throw new AlreadyDataException("이미 사용 중인 연락처입니다.");
 
         // 올바르지 않은 findPwdQuestionId 인 경우
         if (findPwdQuestionRepository.findById(request.getFindPwdQuestionId()).isEmpty()) throw new NotFoundDataException("존재하지 않는 질문입니다.");

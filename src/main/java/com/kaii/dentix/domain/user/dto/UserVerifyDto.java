@@ -11,6 +11,4 @@ public class UserVerifyDto {
 
     private Long patientId;
 
-    private String patientPhoneNumber;
-
 }

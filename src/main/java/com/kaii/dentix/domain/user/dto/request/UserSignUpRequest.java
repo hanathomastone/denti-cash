@@ -41,9 +41,6 @@ public class UserSignUpRequest {
 
     private Long patientId;
 
-    @NotBlank
-    private String userPhoneNumber;
-
     private String userDeviceModel;
     private String userDeviceManufacturer;
     private String userOsVersion;

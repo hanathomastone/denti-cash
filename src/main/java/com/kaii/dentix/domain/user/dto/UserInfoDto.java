@@ -13,7 +13,7 @@ public class UserInfoDto {
 
     private String userLoginIdentifier;
 
-    private String userPhoneNumber;
+    private String patientPhoneNumber;
 
     private YnType isUserMarketingAgree;
 
