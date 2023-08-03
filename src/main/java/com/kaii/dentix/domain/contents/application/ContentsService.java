@@ -5,6 +5,7 @@ import com.kaii.dentix.domain.contents.dao.ContentsCategoryRepository;
 import com.kaii.dentix.domain.contents.dao.ContentsListRepository;
 import com.kaii.dentix.domain.contents.dao.ContentsRepository;
 import com.kaii.dentix.domain.contents.domain.Contents;
+import com.kaii.dentix.domain.contents.domain.ContentsToCategory;
 import com.kaii.dentix.domain.contents.dto.*;
 import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.domain.User;
@@ -55,7 +56,7 @@ public class ContentsService {
                 .map(contents -> {
                     // 콘텐츠 별 카테고리 Id 조회
                     List<Integer> contentsLists = contentsListRepository.findByContentsId(contents.getContentsId()).stream()
-                            .map(contentsList -> contentsList.getContentsCategoryId())
+                            .map(ContentsToCategory::getContentsCategoryId)
                             .collect(Collectors.toList());
 
                     return new ContentsDto(
@@ -79,11 +80,15 @@ public class ContentsService {
                 List<ContentsCategoryDto> userCategoryList = new ArrayList<>(categoryList);
                 ContentsCategoryDto userCategory = ContentsCategoryDto.builder()
                         .id(0)
-                        .sort(0)
+                        .sort(1)
                         .name(user.getUserName() + "님 맞춤")
                         .color(null)
                         .build();
                 userCategoryList.add(0, userCategory);
+
+                for (int i = 0; i < userCategoryList.size(); i++) {
+                    userCategoryList.get(i).setSort(i + 1);
+                }
 
                 List<ContentsDto> userContentsList = new ArrayList<>(contentsDto);
 

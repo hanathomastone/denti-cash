@@ -19,6 +19,4 @@ public class UserSignUpDto extends TokenDto{
 
     private GenderType userGender;
 
-    private String userPhoneNumber;
-
 }

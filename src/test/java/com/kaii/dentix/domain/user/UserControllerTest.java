@@ -94,7 +94,7 @@ public class UserControllerTest extends ControllerTest {
         return UserInfoDto.builder()
                 .userName("김덴티")
                 .userLoginIdentifier("detix123")
-                .userPhoneNumber("01012345678")
+                .patientPhoneNumber("01012345678")
                 .isUserMarketingAgree(YnType.Y)
                 .build();
     }
@@ -146,7 +146,7 @@ public class UserControllerTest extends ControllerTest {
                                 fieldWithPath("response.accessToken").type(JsonFieldType.STRING).description("Access Token"),
                                 fieldWithPath("response.refreshToken").type(JsonFieldType.STRING).description("Refresh Token"),
                                 fieldWithPath("response.userId").type(JsonFieldType.NUMBER).description("사용자 고유 번호"),
-                                fieldWithPath("response.userName").type(JsonFieldType.STRING).description("사용자 이름")
+                                fieldWithPath("response.userName").type(JsonFieldType.STRING).description("사용자 닉네임")
                         )
                 ));
 
@@ -324,7 +324,7 @@ public class UserControllerTest extends ControllerTest {
                                 fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
                                 fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
                                 fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
-                                fieldWithPath("response.userName").type(JsonFieldType.STRING).description("사용자 이름"),
+                                fieldWithPath("response.userName").type(JsonFieldType.STRING).description("사용자 닉네임"),
                                 fieldWithPath("response.userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별")
                         )
                 ));
@@ -473,9 +473,9 @@ public class UserControllerTest extends ControllerTest {
                                 fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
                                 fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
                                 fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
-                                fieldWithPath("response.userName").type(JsonFieldType.STRING).description("사용자 이름"),
+                                fieldWithPath("response.userName").type(JsonFieldType.STRING).description("사용자 닉네임"),
                                 fieldWithPath("response.userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디"),
-                                fieldWithPath("response.userPhoneNumber").type(JsonFieldType.STRING).attributes(userNumberFormat()).description("사용자 연락처"),
+                                fieldWithPath("response.patientPhoneNumber").type(JsonFieldType.STRING).optional().attributes(userNumberFormat()).description("사용자(환자) 연락처"),
                                 fieldWithPath("response.isUserMarketingAgree").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("사용자 마케팅 동의 여부")
                         )
                 ));
