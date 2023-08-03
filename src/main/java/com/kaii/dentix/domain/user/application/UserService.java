@@ -4,6 +4,7 @@ import com.kaii.dentix.domain.findPwdQuestion.dao.FindPwdQuestionRepository;
 import com.kaii.dentix.domain.jwt.JwtTokenUtil;
 import com.kaii.dentix.domain.jwt.TokenType;
 import com.kaii.dentix.domain.patient.dao.PatientRepository;
+import com.kaii.dentix.domain.patient.domain.Patient;
 import com.kaii.dentix.domain.serviceAgreement.dao.ServiceAgreementRepository;
 import com.kaii.dentix.domain.serviceAgreement.domain.ServiceAgreement;
 import com.kaii.dentix.domain.type.DeviceType;
@@ -243,10 +244,17 @@ public class UserService {
         UserServiceAgreement userServiceAgreement = userServiceAgreementRepository.findByServiceAgreeIdAndUserId(serviceAgreement.getServiceAgreeId(), user.getUserId())
                 .orElseThrow(() -> new NotFoundDataException("회원 정보를 조회할 수 없습니다."));
 
+        String patientPhoneNumber = null;
+
+        if (user.getPatientId() != null){
+            Patient patient = patientRepository.findById(user.getPatientId()).orElseThrow(() -> new NotFoundDataException("존재하지 않는 환자입니다."));
+            patientPhoneNumber = patient.getPatientPhoneNumber();
+        }
+
         return UserInfoDto.builder()
                 .userName(user.getUserName())
                 .userLoginIdentifier(user.getUserLoginIdentifier())
-                .patientPhoneNumber(user.getPatientId() == null ? null : patientRepository.findById(user.getPatientId()).get().getPatientPhoneNumber()) // true : 미인증 사용자, false : 인증 사용자
+                .patientPhoneNumber(user.getPatientId() == null ? null : patientPhoneNumber) // true : 미인증 사용자, false : 인증 사용자
                 .isUserMarketingAgree(userServiceAgreement.getIsUserServiceAgree())
                 .build();
     }

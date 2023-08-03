@@ -102,22 +102,15 @@ public class UserLoginService {
         if (patient != null && userRepository.findByPatientId(patient.getPatientId()).isPresent()) throw new AlreadyDataException("이미 가입한 사용자입니다.");
 
         if (patient == null) {
-
-            // 동일한 연락처가 이미 가입되어 있는 경우
             Optional<Patient> isExistPatientPhoneNumber = patientList.stream()
                     .filter(p -> p.getPatientPhoneNumber().equals(request.getPatientPhoneNumber()))
                     .findAny();
 
             if (isExistPatientPhoneNumber.isPresent()){
                 Long patientId = isExistPatientPhoneNumber.get().getPatientId();
-                if (userRepository.findByPatientId(patientId).isPresent()) throw new AlreadyDataException("이미 사용중인 번호에요.\n번호를 다시 확인해 주세요.");
-            }
+                if (userRepository.findByPatientId(patientId).isPresent()) throw new AlreadyDataException("이미 사용중인 번호에요.\n번호를 다시 확인해 주세요.");  // 동일한 연락처가 이미 가입되어 있는 경우
 
-            boolean isSamePhoneNumber = patientList.stream()
-                    .anyMatch(p -> p.getPatientPhoneNumber().equals(request.getPatientPhoneNumber()));
-
-            if (isSamePhoneNumber) { // 연락처 일치 && 실명 불일치
-                throw new UnauthorizedException("회원 정보가 일치하지 않아요.\n다시 확인해 주세요.");
+                throw new UnauthorizedException("회원 정보가 일치하지 않아요.\n다시 확인해 주세요."); // 연락처 일치 && 실명 불일치
             }
         }
 
