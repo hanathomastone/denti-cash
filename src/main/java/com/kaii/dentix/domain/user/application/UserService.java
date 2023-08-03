@@ -254,7 +254,7 @@ public class UserService {
         return UserInfoDto.builder()
                 .userName(user.getUserName())
                 .userLoginIdentifier(user.getUserLoginIdentifier())
-                .patientPhoneNumber(user.getPatientId() == null ? null : patientPhoneNumber) // true : 미인증 사용자, false : 인증 사용자
+                .patientPhoneNumber(patientPhoneNumber)
                 .isUserMarketingAgree(userServiceAgreement.getIsUserServiceAgree())
                 .build();
     }

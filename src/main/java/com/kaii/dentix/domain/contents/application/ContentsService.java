@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -86,8 +85,6 @@ public class ContentsService {
                         .color(null)
                         .build();
                 userCategoryList.add(0, userCategory);
-
-                userCategoryList.sort(Comparator.comparingInt(ContentsCategoryDto::getSort));
 
                 for (int i = 0; i < userCategoryList.size(); i++) {
                     userCategoryList.get(i).setSort(i + 1);
