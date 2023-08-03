@@ -2,7 +2,7 @@ package com.kaii.dentix.domain.contents.dto;
 
 import lombok.*;
 
-@Getter @Builder @Setter
+@Getter @Builder
 @AllArgsConstructor @NoArgsConstructor
 public class ContentsCategoryDto {
 
@@ -12,6 +12,7 @@ public class ContentsCategoryDto {
 
     private String color;
 
+    @Setter
     private int sort;
 
 }
