@@ -1,7 +1,7 @@
 package com.kaii.dentix.domain.user.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,10 +11,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor @NoArgsConstructor
 public class UserVerifyRequest {
 
-    @NotBlank @Size(min = 11)
+    @NotBlank
+    @Pattern(regexp = "^[0-9]{10,11}$")
     private String patientPhoneNumber;
 
-    @NotBlank @Size(min = 2)
+    @NotBlank
+    @Pattern(regexp = "^[가-힣a-zA-Z\s]{2,100}$")
     private String patientName;
 
 }

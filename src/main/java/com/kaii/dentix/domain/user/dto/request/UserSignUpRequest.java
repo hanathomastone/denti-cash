@@ -5,7 +5,7 @@ import com.kaii.dentix.domain.userServiceAgreement.dto.request.UserServiceAgreem
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,16 +21,19 @@ public class UserSignUpRequest {
     @Valid
     private List<UserServiceAgreementRequest>  userServiceAgreementRequest;
 
-    @NotBlank @Size(min = 4, max = 12)
+    @NotBlank
+    @Pattern(regexp = "^[a-zA-Z0-9]{4,12}$")
     private String userLoginIdentifier;
 
-    @NotBlank @Size(min = 2, max = 6)
+    @NotBlank
+    @Pattern(regexp = "^[가-힣a-zA-Z\s]{2,100}$")
     private String userName;
 
     @NotNull
     private GenderType userGender;
 
-    @NotBlank @Size(min = 8, max = 20)
+    @NotBlank
+    @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*[!@#$%^&*]).{8,20}$")
     private String userPassword;
 
     @NotNull
