@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -111,7 +113,16 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.OK)
     public ErrorResponse MethodArgumentNotValidException(HttpServletRequest request, MethodArgumentNotValidException e) {
         log.info("error : ", e);
-        return ErrorResponse.of(HttpStatus.EXPECTATION_FAILED, ResponseMessage.EXPECTATION_FAILED_MSG.replace("{FieldName}", e.getBindingResult().getFieldError().getField()));
+
+        BindingResult bindingResult = e.getBindingResult();
+
+        String message = bindingResult.getFieldErrors().stream()
+                .filter(error -> Objects.equals(error.getCode(), "Pattern") || Objects.equals(error.getCode(), "Size")) // @Pattern, @Size 어노테이션이 적용된 필드의 경우
+                .map(FieldError::getDefaultMessage)
+                .findFirst()
+                .orElse(ResponseMessage.EXPECTATION_FAILED_MSG.replace("{FieldName}", Objects.requireNonNull(bindingResult.getFieldError()).getField()));
+
+        return ErrorResponse.of(HttpStatus.EXPECTATION_FAILED, message);
     }
     
     /**
