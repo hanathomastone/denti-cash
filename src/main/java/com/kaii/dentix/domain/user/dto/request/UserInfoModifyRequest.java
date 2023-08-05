@@ -13,10 +13,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor @NoArgsConstructor
 public class UserInfoModifyRequest {
 
-    @NotBlank @Size(min = 2, max = 6)
+    @NotBlank(message = "닉네임은 필수입니다.")
+    @Size(min = 2, max = 6, message = "닉네임은 최소 4자부터 최대 6자입니다.")
     private String userName;
 
-    @NotNull
+    @NotNull(message = "성별은 필수입니다.")
     private GenderType userGender;
 
 }

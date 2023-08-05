@@ -14,7 +14,7 @@ public class UserServiceAgreementRequest {
     @Min(value = 1)
     private Long userServiceAgreeId;
 
-    @NotNull
+    @NotNull(message = "동의 여부는 필수입니다.")
     private YnType isUserServiceAgree;
 
 }

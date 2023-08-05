@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor @NoArgsConstructor
 public class UserInfoModifyQnARequest {
 
-    @NotNull
+    @NotNull(message = "질문 선택은 필수입니다.")
     private Long findPwdQuestionId;
 
-    @NotBlank
+    @NotBlank(message = "답변은 필수입니다.")
     private String findPwdAnswer;
 
 }

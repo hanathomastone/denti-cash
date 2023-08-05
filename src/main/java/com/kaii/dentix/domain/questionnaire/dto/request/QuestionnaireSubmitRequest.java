@@ -12,6 +12,6 @@ import java.util.List;
 @AllArgsConstructor @NoArgsConstructor
 public class QuestionnaireSubmitRequest {
 
-    @NotNull
+    @NotNull(message = "문진표 작성은 필수입니다.")
     private List<QuestionnaireKeyValueDto> form;
 }

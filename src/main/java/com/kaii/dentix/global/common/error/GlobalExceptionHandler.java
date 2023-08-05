@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
+import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -116,11 +117,22 @@ public class GlobalExceptionHandler {
 
         BindingResult bindingResult = e.getBindingResult();
 
-        String message = bindingResult.getFieldErrors().stream()
-                .filter(error -> Objects.equals(error.getCode(), "Pattern") || Objects.equals(error.getCode(), "Size")) // @Pattern, @Size 어노테이션이 적용된 필드의 경우
-                .map(FieldError::getDefaultMessage)
-                .findFirst()
-                .orElse(ResponseMessage.EXPECTATION_FAILED_MSG.replace("{FieldName}", Objects.requireNonNull(bindingResult.getFieldError()).getField()));
+        FieldError fieldError = null;
+        // @NotBlank, @NotNull, @Size, @Pattern 어노테이션 순으로 유효성 검사 체크
+        List<String> errorCase = List.of("NotBlank", "NotNull", "Size", "Pattern");
+
+        for (String errorCode : errorCase) {
+            fieldError = bindingResult.getFieldErrors().stream()
+                    .filter(error -> Objects.equals(error.getCode(), errorCode))
+                    .findFirst()
+                    .orElse(null);
+
+            if (fieldError != null) {
+                break;
+            }
+        }
+
+        String message = (fieldError != null) ? fieldError.getDefaultMessage() : ResponseMessage.EXPECTATION_FAILED_MSG;
 
         return ErrorResponse.of(HttpStatus.EXPECTATION_FAILED, message);
     }
