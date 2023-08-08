@@ -207,7 +207,7 @@ public class UserControllerTest extends ControllerTest {
         doNothing().when(userService).userModifyPassword(any(HttpServletRequest.class), any(UserInfoModifyPasswordRequest.class));
 
         UserInfoModifyPasswordRequest userInfoModifyPasswordRequest = UserInfoModifyPasswordRequest.builder()
-                .userPassword("password")
+                .userPassword("password!")
                 .build();
 
         // when
