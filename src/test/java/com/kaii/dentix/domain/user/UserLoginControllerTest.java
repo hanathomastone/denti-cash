@@ -160,7 +160,7 @@ public class UserLoginControllerTest extends ControllerTest{
                 ))
                 .userLoginIdentifier("dentix123")
                 .userName("김덴티")
-                .userPassword("password")
+                .userPassword("password!")
                 .userGender(GenderType.W)
                 .findPwdQuestionId(1L)
                 .findPwdAnswer("초록색")
@@ -267,7 +267,7 @@ public class UserLoginControllerTest extends ControllerTest{
 
         UserLoginRequest userLoginRequest = UserLoginRequest.builder()
                 .userLoginIdentifier("dentix123")
-                .userPassword("password")
+                .userPassword("password!")
                 .userDeviceModel("iPhone 14 Pro")
                 .userDeviceManufacturer("APPLE")
                 .userOsVersion("1.1.1")
@@ -371,7 +371,7 @@ public class UserLoginControllerTest extends ControllerTest{
 
         UserModifyPasswordRequest userPasswordVerifyRequest = UserModifyPasswordRequest.builder()
                 .userId(1L)
-                .userPassword("password")
+                .userPassword("password!")
                 .build();
 
         // when
