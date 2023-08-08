@@ -5,6 +5,7 @@ import com.kaii.dentix.domain.userServiceAgreement.dto.request.UserServiceAgreem
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,26 +18,32 @@ import java.util.List;
 @AllArgsConstructor @NoArgsConstructor
 public class UserSignUpRequest {
 
-    @NotNull
+    @NotNull(message = "서비스 동의 체크는 필수입니다.")
     @Valid
     private List<UserServiceAgreementRequest>  userServiceAgreementRequest;
 
-    @NotBlank @Size(min = 4, max = 12)
+    @NotBlank(message = "아이디는 필수입니다.")
+    @Size(min = 4, max = 12, message = "아이디는 최소 4자부터 최대 12자입니다.")
+    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "아이디는 숫자나 영문만 사용 가능해요.")
     private String userLoginIdentifier;
 
-    @NotBlank @Size(min = 2, max = 6)
+    @NotBlank(message = "닉네임은 필수입니다.")
+    @Size(min = 2, max = 100, message = "닉네임은 최소 2자 이상 입력해야 됩니다.")
+    @Pattern(regexp = "^[가-힣a-zA-Z\\s]+$", message = "닉네임은 한글이나 영문으로 작성해 주세요.")
     private String userName;
 
-    @NotNull
+    @NotNull(message = "성별은 필수입니다.")
     private GenderType userGender;
 
-    @NotBlank @Size(min = 8, max = 20)
+    @NotBlank(message = "비밀번호는 필수입니다.")
+    @Size(min = 8, max = 20, message = "비밀번호는 최소 8자부터 최대 20자입니다.")
+    @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*[!@#$%^&*])[a-zA-Z!@#$%^&*0-9]+$", message = "비밀번호는 영문과 특수문자가 필수입니다.")
     private String userPassword;
 
-    @NotNull
+    @NotNull(message = "질문 선택 필수입니다.")
     private Long findPwdQuestionId;
 
-    @NotBlank
+    @NotBlank(message = "답변은 필수입니다.")
     private String findPwdAnswer;
 
     private Long patientId;

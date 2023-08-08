@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor @NoArgsConstructor
 public class UserLoginRequest {
 
-    @NotBlank
+    @NotBlank(message = "아이디는 필수입니다.")
     private String userLoginIdentifier;
 
-    @NotBlank
+    @NotBlank(message = "비밀번호는 필수입니다.")
     private String userPassword;
 
     private String userDeviceModel;

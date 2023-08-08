@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor @NoArgsConstructor
 public class UserModifyServiceAgreeRequest {
 
-    @NotNull
+    @NotNull(message = "동의 여부는 필수입니다.")
     private YnType isUserServiceAgree;
 
 }

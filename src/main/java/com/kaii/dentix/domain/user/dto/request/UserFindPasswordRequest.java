@@ -12,13 +12,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor @NoArgsConstructor
 public class UserFindPasswordRequest {
 
-    @NotBlank @Size(min = 4, max = 12)
+    @NotBlank(message = "아이디는 필수입니다.")
+    @Size(min = 4, max = 12, message = "아이디는 최소 4자부터 최대 12자입니다.")
     private String userLoginIdentifier;
 
-    @NotNull
+    @NotNull(message = "질문 선택은 필수입니다.")
     private Long findPwdQuestionId;
 
-    @NotBlank
+    @NotBlank(message = "답변은 필수입니다.")
     private String findPwdAnswer;
 
 }

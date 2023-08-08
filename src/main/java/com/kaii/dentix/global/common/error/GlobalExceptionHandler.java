@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
+import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -111,7 +114,27 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.OK)
     public ErrorResponse MethodArgumentNotValidException(HttpServletRequest request, MethodArgumentNotValidException e) {
         log.info("error : ", e);
-        return ErrorResponse.of(HttpStatus.EXPECTATION_FAILED, ResponseMessage.EXPECTATION_FAILED_MSG.replace("{FieldName}", e.getBindingResult().getFieldError().getField()));
+
+        BindingResult bindingResult = e.getBindingResult();
+
+        FieldError fieldError = null;
+        // @NotBlank, @NotNull, @Size, @Pattern 어노테이션 순으로 유효성 검사 체크
+        List<String> errorCase = List.of("NotBlank", "NotNull", "Size", "Pattern");
+
+        for (String errorCode : errorCase) {
+            fieldError = bindingResult.getFieldErrors().stream()
+                    .filter(error -> Objects.equals(error.getCode(), errorCode))
+                    .findFirst()
+                    .orElse(null);
+
+            if (fieldError != null) {
+                break;
+            }
+        }
+
+        String message = (fieldError != null) ? fieldError.getDefaultMessage() : bindingResult.getFieldError().getField() + "의 형식이 올바르지 않습니다.";
+
+        return ErrorResponse.of(HttpStatus.EXPECTATION_FAILED, message);
     }
     
     /**
