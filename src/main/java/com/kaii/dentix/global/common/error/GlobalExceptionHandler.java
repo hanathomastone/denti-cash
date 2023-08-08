@@ -132,7 +132,7 @@ public class GlobalExceptionHandler {
             }
         }
 
-        String message = (fieldError != null) ? fieldError.getDefaultMessage() : ResponseMessage.EXPECTATION_FAILED_MSG;
+        String message = (fieldError != null) ? fieldError.getDefaultMessage() : bindingResult.getFieldError().getField() + "의 형식이 올바르지 않습니다.";
 
         return ErrorResponse.of(HttpStatus.EXPECTATION_FAILED, message);
     }
