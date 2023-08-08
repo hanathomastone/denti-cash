@@ -96,6 +96,7 @@ public class UserControllerTest extends ControllerTest {
                 .userLoginIdentifier("detix123")
                 .patientPhoneNumber("01012345678")
                 .isUserMarketingAgree(YnType.Y)
+                .userGender(GenderType.W)
                 .build();
     }
 
@@ -476,7 +477,9 @@ public class UserControllerTest extends ControllerTest {
                                 fieldWithPath("response.userName").type(JsonFieldType.STRING).description("사용자 닉네임"),
                                 fieldWithPath("response.userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디"),
                                 fieldWithPath("response.patientPhoneNumber").type(JsonFieldType.STRING).optional().attributes(userNumberFormat()).description("사용자(환자) 연락처"),
-                                fieldWithPath("response.isUserMarketingAgree").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("사용자 마케팅 동의 여부")
+                                fieldWithPath("response.isUserMarketingAgree").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("사용자 마케팅 동의 여부"),
+                                fieldWithPath("response.userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별")
+
                         )
                 ));
 
