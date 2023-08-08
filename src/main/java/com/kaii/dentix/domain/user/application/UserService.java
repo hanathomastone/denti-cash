@@ -256,6 +256,7 @@ public class UserService {
                 .userLoginIdentifier(user.getUserLoginIdentifier())
                 .patientPhoneNumber(patientPhoneNumber)
                 .isUserMarketingAgree(userServiceAgreement.getIsUserServiceAgree())
+                .userGender(user.getUserGender())
                 .build();
     }
 

@@ -1,5 +1,6 @@
 package com.kaii.dentix.domain.user.dto;
 
+import com.kaii.dentix.domain.type.GenderType;
 import com.kaii.dentix.domain.type.YnType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,5 +17,7 @@ public class UserInfoDto {
     private String patientPhoneNumber;
 
     private YnType isUserMarketingAgree;
+
+    private GenderType userGender;
 
 }
