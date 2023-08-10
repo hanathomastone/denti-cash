@@ -1,7 +1,6 @@
 package com.kaii.dentix.domain.user.dto.request;
 
 import com.kaii.dentix.domain.type.GenderType;
-import com.kaii.dentix.domain.userServiceAgreement.dto.request.UserServiceAgreementRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,7 +19,7 @@ public class UserSignUpRequest {
 
     @NotNull(message = "서비스 동의 체크는 필수입니다.")
     @Valid
-    private List<UserServiceAgreementRequest>  userServiceAgreementRequest;
+    private List<Long>  userServiceAgreementRequest;
 
     @NotBlank(message = "아이디는 필수입니다.")
     @Size(min = 4, max = 12, message = "아이디는 최소 4자부터 최대 12자입니다.")
