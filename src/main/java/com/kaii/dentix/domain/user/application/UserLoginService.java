@@ -3,8 +3,6 @@ package com.kaii.dentix.domain.user.application;
 import com.kaii.dentix.domain.findPwdQuestion.dao.FindPwdQuestionRepository;
 import com.kaii.dentix.domain.jwt.JwtTokenUtil;
 import com.kaii.dentix.domain.jwt.TokenType;
-import com.kaii.dentix.domain.serviceAgreement.dao.ServiceAgreementRepository;
-import com.kaii.dentix.domain.serviceAgreement.domain.ServiceAgreement;
 import com.kaii.dentix.domain.serviceAgreement.dto.ServiceAgreementDto;
 import com.kaii.dentix.domain.type.UserRole;
 import com.kaii.dentix.domain.type.YnType;
@@ -52,34 +50,34 @@ public class UserLoginService {
 
     private final ApplicationEventPublisher publisher;
 
-    private final ServiceAgreementRepository serviceAgreementRepository;
-
     /**
      * 사용자 서비스 이용동의 여부 확인 및 저장
      */
     public void userServiceAgreeCheckAndSave(List<Long> request, Long userId){
         List<ServiceAgreementDto> serviceAgreementList = serviceAgreementService.serviceAgreementList().getServiceAgreement();
 
+        if (request.stream().anyMatch(serviceAgreementId -> serviceAgreementList.stream().noneMatch(requestId -> requestId.getId().equals(serviceAgreementId)))) {
+            throw new NotFoundDataException("존재하지 않는 서비스 이용 동의입니다.");
+        }
+
         Date now = new Date();
 
+        // 필수 동의 항목 리스트
+        List<ServiceAgreementDto> requiredServiceAgreements = serviceAgreementList.stream()
+                .filter(requiredServiceAgree -> requiredServiceAgree.getIsServiceAgreeRequired() == YnType.Y)
+                .toList();
+
+        // 필수 동의 항목 리스트에서 필수 동의 항목 누락된 id 값 추출
+        List<Long> missRequiredAgreementIds = requiredServiceAgreements.stream()
+                .map(ServiceAgreementDto::getId)
+                .filter(id -> !request.contains(id))
+                .toList();
+
+        if (!missRequiredAgreementIds.isEmpty()) {
+            throw new BadRequestApiException("필수 항목을 동의해주세요.");
+        }
+
         serviceAgreementList.forEach(serviceAgreementDTO -> {
-            // 필수 동의 항목 리스트
-            List<ServiceAgreement> requiredServiceAgreements = serviceAgreementRepository.findAllByIsServiceAgreeRequired(YnType.Y);
-
-            // 필수 동의 항목 리스트에서 id 값 추출
-            List<Long> requiredAgreementIds = requiredServiceAgreements.stream()
-                    .map(ServiceAgreement::getServiceAgreeId)
-                    .toList();
-
-            // 필수 동의 항목 누락된 id 값 추출
-            List<Long> missRequiredAgreementIds = requiredAgreementIds.stream()
-                    .filter(id -> !request.contains(id))
-                    .toList();
-
-            if (!missRequiredAgreementIds.isEmpty()) {
-                throw new BadRequestApiException("필수 항목을 동의해주세요.");
-            }
-
             userServiceAgreementRepository.save(UserServiceAgreement.builder()
                     .userId(userId)
                     .serviceAgreeId(serviceAgreementDTO.getId())
