@@ -64,7 +64,7 @@ public class UserLoginService {
 
         // 필수 동의 항목 리스트
         List<ServiceAgreementDto> requiredServiceAgreements = serviceAgreementList.stream()
-                .filter(requiredServiceAgree -> requiredServiceAgree.getIsServiceAgreeRequired() == YnType.Y)
+                .filter(requiredServiceAgree -> requiredServiceAgree.getIsServiceAgreeRequired().equals(YnType.Y))
                 .toList();
 
         // 필수 동의 항목 리스트에서 필수 동의 항목 누락된 id 값 추출
