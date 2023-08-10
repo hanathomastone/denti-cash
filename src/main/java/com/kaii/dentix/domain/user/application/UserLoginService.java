@@ -3,6 +3,8 @@ package com.kaii.dentix.domain.user.application;
 import com.kaii.dentix.domain.findPwdQuestion.dao.FindPwdQuestionRepository;
 import com.kaii.dentix.domain.jwt.JwtTokenUtil;
 import com.kaii.dentix.domain.jwt.TokenType;
+import com.kaii.dentix.domain.serviceAgreement.dao.ServiceAgreementRepository;
+import com.kaii.dentix.domain.serviceAgreement.domain.ServiceAgreement;
 import com.kaii.dentix.domain.serviceAgreement.dto.ServiceAgreementDto;
 import com.kaii.dentix.domain.type.UserRole;
 import com.kaii.dentix.domain.type.YnType;
@@ -16,7 +18,6 @@ import com.kaii.dentix.domain.user.dto.request.*;
 import com.kaii.dentix.domain.user.event.UserModifyDeviceInfoEvent;
 import com.kaii.dentix.domain.userServiceAgreement.dao.UserServiceAgreementRepository;
 import com.kaii.dentix.domain.userServiceAgreement.domain.UserServiceAgreement;
-import com.kaii.dentix.domain.userServiceAgreement.dto.request.UserServiceAgreementRequest;
 import com.kaii.dentix.global.common.error.exception.*;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,36 +52,40 @@ public class UserLoginService {
 
     private final ApplicationEventPublisher publisher;
 
+    private final ServiceAgreementRepository serviceAgreementRepository;
+
     /**
      * 사용자 서비스 이용동의 여부 확인 및 저장
      */
-    public void userServiceAgreeCheckAndSave(List<UserServiceAgreementRequest> request, Long userId){
-
+    public void userServiceAgreeCheckAndSave(List<Long> request, Long userId){
         List<ServiceAgreementDto> serviceAgreementList = serviceAgreementService.serviceAgreementList().getServiceAgreement();
-        if (serviceAgreementList.size() != request.size())
-            throw new ValidationException("서비스 동의 개수 불일치");
 
         Date now = new Date();
 
         serviceAgreementList.forEach(serviceAgreementDTO -> {
-            UserServiceAgreementRequest userServiceAgreementRequest = request.stream()
-                    .filter(userServiceAgreementDTO -> serviceAgreementDTO.getId().equals(userServiceAgreementDTO.getUserServiceAgreeId()))
-                    .findAny().orElseThrow(() -> new ValidationException("동의 항목 누락"));
+            // 필수 동의 항목 리스트
+            List<ServiceAgreement> requiredServiceAgreements = serviceAgreementRepository.findAllByIsServiceAgreeRequired(YnType.Y);
 
-            // 필수 동의 확인
-            if (serviceAgreementDTO.getIsServiceAgreeRequired().equals(YnType.Y) && !userServiceAgreementRequest.getIsUserServiceAgree().equals(YnType.Y)) {
-                throw new BadRequestApiException(serviceAgreementDTO.getName() + " : 필수 동의 항목입니다.");
+            // 필수 동의 항목 리스트에서 id 값 추출
+            List<Long> requiredAgreementIds = requiredServiceAgreements.stream()
+                    .map(ServiceAgreement::getServiceAgreeId)
+                    .toList();
+
+            // 필수 동의 항목 누락된 id 값 추출
+            List<Long> missRequiredAgreementIds = requiredAgreementIds.stream()
+                    .filter(id -> !request.contains(id))
+                    .toList();
+
+            if (!missRequiredAgreementIds.isEmpty()) {
+                throw new BadRequestApiException("필수 항목을 동의해주세요.");
             }
 
-            if (userId != null) { // 회원가입 시, 서비스 동의 목록 저장
-
-                userServiceAgreementRepository.save(UserServiceAgreement.builder()
-                        .userId(userId)
-                        .serviceAgreeId(serviceAgreementDTO.getId())
-                        .isUserServiceAgree(userServiceAgreementRequest.getIsUserServiceAgree())
-                        .userServiceAgreeDate(now)
-                        .build());
-            }
+            userServiceAgreementRepository.save(UserServiceAgreement.builder()
+                    .userId(userId)
+                    .serviceAgreeId(serviceAgreementDTO.getId())
+                    .isUserServiceAgree(request.contains(serviceAgreementDTO.getId()) ? YnType.Y : YnType.N)
+                    .userServiceAgreeDate(now)
+                    .build());
 
         });
 

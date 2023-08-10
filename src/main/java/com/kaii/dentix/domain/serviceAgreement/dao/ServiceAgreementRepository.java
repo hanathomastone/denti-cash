@@ -2,6 +2,7 @@ package com.kaii.dentix.domain.serviceAgreement.dao;
 
 import com.kaii.dentix.domain.serviceAgreement.domain.ServiceAgreement;
 import com.kaii.dentix.domain.type.ServiceAgreeType;
+import com.kaii.dentix.domain.type.YnType;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -13,5 +14,7 @@ public interface ServiceAgreementRepository extends JpaRepository<ServiceAgreeme
     List<ServiceAgreement> findAll(Sort sort);
 
     Optional<ServiceAgreement> findByServiceAgreeType(ServiceAgreeType serviceAgreeType);
+
+    List<ServiceAgreement> findAllByIsServiceAgreeRequired(YnType isServiceAgreeRequired);
 
 }
