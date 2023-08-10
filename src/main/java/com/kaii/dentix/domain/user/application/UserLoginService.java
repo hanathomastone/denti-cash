@@ -62,29 +62,17 @@ public class UserLoginService {
 
         Date now = new Date();
 
-        // 필수 동의 항목 리스트
-        List<ServiceAgreementDto> requiredServiceAgreements = serviceAgreementList.stream()
-                .filter(requiredServiceAgree -> requiredServiceAgree.getIsServiceAgreeRequired().equals(YnType.Y))
-                .toList();
-
-        // 필수 동의 항목 리스트에서 필수 동의 항목 누락된 id 값 추출
-        List<Long> missRequiredAgreementIds = requiredServiceAgreements.stream()
-                .map(ServiceAgreementDto::getId)
-                .filter(id -> !request.contains(id))
-                .toList();
-
-        if (!missRequiredAgreementIds.isEmpty()) {
-            throw new BadRequestApiException("필수 항목을 동의해주세요.");
-        }
-
         serviceAgreementList.forEach(serviceAgreementDTO -> {
+            if (serviceAgreementDTO.getIsServiceAgreeRequired().equals(YnType.Y) && !request.contains(serviceAgreementDTO.getId())) {
+                throw new BadRequestApiException(serviceAgreementDTO.getName() + "는(은) 필수 항목입니다.");
+            }
+
             userServiceAgreementRepository.save(UserServiceAgreement.builder()
                     .userId(userId)
                     .serviceAgreeId(serviceAgreementDTO.getId())
                     .isUserServiceAgree(request.contains(serviceAgreementDTO.getId()) ? YnType.Y : YnType.N)
                     .userServiceAgreeDate(now)
                     .build());
-
         });
 
     }
