@@ -3,12 +3,10 @@ package com.kaii.dentix.domain.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaii.dentix.common.ControllerTest;
 import com.kaii.dentix.domain.type.GenderType;
-import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.domain.user.application.UserLoginService;
 import com.kaii.dentix.domain.user.controller.UserLoginController;
 import com.kaii.dentix.domain.user.dto.*;
 import com.kaii.dentix.domain.user.dto.request.*;
-import com.kaii.dentix.domain.userServiceAgreement.dto.request.UserServiceAgreementRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +23,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentRequest;
 import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentResponse;
@@ -151,13 +150,11 @@ public class UserLoginControllerTest extends ControllerTest{
         // given
         given(userLoginService.userSignUp(any(HttpServletRequest.class), any(UserSignUpRequest.class))).willReturn(userSignUpDto());
 
+        List<Long> serviceAgreementList = Arrays.asList(1L, 2L, 3L);
+
         UserSignUpRequest userSignUpRequest = UserSignUpRequest.builder()
                 .patientId(1L)
-                .userServiceAgreementRequest(Arrays.asList(
-                        new UserServiceAgreementRequest(1L, YnType.Y),
-                        new UserServiceAgreementRequest(2L, YnType.Y),
-                        new UserServiceAgreementRequest(3L, YnType.N)
-                ))
+                .userServiceAgreementRequest(serviceAgreementList)
                 .userLoginIdentifier("dentix123")
                 .userName("김덴티")
                 .userPassword("password!")
@@ -188,9 +185,7 @@ public class UserLoginControllerTest extends ControllerTest{
                         getDocumentResponse(),
                         requestFields(
                                 fieldWithPath("patientId").type(JsonFieldType.NUMBER).optional().description("사용자(환자) 고유 번호"),
-                                fieldWithPath("userServiceAgreementRequest[]").type(JsonFieldType.ARRAY).description("사용자 서비스 동의"),
-                                fieldWithPath("userServiceAgreementRequest[].userServiceAgreeId").type(JsonFieldType.NUMBER).description("사용자 서비스 동의 고유 번호"),
-                                fieldWithPath("userServiceAgreementRequest[].isUserServiceAgree").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("사용자 서비스 동의 여부"),
+                                fieldWithPath("userServiceAgreementRequest[]").type(JsonFieldType.ARRAY).description("사용자 서비스 동의 고유 번호"),
                                 fieldWithPath("userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디"),
                                 fieldWithPath("userName").type(JsonFieldType.STRING).description("사용자 닉네임"),
                                 fieldWithPath("userPassword").type(JsonFieldType.STRING).description("사용자 비밀번호"),
