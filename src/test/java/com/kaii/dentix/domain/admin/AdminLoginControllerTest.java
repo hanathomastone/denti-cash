@@ -53,13 +53,6 @@ public class AdminLoginControllerTest extends ControllerTest {
     @MockBean
     private AdminLoginService adminLoginService;
 
-    public AdminSignUpDto adminSignUpDto(){
-        return AdminSignUpDto.builder()
-                .adminId(1L)
-                .adminPassword("dentix2023!")
-                .build();
-    }
-
     public AdminLoginDto adminLoginDto(){
         return AdminLoginDto.builder()
                 .adminId(1L)
@@ -69,53 +62,6 @@ public class AdminLoginControllerTest extends ControllerTest {
                 .refreshToken("RefreshToken")
                 .isSuper(YnType.N)
                 .build();
-    }
-
-    /**
-     *  관리자 등록
-     */
-    @Test
-    public void adminSignUp() throws Exception{
-
-        // given
-        given(adminLoginService.adminSignUp(any(AdminSignUpRequest.class))).willReturn(adminSignUpDto());
-
-        AdminSignUpRequest adminSignUpRequest = AdminSignUpRequest.builder()
-                .adminName("홍길동")
-                .adminLoginIdentifier("adminhong")
-                .adminPhoneNumber("01012345678")
-                .build();
-
-        // when
-        ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.post("/admin/signUp")
-                        .content(objectMapper.writeValueAsString(adminSignUpRequest))
-                        .contentType(MediaType.APPLICATION_JSON)
-        );
-
-        // then
-        resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("rt").value(200))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andDo(document("admin/signUp",
-                        getDocumentRequest(),
-                        getDocumentResponse(),
-                        requestFields(
-                                fieldWithPath("adminName").type(JsonFieldType.STRING).description("관리자 이름"),
-                                fieldWithPath("adminLoginIdentifier").type(JsonFieldType.STRING).description("관리자 아이디"),
-                                fieldWithPath("adminPhoneNumber").type(JsonFieldType.STRING).attributes(userNumberFormat()).description("관리자 연락처")
-                        ),
-                        responseFields(
-                                fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
-                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
-                                fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
-                                fieldWithPath("response.adminId").type(JsonFieldType.NUMBER).description("관리자 고유 번호"),
-                                fieldWithPath("response.adminPassword").type(JsonFieldType.STRING).description("관리자 초기 비밀번호")
-                        )
-                ));
-
-        verify(adminLoginService).adminSignUp(any(AdminSignUpRequest.class));
-
     }
 
     /**

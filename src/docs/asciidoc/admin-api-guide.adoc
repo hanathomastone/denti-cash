@@ -33,12 +33,12 @@ include::admin-common.adoc[]
 - 이미 가입된 관리자 : `"이미 존재하는 관리자 정보입니다."` (rt : 422)
 
 === Http
-include::{snippets}/admin/signUp/http-request.adoc[]
+include::{snippets}/admin/account/http-request.adoc[]
 === Request
-include::{snippets}/admin/signUp/request-fields.adoc[]
+include::{snippets}/admin/account/request-fields.adoc[]
 === Response
-include::{snippets}/admin/signUp/response-fields.adoc[]
-include::{snippets}/admin/signUp/response-body.adoc[]
+include::{snippets}/admin/account/response-fields.adoc[]
+include::{snippets}/admin/account/response-body.adoc[]
 
 [[login]]
 == 2. 관리자 로그인
