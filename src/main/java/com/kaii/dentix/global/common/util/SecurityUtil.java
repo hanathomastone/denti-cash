@@ -8,6 +8,6 @@ public class SecurityUtil {
     /**
      * 기본 비밀번호
      */
-    public static final String defaultPassword = "2023";
+    public static final String defaultPassword = "dentix2023!";
 
 }

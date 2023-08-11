@@ -56,7 +56,7 @@ public class AdminLoginControllerTest extends ControllerTest {
     public AdminSignUpDto adminSignUpDto(){
         return AdminSignUpDto.builder()
                 .adminId(1L)
-                .adminPassword("2023")
+                .adminPassword("dentix2023!")
                 .build();
     }
 
@@ -129,7 +129,7 @@ public class AdminLoginControllerTest extends ControllerTest {
 
         AdminLoginRequest adminLoginRequest = AdminLoginRequest.builder()
                 .adminLoginIdentifier("adminhong")
-                .adminPassword("2023")
+                .adminPassword("dentix2023!")
                 .build();
 
         // when

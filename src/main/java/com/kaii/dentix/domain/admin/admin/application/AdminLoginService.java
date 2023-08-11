@@ -10,6 +10,7 @@ import com.kaii.dentix.domain.jwt.JwtTokenUtil;
 import com.kaii.dentix.domain.jwt.TokenType;
 import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.global.common.error.exception.AlreadyDataException;
+import com.kaii.dentix.global.common.error.exception.BadRequestApiException;
 import com.kaii.dentix.global.common.error.exception.NotFoundDataException;
 import com.kaii.dentix.global.common.error.exception.UnauthorizedException;
 import com.kaii.dentix.global.common.util.SecurityUtil;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -34,11 +36,14 @@ public class AdminLoginService {
     @Transactional
     public AdminSignUpDto adminSignUp(AdminSignUpRequest request){
 
-        // 아이디 중복 확인
-        if (adminRepository.findByAdminLoginIdentifier(request.getAdminLoginIdentifier()).isPresent()) throw new AlreadyDataException("이미 존재하는 아이디입니다.");
+        // 이미 가입된 사용자의 경우
+        if (adminRepository.findByAdminNameAndAdminPhoneNumber(request.getAdminName(), request.getAdminPhoneNumber()).isPresent()) throw  new AlreadyDataException("이미 가입한 관리자입니다.");
 
         // 연락처 중복 확인
-        if (adminRepository.findByAdminPhoneNumber(request.getAdminPhoneNumber()).isPresent()) throw new AlreadyDataException("이미 사용 중인 연락처입니다.");
+        if (adminRepository.findByAdminPhoneNumber(request.getAdminPhoneNumber()).isPresent()) throw  new BadRequestApiException("이미 사용중인 번호에요. 번호를 다시 확인해 주세요.");
+
+        // 아이디 중복 확인
+        if (adminRepository.findByAdminLoginIdentifier(request.getAdminLoginIdentifier()).isPresent()) throw new AlreadyDataException("이미 존재하는 아이디입니다.");
 
         Admin admin = Admin.builder()
                 .adminName(request.getAdminName())
