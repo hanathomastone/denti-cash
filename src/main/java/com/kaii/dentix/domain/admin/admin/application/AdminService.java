@@ -20,7 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -51,15 +51,15 @@ public class AdminService {
     @Transactional
     public AdminSignUpDto adminSignUp(AdminSignUpRequest request){
 
-        List<Admin> adminList = adminRepository.findByAdminNameOrAdminPhoneNumber(request.getAdminName(), request.getAdminPhoneNumber());
+        Optional<Admin> existAdmin = adminRepository.findByAdminPhoneNumber(request.getAdminPhoneNumber());
 
-        // 이미 가입된 사용자의 경우
-        if (adminList.stream().anyMatch(admin -> admin.getAdminName().equals(request.getAdminName()) && admin.getAdminPhoneNumber().equals(request.getAdminPhoneNumber())))
-            throw new AlreadyDataException("이미 가입한 관리자입니다.");
+        if (existAdmin.isPresent()){
+            // 이미 가입된 사용자의 경우
+            if (existAdmin.get().getAdminName().equals(request.getAdminName())) throw new AlreadyDataException("이미 가입한 관리자입니다.");
 
-        // 연락처 중복 확인
-        if (adminList.stream().anyMatch(admin -> admin.getAdminPhoneNumber().equals(request.getAdminPhoneNumber())))
+            // 연락처 중복 확인
             throw new BadRequestApiException("이미 사용중인 번호에요. 번호를 다시 확인해 주세요.");
+        }
 
         // 아이디 중복 확인
         if (adminRepository.findByAdminLoginIdentifier(request.getAdminLoginIdentifier()).isPresent()) throw new AlreadyDataException("이미 존재하는 아이디입니다.");
