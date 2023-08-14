@@ -91,6 +91,9 @@ public class AdminControllerTest extends ControllerTest {
                 RestDocumentationRequestBuilders.post("/admin/account")
                         .content(objectMapper.writeValueAsString(adminSignUpRequest))
                         .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "account.고유경.AccessToken")
+                        .with(user("user").roles("ADMIN"))
         );
 
         // then
