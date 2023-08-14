@@ -1,5 +1,7 @@
 package com.kaii.dentix.domain.jwt;
 
+import com.kaii.dentix.domain.admin.admin.dao.AdminRepository;
+import com.kaii.dentix.domain.admin.admin.domain.Admin;
 import com.kaii.dentix.domain.type.UserRole;
 import com.kaii.dentix.domain.user.dao.UserRepository;
 import com.kaii.dentix.domain.user.domain.User;
@@ -31,6 +33,8 @@ public class JwtTokenUtil {
 
     private final UserRepository userRepository;
 
+    private final AdminRepository adminRepository;
+
     // 객체 초기화, secretKey를 Base64로 인코딩한다.
     @PostConstruct
     protected void init() {
@@ -40,6 +44,10 @@ public class JwtTokenUtil {
 
     public String createToken(User user, TokenType tokenType) {
         return this.createToken(user.getUserId(), UserRole.ROLE_USER, tokenType);
+    }
+
+    public String createToken(Admin admin, TokenType tokenType) {
+        return this.createToken(admin.getAdminId(), UserRole.ROLE_ADMIN, tokenType);
     }
 
     // JWT 토큰 인증정보 생성
@@ -118,6 +126,9 @@ public class JwtTokenUtil {
             case ROLE_USER:
                 User user = userRepository.findById(userId).orElse(null);
                 return user == null;
+            case ROLE_ADMIN:
+                Admin admin = adminRepository.findById(userId).orElse(null);
+                return admin == null;
             default:
                 return true;
         }

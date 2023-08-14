@@ -1,0 +1,74 @@
+ifndef::snippets[]
+:snippets: build/generated-snippets
+endif::[]
+ifndef::doc[]
+:doc: src/docs/asciidoc
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+:operation-http-request-title: Example Request
+:operation-http-response-title: Example Response
+ifndef::snippets-custom[]
+:snippets-custom: ../../../src/docs/custom
+
+
+
+[[title]]
+= DTX 관리자 API 문서
+
+include::admin-common.adoc[]
+
+[[signUp]]
+== 1. 관리자 등록
+*관리자 등록 API*
+
+*[ 등록 실패 ]* ::
+
+- 아이디 중복 : `"이미 존재하는 아이디입니다."` (rt : 422)
+- 이미 사용 중인 연락처 : `"이미 사용 중인 연락처입니다."` (rt : 400)
+- 이미 가입된 관리자 : `"이미 존재하는 관리자 정보입니다."` (rt : 422)
+
+=== Http
+include::{snippets}/admin/account/http-request.adoc[]
+=== Request
+include::{snippets}/admin/account/request-fields.adoc[]
+=== Response
+include::{snippets}/admin/account/response-fields.adoc[]
+include::{snippets}/admin/account/response-body.adoc[]
+
+[[login]]
+== 2. 관리자 로그인
+*관리자 로그인 API*
+
+*[ 로그인 실패 ]*::
+
+- 존재하지 않는 아이디, 비밀번호 불일치 : `"입력하신 정보가 일치하지 않습니다. 다시 확인해주세요."` (rt : 401)
+
+=== Http
+include::{snippets}/admin/login/http-request.adoc[]
+=== Request
+include::{snippets}/admin/login/request-fields.adoc[]
+=== Response
+include::{snippets}/admin/login/response-fields.adoc[]
+include::{snippets}/admin/login/response-body.adoc[]
+
+[[modifyPassword]]
+== 3. 관리자 비밀번호 변경
+*관리자 비밀번호 변경 API*
+
+*[ 비밀번호 변경 실패 ]*::
+
+- 관리자 정보 조회 불가능 : `"존재하지 않는 관리자입니다."` (rt : 416)
+
+=== Http
+include::{snippets}/admin/account/password-modify/http-request.adoc[]
+=== Request
+include::{snippets}/admin/account/password-modify/request-fields.adoc[]
+==== Response
+include::{snippets}/admin/account/password-modify/response-fields.adoc[]
+include::{snippets}/admin/account/password-modify/response-body.adoc[]
+
