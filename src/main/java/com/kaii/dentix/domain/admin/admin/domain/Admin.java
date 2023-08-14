@@ -60,4 +60,11 @@ public class Admin extends TimeEntity {
         this.adminPassword = passwordEncoder.encode(adminPassword);
     }
 
+    /**
+     *  관리자 삭제
+     */
+    public void deleteAdmin(){
+        this.deleted = new Date();
+    }
+
 }

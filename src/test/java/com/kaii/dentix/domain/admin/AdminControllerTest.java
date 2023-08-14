@@ -28,11 +28,14 @@ import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentResponse;
 import static com.kaii.dentix.common.DocumentOptionalGenerator.userNumberFormat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -145,6 +148,43 @@ public class AdminControllerTest extends ControllerTest {
                 ));
 
         verify(adminService).adminModifyPassword(any(HttpServletRequest.class), any(AdminModifyPasswordRequest.class));
+    }
+
+    /**
+     *  관리자 삭제
+     */
+    @Test
+    public void deleteAdmin() throws Exception{
+
+        // given
+        doNothing().when(adminService).adminDelete(any(Long.class));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                RestDocumentationRequestBuilders.delete("/admin/account?adminId={adminId}", 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "admin-delete.고유경.AccessToken")
+                        .with(user("user").roles("ADMIN"))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("rt").value(200))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andDo(document("admin/account/delete",
+                        getDocumentRequest(),
+                        getDocumentResponse(),
+                        queryParameters(
+                                parameterWithName("adminId").description("관리자 고유 번호")
+                        ),
+                        responseFields(
+                                fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
+                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지")
+                        )
+                ));
+
+        verify(adminService).adminDelete(any(Long.class));
     }
 
 }

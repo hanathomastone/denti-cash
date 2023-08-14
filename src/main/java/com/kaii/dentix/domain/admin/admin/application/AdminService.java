@@ -90,4 +90,13 @@ public class AdminService {
         admin.modifyAdminPassword(passwordEncoder, request.getAdminPassword());
     }
 
+    /**
+     *  관리자 삭제
+     */
+    @Transactional
+    public void adminDelete(Long adminId){
+        Admin admin = adminRepository.findById(adminId).orElseThrow(() -> new NotFoundDataException("존재하지 않는 관리자입니다."));
+        admin.deleteAdmin();
+    }
+
 }
