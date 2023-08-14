@@ -36,4 +36,13 @@ public class AdminController {
         return new SuccessResponse();
     }
 
+    /**
+     *  관리자 삭제
+     */
+    @DeleteMapping(name = "관리자 삭제")
+    public SuccessResponse adminDelete(@RequestParam Long adminId){
+        adminService.adminDelete(adminId);
+        return new SuccessResponse();
+    }
+
 }
