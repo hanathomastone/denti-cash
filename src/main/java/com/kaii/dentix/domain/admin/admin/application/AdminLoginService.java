@@ -38,7 +38,7 @@ public class AdminLoginService {
         // 처음 로그인 시도인 경우
         if (admin.getAdminPassword() == null || admin.getAdminPassword().isEmpty()){
             isFirstLogin = YnType.Y; // 비밀번호 초기화를 위해
-            admin.modifyAdminPassword(passwordEncoder, SecurityUtil.defaultPassword);
+            admin.updatePassword(passwordEncoder, SecurityUtil.defaultPassword);
         }
 
         if (!passwordEncoder.matches(request.getAdminPassword(), admin.getAdminPassword())){

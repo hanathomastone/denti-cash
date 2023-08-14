@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaii.dentix.common.ControllerTest;
 import com.kaii.dentix.domain.admin.admin.application.AdminService;
 import com.kaii.dentix.domain.admin.admin.controller.AdminController;
+import com.kaii.dentix.domain.admin.admin.dto.AdminPasswordResetDto;
 import com.kaii.dentix.domain.admin.admin.dto.AdminSignUpDto;
 import com.kaii.dentix.domain.admin.admin.dto.request.AdminModifyPasswordRequest;
 import com.kaii.dentix.domain.admin.admin.dto.request.AdminSignUpRequest;
@@ -60,6 +61,12 @@ public class AdminControllerTest extends ControllerTest {
     public AdminSignUpDto adminSignUpDto(){
         return AdminSignUpDto.builder()
                 .adminId(1L)
+                .adminPassword("dentix2023!")
+                .build();
+    }
+
+    public AdminPasswordResetDto adminPasswordResetDto(){
+        return AdminPasswordResetDto.builder()
                 .adminPassword("dentix2023!")
                 .build();
     }
@@ -185,6 +192,45 @@ public class AdminControllerTest extends ControllerTest {
                 ));
 
         verify(adminService).adminDelete(any(Long.class));
+    }
+
+    /**
+     *  관리자 비밀번호 초기화
+     */
+    @Test
+    public void adminPasswordReset() throws Exception{
+
+        // given
+        given(adminService.adminPasswordReset(any(Long.class))).willReturn(adminPasswordResetDto());
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                RestDocumentationRequestBuilders.put("/admin/account/reset-password?adminId={adminId}", 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "reset-password.고유경.AccessToken")
+                        .with(user("user").roles("ADMIN"))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("rt").value(200))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andDo(document("admin/account/reset-password",
+                        getDocumentRequest(),
+                        getDocumentResponse(),
+                        queryParameters(
+                                parameterWithName("adminId").description("관리자 고유 번호")
+                        ),
+                        responseFields(
+                                fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
+                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
+                                fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
+                                fieldWithPath("response.adminPassword").type(JsonFieldType.STRING).description("관리자 비밀번호")
+                        )
+                ));
+
+        verify(adminService).adminPasswordReset(any(Long.class));
     }
 
 }
