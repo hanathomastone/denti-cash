@@ -2,6 +2,7 @@ package com.kaii.dentix.domain.admin.admin.application;
 
 import com.kaii.dentix.domain.admin.admin.dao.AdminRepository;
 import com.kaii.dentix.domain.admin.admin.domain.Admin;
+import com.kaii.dentix.domain.admin.admin.dto.AdminPasswordResetDto;
 import com.kaii.dentix.domain.admin.admin.dto.AdminSignUpDto;
 import com.kaii.dentix.domain.admin.admin.dto.request.AdminModifyPasswordRequest;
 import com.kaii.dentix.domain.admin.admin.dto.request.AdminSignUpRequest;
@@ -87,7 +88,7 @@ public class AdminService {
     public void adminModifyPassword(HttpServletRequest httpServletRequest, AdminModifyPasswordRequest request){
         Admin admin = this.getTokenAdmin(httpServletRequest);
 
-        admin.modifyAdminPassword(passwordEncoder, request.getAdminPassword());
+        admin.updatePassword(passwordEncoder, request.getAdminPassword());
     }
 
     /**
@@ -97,6 +98,19 @@ public class AdminService {
     public void adminDelete(Long adminId){
         Admin admin = adminRepository.findById(adminId).orElseThrow(() -> new NotFoundDataException("존재하지 않는 관리자입니다."));
         admin.deleteAdmin();
+    }
+
+    /**
+     *  관리자 비밀번호 초기화
+     */
+    @Transactional
+    public AdminPasswordResetDto adminPasswordReset(Long adminId){
+        Admin admin = adminRepository.findById(adminId).orElseThrow(() -> new NotFoundDataException("존재하지 않는 관리자입니다."));
+        admin.updatePassword(passwordEncoder, SecurityUtil.defaultPassword);
+
+        return AdminPasswordResetDto.builder()
+                .adminPassword(SecurityUtil.defaultPassword)
+                .build();
     }
 
 }

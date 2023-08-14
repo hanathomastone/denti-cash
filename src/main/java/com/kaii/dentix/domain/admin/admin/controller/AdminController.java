@@ -1,6 +1,7 @@
 package com.kaii.dentix.domain.admin.admin.controller;
 
 import com.kaii.dentix.domain.admin.admin.application.AdminService;
+import com.kaii.dentix.domain.admin.admin.dto.AdminPasswordResetDto;
 import com.kaii.dentix.domain.admin.admin.dto.AdminSignUpDto;
 import com.kaii.dentix.domain.admin.admin.dto.request.AdminModifyPasswordRequest;
 import com.kaii.dentix.domain.admin.admin.dto.request.AdminSignUpRequest;
@@ -43,6 +44,15 @@ public class AdminController {
     public SuccessResponse adminDelete(@RequestParam Long adminId){
         adminService.adminDelete(adminId);
         return new SuccessResponse();
+    }
+
+    /**
+     *  관리자 비밀번호 초기화
+     */
+    @PutMapping(value = "/reset-password", name = "관리자 비밀번호 초기화")
+    public DataResponse<AdminPasswordResetDto> adminPasswordReset(@RequestParam Long adminId){
+        DataResponse<AdminPasswordResetDto> response = new DataResponse<>(adminService.adminPasswordReset(adminId));
+        return response;
     }
 
 }
