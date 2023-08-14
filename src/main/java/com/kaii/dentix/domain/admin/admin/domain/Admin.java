@@ -56,7 +56,7 @@ public class Admin extends TimeEntity {
     /**
      *  관리자 비밀번호 변경
      */
-    public void modifyAdminPassword(PasswordEncoder passwordEncoder, String adminPassword) {
+    public void updatePassword(PasswordEncoder passwordEncoder, String adminPassword) {
         this.adminPassword = passwordEncoder.encode(adminPassword);
     }
 
