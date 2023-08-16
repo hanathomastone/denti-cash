@@ -235,6 +235,8 @@ public class UserLoginService {
 
         return UserFindPasswordDto.builder()
                 .userId(user.getUserId())
+                .userName(user.getUserName())
+                .userLoginIdentifier(user.getUserLoginIdentifier())
                 .build();
 
     }

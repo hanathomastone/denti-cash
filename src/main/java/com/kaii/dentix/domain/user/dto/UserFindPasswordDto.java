@@ -10,4 +10,8 @@ public class UserFindPasswordDto {
 
     private Long userId;
 
+    private String userName;
+
+    private String userLoginIdentifier;
+
 }
