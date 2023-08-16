@@ -2,10 +2,8 @@ package com.kaii.dentix.domain.admin.admin.dao;
 
 import com.kaii.dentix.domain.admin.admin.domain.QAdmin;
 import com.kaii.dentix.domain.admin.admin.dto.AdminAccountDto;
-import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.global.common.dto.PageAndSizeRequest;
 import com.kaii.dentix.global.common.dto.PagingRequest;
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -15,7 +13,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -33,7 +33,12 @@ public class AdminRepositoryImpl implements AdminCustomRepository {
 
         Pageable paging = new PagingRequest(request.getPage(), request.getSize()).of();
 
-        List<AdminAccountDto> result = queryFactory
+        // fetchCount Deprecated 로 인해 count 쿼리 구현
+        long total = Optional.ofNullable(queryFactory.select(admin.count()).from(admin).fetchOne())
+                .orElse(0L);
+
+        // total 이 0보다 크면 조건에 맞게
+        List<AdminAccountDto> result = total > 0 ? queryFactory
                 .select(Projections.constructor(AdminAccountDto.class,
                         admin.adminId, admin.adminIsSuper, admin.adminLoginIdentifier, admin.adminName, admin.adminPhoneNumber,
                         Expressions.stringTemplate("DATE_FORMAT({0}, {1})", admin.created, "%Y-%m-%d")
@@ -42,9 +47,9 @@ public class AdminRepositoryImpl implements AdminCustomRepository {
                 .orderBy(admin.created.desc())
                 .offset(paging.getOffset())
                 .limit(paging.getPageSize())
-                .fetch();
+                .fetch() : new ArrayList<>();
 
-        return new PageImpl<>(result, paging, result.size());
+        return new PageImpl<>(result, paging, total);
 
     }
 
