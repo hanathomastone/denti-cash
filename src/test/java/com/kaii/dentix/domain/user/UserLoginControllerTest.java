@@ -88,6 +88,8 @@ public class UserLoginControllerTest extends ControllerTest{
     private UserFindPasswordDto userFindPasswordDto(){
         return UserFindPasswordDto.builder()
                 .userId(1L)
+                .userLoginIdentifier("detix123")
+                .userName("김덴티")
                 .build();
     }
 
@@ -347,7 +349,9 @@ public class UserLoginControllerTest extends ControllerTest{
                                 fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
                                 fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
                                 fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
-                                fieldWithPath("response.userId").type(JsonFieldType.NUMBER).description("사용자 고유 번호")
+                                fieldWithPath("response.userId").type(JsonFieldType.NUMBER).description("사용자 고유 번호"),
+                                fieldWithPath("response.userName").type(JsonFieldType.STRING).description("사용자 이름"),
+                                fieldWithPath("response.userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디")
                         )
                 ));
 
