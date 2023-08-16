@@ -130,4 +130,7 @@ dependencies {
     implementation group: 'com.amazonaws', name: 'aws-java-sdk-sts', version: '1.11.895'
     implementation group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.11.895'
 
+    // modelmapper
+    implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.1.1'
+
 }

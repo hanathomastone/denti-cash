@@ -1,10 +1,12 @@
 package com.kaii.dentix.domain.admin.admin.controller;
 
 import com.kaii.dentix.domain.admin.admin.application.AdminService;
+import com.kaii.dentix.domain.admin.admin.dto.AdminListDto;
 import com.kaii.dentix.domain.admin.admin.dto.AdminPasswordResetDto;
 import com.kaii.dentix.domain.admin.admin.dto.AdminSignUpDto;
 import com.kaii.dentix.domain.admin.admin.dto.request.AdminModifyPasswordRequest;
 import com.kaii.dentix.domain.admin.admin.dto.request.AdminSignUpRequest;
+import com.kaii.dentix.global.common.dto.PageAndSizeRequest;
 import com.kaii.dentix.global.common.response.DataResponse;
 import com.kaii.dentix.global.common.response.SuccessResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -52,6 +54,15 @@ public class AdminController {
     @PutMapping(value = "/reset-password", name = "관리자 비밀번호 초기화")
     public DataResponse<AdminPasswordResetDto> adminPasswordReset(@RequestParam Long adminId){
         DataResponse<AdminPasswordResetDto> response = new DataResponse<>(adminService.adminPasswordReset(adminId));
+        return response;
+    }
+
+    /**
+     *  관리자 목록 조회
+     */
+    @GetMapping(value = "/list", name = "관리자 목록 조회")
+    public DataResponse<AdminListDto> adminList(PageAndSizeRequest request){
+        DataResponse<AdminListDto> response = new DataResponse<>(adminService.adminList(request));
         return response;
     }
 
