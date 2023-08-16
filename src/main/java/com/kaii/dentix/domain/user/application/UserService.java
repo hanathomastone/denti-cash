@@ -26,6 +26,7 @@ import com.kaii.dentix.domain.userServiceAgreement.dto.UserModifyServiceAgreeDto
 import com.kaii.dentix.domain.userServiceAgreement.dto.request.UserModifyServiceAgreeRequest;
 import com.kaii.dentix.global.common.error.exception.NotFoundDataException;
 import com.kaii.dentix.global.common.error.exception.RequiredVersionInfoException;
+import com.kaii.dentix.global.common.error.exception.TokenExpiredException;
 import com.kaii.dentix.global.common.error.exception.UnauthorizedException;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -80,6 +81,8 @@ public class UserService {
     public User getTokenUserNullable(HttpServletRequest servletRequest) {
 
         String token = jwtTokenUtil.getAccessToken(servletRequest);
+
+        if (jwtTokenUtil.isExpired(token, TokenType.AccessToken)) throw new TokenExpiredException();
 
         if (StringUtils.isBlank(token)){ // 비로그인 사용자
             return null;
