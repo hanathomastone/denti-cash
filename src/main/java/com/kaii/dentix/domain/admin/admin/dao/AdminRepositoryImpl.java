@@ -37,7 +37,7 @@ public class AdminRepositoryImpl implements AdminCustomRepository {
         long total = Optional.ofNullable(queryFactory.select(admin.count()).from(admin).fetchOne())
                 .orElse(0L);
 
-        // total 이 0보다 크면 조건에 맞게
+        // total 이 0보다 크면 조건에 맞게 페이징 처리 , 0 이면 빈 리스트 반환
         List<AdminAccountDto> result = total > 0 ? queryFactory
                 .select(Projections.constructor(AdminAccountDto.class,
                         admin.adminId, admin.adminIsSuper, admin.adminLoginIdentifier, admin.adminName, admin.adminPhoneNumber,
