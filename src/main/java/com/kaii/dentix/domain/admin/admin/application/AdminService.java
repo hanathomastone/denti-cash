@@ -1,7 +1,11 @@
 package com.kaii.dentix.domain.admin.admin.application;
 
+import com.kaii.dentix.domain.admin.admin.dao.AdminCustomRepository;
 import com.kaii.dentix.domain.admin.admin.dao.AdminRepository;
 import com.kaii.dentix.domain.admin.admin.domain.Admin;
+import com.kaii.dentix.domain.admin.admin.dto.AdminAccountDto;
+import com.kaii.dentix.domain.admin.admin.dto.AdminListDto;
+import com.kaii.dentix.domain.admin.admin.dto.AdminPasswordResetDto;
 import com.kaii.dentix.domain.admin.admin.dto.AdminSignUpDto;
 import com.kaii.dentix.domain.admin.admin.dto.request.AdminModifyPasswordRequest;
 import com.kaii.dentix.domain.admin.admin.dto.request.AdminSignUpRequest;
@@ -9,6 +13,8 @@ import com.kaii.dentix.domain.jwt.JwtTokenUtil;
 import com.kaii.dentix.domain.jwt.TokenType;
 import com.kaii.dentix.domain.type.UserRole;
 import com.kaii.dentix.domain.type.YnType;
+import com.kaii.dentix.global.common.dto.PageAndSizeRequest;
+import com.kaii.dentix.global.common.dto.PagingDTO;
 import com.kaii.dentix.global.common.error.exception.AlreadyDataException;
 import com.kaii.dentix.global.common.error.exception.BadRequestApiException;
 import com.kaii.dentix.global.common.error.exception.NotFoundDataException;
@@ -16,6 +22,8 @@ import com.kaii.dentix.global.common.error.exception.UnauthorizedException;
 import com.kaii.dentix.global.common.util.SecurityUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +39,10 @@ public class AdminService {
     private final JwtTokenUtil jwtTokenUtil;
 
     private final BCryptPasswordEncoder passwordEncoder;
+
+    private final AdminCustomRepository adminCustomRepository;
+
+    private final ModelMapper modelMapper;
 
     /**
      * 토큰에서 Admin 추출
@@ -87,7 +99,44 @@ public class AdminService {
     public void adminModifyPassword(HttpServletRequest httpServletRequest, AdminModifyPasswordRequest request){
         Admin admin = this.getTokenAdmin(httpServletRequest);
 
-        admin.modifyAdminPassword(passwordEncoder, request.getAdminPassword());
+        admin.updatePassword(passwordEncoder, request.getAdminPassword());
+    }
+
+    /**
+     *  관리자 삭제
+     */
+    @Transactional
+    public void adminDelete(Long adminId){
+        Admin admin = adminRepository.findById(adminId).orElseThrow(() -> new NotFoundDataException("존재하지 않는 관리자입니다."));
+        admin.deleteAdmin();
+    }
+
+    /**
+     *  관리자 비밀번호 초기화
+     */
+    @Transactional
+    public AdminPasswordResetDto adminPasswordReset(Long adminId){
+        Admin admin = adminRepository.findById(adminId).orElseThrow(() -> new NotFoundDataException("존재하지 않는 관리자입니다."));
+        admin.updatePassword(passwordEncoder, SecurityUtil.defaultPassword);
+
+        return AdminPasswordResetDto.builder()
+                .adminPassword(SecurityUtil.defaultPassword)
+                .build();
+    }
+
+    /**
+     *  관리자 목록 조회
+     */
+    public AdminListDto adminList(PageAndSizeRequest request){
+        Page<AdminAccountDto> adminList = adminCustomRepository.findAll(request);
+
+        PagingDTO pagingDTO = modelMapper.map(adminList, PagingDTO.class);
+
+        return AdminListDto.builder()
+                .paging(pagingDTO)
+                .adminList(adminList.getContent())
+                .build();
+
     }
 
 }
