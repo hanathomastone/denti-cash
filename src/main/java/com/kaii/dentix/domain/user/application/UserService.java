@@ -82,11 +82,11 @@ public class UserService {
 
         String token = jwtTokenUtil.getAccessToken(servletRequest);
 
-        if (jwtTokenUtil.isExpired(token, TokenType.AccessToken)) throw new TokenExpiredException();
-
         if (StringUtils.isBlank(token)){ // 비로그인 사용자
             return null;
         }
+
+        if (jwtTokenUtil.isExpired(token, TokenType.AccessToken)) throw new TokenExpiredException();
 
         UserRole roles = jwtTokenUtil.getRoles(token, TokenType.AccessToken);
         if (!roles.equals(UserRole.ROLE_USER)) throw new UnauthorizedException("권한이 없는 사용자입니다.");
