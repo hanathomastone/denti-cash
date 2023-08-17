@@ -3,10 +3,7 @@ package com.kaii.dentix.domain.admin.admin.controller;
 import com.kaii.dentix.domain.admin.admin.application.AdminUserService;
 import com.kaii.dentix.global.common.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,9 +15,18 @@ public class AdminUserController {
     /**
      *  사용자 인증
      */
-    @PutMapping("/verify")
+    @PutMapping(value = "/verify", name = "사용자 인증")
     public SuccessResponse userVerify(@RequestParam Long userId){
         adminUserService.userVerify(userId);
+        return new SuccessResponse();
+    }
+
+    /**
+     *  사용자 삭제
+     */
+    @DeleteMapping(name = "사용자 삭제")
+    public SuccessResponse userDelete(@RequestParam Long userId){
+        adminUserService.userDelete(userId);
         return new SuccessResponse();
     }
 

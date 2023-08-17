@@ -27,4 +27,14 @@ public class AdminUserService {
         user.setIsVerify(YnType.Y);
     }
 
+    /**
+     *  사용자 삭제
+     */
+    @Transactional
+    public void userDelete(Long userId){
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundDataException("존재하지 않는 사용자입니다."));
+
+        user.revoke();
+    }
+
 }
