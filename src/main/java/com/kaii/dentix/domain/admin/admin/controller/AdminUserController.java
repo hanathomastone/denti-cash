@@ -1,6 +1,9 @@
 package com.kaii.dentix.domain.admin.admin.controller;
 
 import com.kaii.dentix.domain.admin.admin.application.AdminUserService;
+import com.kaii.dentix.domain.admin.admin.dto.AdminUserListDto;
+import com.kaii.dentix.domain.admin.admin.dto.request.AdminUserListRequest;
+import com.kaii.dentix.global.common.response.DataResponse;
 import com.kaii.dentix.global.common.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +31,15 @@ public class AdminUserController {
     public SuccessResponse userDelete(@RequestParam Long userId){
         adminUserService.userDelete(userId);
         return new SuccessResponse();
+    }
+
+    /**
+     *  사용자 목록 조회
+     */
+    @GetMapping(name = "사용자 목록 조회")
+    public DataResponse<AdminUserListDto> userList(AdminUserListRequest request){
+        DataResponse<AdminUserListDto> response = new DataResponse<>(adminUserService.userList(request));
+        return response;
     }
 
 }
