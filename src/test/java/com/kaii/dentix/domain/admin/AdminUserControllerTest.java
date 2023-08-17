@@ -88,4 +88,41 @@ public class AdminUserControllerTest extends ControllerTest {
         verify(adminUserService).userVerify(any(Long.class));
     }
 
+    /**
+     *  사용자 삭제
+     */
+    @Test
+    public void userDelete() throws Exception{
+
+        // given
+        doNothing().when(adminUserService).userDelete(any(Long.class));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                RestDocumentationRequestBuilders.delete("/admin/user?userId={userId}", 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "user-delete.고유경.AccessToken")
+                        .with(user("user").roles("ADMIN"))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("rt").value(200))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andDo(document("admin/user/delete",
+                        getDocumentRequest(),
+                        getDocumentResponse(),
+                        queryParameters(
+                                parameterWithName("userId").description("사용자 고유 번호")
+                        ),
+                        responseFields(
+                                fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
+                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지")
+                        )
+                ));
+
+        verify(adminUserService).userDelete(any(Long.class));
+    }
+
 }
