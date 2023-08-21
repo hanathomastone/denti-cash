@@ -18,7 +18,7 @@ public class AdminUserListRequest extends PageAndSizeRequest {
 
     private OralCheckResultTotalType oralCheckResultTotalType; // 구강 상태
 
-    private String oralStatusTitle; // 문진표 유형
+    private String oralStatus; // 문진표 유형
 
     private GenderType userGender; // 사용자 성별
 

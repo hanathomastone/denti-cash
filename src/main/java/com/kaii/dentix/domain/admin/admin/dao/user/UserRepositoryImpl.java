@@ -3,16 +3,17 @@ package com.kaii.dentix.domain.admin.admin.dao.user;
 import com.kaii.dentix.domain.admin.admin.dto.AdminUserInfoDto;
 import com.kaii.dentix.domain.admin.admin.dto.request.AdminUserListRequest;
 import com.kaii.dentix.domain.oralCheck.domain.QOralCheck;
-import com.kaii.dentix.domain.oralStatus.domain.QOralStatus;
 import com.kaii.dentix.domain.questionnaire.domain.QQuestionnaire;
 import com.kaii.dentix.domain.type.DatePeriodType;
 import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
 import com.kaii.dentix.domain.user.domain.QUser;
+import com.kaii.dentix.domain.userOralStatus.domain.QUserOralStatus;
 import com.kaii.dentix.global.common.dto.PagingRequest;
 import com.kaii.dentix.global.common.util.DateFormatUtil;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +34,7 @@ public class UserRepositoryImpl implements UserCustomRepository{
 
     private final QOralCheck oralCheck = QOralCheck.oralCheck;
 
-    private final QOralStatus oralStatus = QOralStatus.oralStatus;
+    private final QUserOralStatus userOralStatus = QUserOralStatus.userOralStatus;
 
     private final QQuestionnaire questionnaire = QQuestionnaire.questionnaire;
 
@@ -52,19 +53,31 @@ public class UserRepositoryImpl implements UserCustomRepository{
         // total 이 0보다 크면 조건에 맞게 페이징 처리 , 0 이면 빈 리스트 반환
         List<AdminUserInfoDto> result = total > 0 ? queryFactory
                 .select(Projections.constructor(AdminUserInfoDto.class,
-                        user.userId, user.userLoginIdentifier, user.userName, oralStatus.oralStatusTitle,
-                        oralStatus.created, oralCheck.oralCheckResultTotalType, oralCheck.created, user.isVerify
+                        user.userId, user.userLoginIdentifier, user.userName,
+                        userOralStatus.oralStatus, userOralStatus.created.as("questionnaireDate"),
+                        oralCheck.oralCheckResultTotalType, oralCheck.created.as("oralCheckDate"), user.isVerify
                 ))
                 .from(user)
-                .join(oralCheck).on(user.userId.eq(oralCheck.userId))
+                .leftJoin(questionnaire).on(questionnaire.userId.eq(user.userId))
+                .leftJoin(userOralStatus).on(questionnaire.questionnaireId.eq(userOralStatus.questionnaire.questionnaireId)
+                        .and(userOralStatus.created.eq(JPAExpressions.select(userOralStatus.created.max())
+                                .from(userOralStatus)
+                                .where(userOralStatus.questionnaire.questionnaireId.eq(questionnaire.questionnaireId))
+                        )))
+                .leftJoin(oralCheck).on(user.userId.eq(oralCheck.userId)
+                        .and(oralCheck.created.eq(JPAExpressions.select(oralCheck.created.max())
+                                .from(oralCheck)
+                                .where(oralCheck.userId.eq(user.userId))
+                        )))
                 .where(
                         StringUtils.isNotBlank(request.getUserIdentifierOrName()) ?
                                 user.userLoginIdentifier.contains(request.getUserIdentifierOrName()).or(user.userName.contains(request.getUserIdentifierOrName()))
                                 : null,
                         whereOralCheckResult(request.getOralCheckResultTotalType()),
-                        request.getOralStatusTitle() != null ? oralStatus.oralStatusTitle.eq(request.getOralStatusTitle()) : null,
+                        request.getOralStatus() != null ? userOralStatus.oralStatus.oralStatusType.eq(request.getOralStatus()) : null,
                         request.getUserGender() != null ? user.userGender.eq(request.getUserGender()) : null,
-                        request.getIsVerify() != null ? user.isVerify.eq(request.getIsVerify()) : null
+                        request.getIsVerify() != null ? user.isVerify.eq(request.getIsVerify()) : null,
+                        whereAllDatePeriod(request.getAllDatePeriod())
                 )
                 .orderBy(user.created.desc())
                 .offset(paging.getOffset())
@@ -107,6 +120,26 @@ public class UserRepositoryImpl implements UserCustomRepository{
                     (Expressions.stringTemplate("DATE_FORMAT({0}, {1})", questionnaire.created, "%Y-%m-%d").goe(DateFormatUtil.dateToString("yyyy-MM-dd", startDate)));
         }
         return null;
+    }
+
+    /**
+     *  기간 설정 '시작일' 필터링
+     */
+    private BooleanExpression whereStartDate(String date){
+        return StringUtils.isNotBlank(date) ?
+                Expressions.stringTemplate("DATE_FORMAT({0}, {1})", oralCheck.created, "%Y-%m-%d").goe(date).or
+                        (Expressions.stringTemplate("DATE_FORMAT({0}, {1})", questionnaire.created, "%Y-%m-%d").goe(date))
+                : null;
+    }
+
+    /**
+     *  기간 설정 '종료일' 필터링
+     */
+    private BooleanExpression whereEndDate(String date){
+        return StringUtils.isNotBlank(date) ?
+                Expressions.stringTemplate("DATE_FORMAT({0}, {1})", oralCheck.created, "%Y-%m-%d").loe(date).or
+                        (Expressions.stringTemplate("DATE_FORMAT({0}, {1})", questionnaire.created, "%Y-%m-%d").loe(date))
+                : null;
     }
 
 }
