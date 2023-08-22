@@ -215,7 +215,7 @@ public class UserService {
     }
 
     /**
-     *  사용자 마케팅 수신 여부 수정
+     *  사용자 서비스 이용동의 여부 수정
      */
     @Transactional
     public UserModifyServiceAgreeDto userModifyServiceAgree(HttpServletRequest httpServletRequest, UserModifyServiceAgreeRequest request){
