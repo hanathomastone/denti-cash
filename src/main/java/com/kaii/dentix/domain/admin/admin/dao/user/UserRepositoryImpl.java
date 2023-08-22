@@ -53,17 +53,19 @@ public class UserRepositoryImpl implements UserCustomRepository{
         // total 이 0보다 크면 조건에 맞게 페이징 처리 , 0 이면 빈 리스트 반환
         List<AdminUserInfoDto> result = total > 0 ? queryFactory
                 .select(Projections.constructor(AdminUserInfoDto.class,
-                        user.userId, user.userLoginIdentifier, user.userName,
+                        user.userId,
+                        user.userLoginIdentifier,
+                        user.userName,
                         userOralStatus.oralStatus, userOralStatus.created.as("questionnaireDate"),
                         oralCheck.oralCheckResultTotalType, oralCheck.created.as("oralCheckDate"), user.isVerify
                 ))
                 .from(user)
-                .leftJoin(questionnaire).on(questionnaire.userId.eq(user.userId))
-                .leftJoin(userOralStatus).on(questionnaire.questionnaireId.eq(userOralStatus.questionnaire.questionnaireId)
-                        .and(userOralStatus.created.eq(JPAExpressions.select(userOralStatus.created.max())
-                                .from(userOralStatus)
-                                .where(userOralStatus.questionnaire.questionnaireId.eq(questionnaire.questionnaireId))
+                .leftJoin(questionnaire).on(questionnaire.userId.eq(user.userId)
+                        .and(questionnaire.created.eq(JPAExpressions.select(questionnaire.created.max())
+                                .from(questionnaire)
+                                .where(questionnaire.userId.eq(user.userId))
                         )))
+                .leftJoin(userOralStatus).on(questionnaire.questionnaireId.eq(userOralStatus.questionnaire.questionnaireId))
                 .leftJoin(oralCheck).on(user.userId.eq(oralCheck.userId)
                         .and(oralCheck.created.eq(JPAExpressions.select(oralCheck.created.max())
                                 .from(oralCheck)
