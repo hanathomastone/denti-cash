@@ -53,10 +53,8 @@ public class UserRepositoryImpl implements UserCustomRepository{
         // total 이 0보다 크면 조건에 맞게 페이징 처리 , 0 이면 빈 리스트 반환
         List<AdminUserInfoDto> result = total > 0 ? queryFactory
                 .select(Projections.constructor(AdminUserInfoDto.class,
-                        user.userId,
-                        user.userLoginIdentifier,
-                        user.userName,
-                        userOralStatus.oralStatus, userOralStatus.created.as("questionnaireDate"),
+                        user.userId, user.userLoginIdentifier, user.userName,
+                        userOralStatus.oralStatus.oralStatusType, questionnaire.created.as("questionnaireDate"),
                         oralCheck.oralCheckResultTotalType, oralCheck.created.as("oralCheckDate"), user.isVerify
                 ))
                 .from(user)
@@ -73,13 +71,14 @@ public class UserRepositoryImpl implements UserCustomRepository{
                         )))
                 .where(
                         StringUtils.isNotBlank(request.getUserIdentifierOrName()) ?
-                                user.userLoginIdentifier.contains(request.getUserIdentifierOrName()).or(user.userName.contains(request.getUserIdentifierOrName()))
-                                : null,
+                                user.userLoginIdentifier.contains(request.getUserIdentifierOrName()).or(user.userName.contains(request.getUserIdentifierOrName())) : null,
                         whereOralCheckResult(request.getOralCheckResultTotalType()),
                         request.getOralStatus() != null ? userOralStatus.oralStatus.oralStatusType.eq(request.getOralStatus()) : null,
                         request.getUserGender() != null ? user.userGender.eq(request.getUserGender()) : null,
                         request.getIsVerify() != null ? user.isVerify.eq(request.getIsVerify()) : null,
-                        whereAllDatePeriod(request.getAllDatePeriod())
+                        whereAllDatePeriod(request.getAllDatePeriod()),
+                        whereStartDate(request.getStartDate()),
+                        whereEndDate(request.getEndDate())
                 )
                 .orderBy(user.created.desc())
                 .offset(paging.getOffset())
