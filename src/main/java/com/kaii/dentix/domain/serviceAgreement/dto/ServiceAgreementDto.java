@@ -12,7 +12,6 @@ public class ServiceAgreementDto {
     private Long id;
     private String name;
     private String menuName;
-    private String footerName;
     private YnType isServiceAgreeRequired;
     private String path;
 
