@@ -10,6 +10,7 @@ import com.kaii.dentix.domain.serviceAgreement.domain.ServiceAgreement;
 import com.kaii.dentix.domain.type.DeviceType;
 import com.kaii.dentix.domain.type.ServiceAgreeType;
 import com.kaii.dentix.domain.type.UserRole;
+import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.domain.user.dao.UserRepository;
 import com.kaii.dentix.domain.user.domain.User;
 import com.kaii.dentix.domain.user.dto.UserInfoDto;
@@ -23,11 +24,9 @@ import com.kaii.dentix.domain.userDeviceType.domain.UserDeviceType;
 import com.kaii.dentix.domain.userServiceAgreement.dao.UserServiceAgreementRepository;
 import com.kaii.dentix.domain.userServiceAgreement.domain.UserServiceAgreement;
 import com.kaii.dentix.domain.userServiceAgreement.dto.UserModifyServiceAgreeDto;
+import com.kaii.dentix.domain.userServiceAgreement.dto.UserModifyServiceAgreeList;
 import com.kaii.dentix.domain.userServiceAgreement.dto.request.UserModifyServiceAgreeRequest;
-import com.kaii.dentix.global.common.error.exception.NotFoundDataException;
-import com.kaii.dentix.global.common.error.exception.RequiredVersionInfoException;
-import com.kaii.dentix.global.common.error.exception.TokenExpiredException;
-import com.kaii.dentix.global.common.error.exception.UnauthorizedException;
+import com.kaii.dentix.global.common.error.exception.*;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +35,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -221,18 +223,30 @@ public class UserService {
     public UserModifyServiceAgreeDto userModifyServiceAgree(HttpServletRequest httpServletRequest, UserModifyServiceAgreeRequest request){
         User user = this.getTokenUser(httpServletRequest);
 
-        // 사용자 마케팅 동의 여부 조회를 위해 serviceAgreementId 조회
-        ServiceAgreement serviceAgreement = serviceAgreementRepository.findByServiceAgreeType(ServiceAgreeType.MARKETING)
-                .orElseThrow(() -> new NotFoundDataException("존재하지 않는 서비스 이용 동의입니다."));
-        UserServiceAgreement userServiceAgreement = userServiceAgreementRepository.findByServiceAgreeIdAndUserId(serviceAgreement.getServiceAgreeId(), user.getUserId())
-                .orElseThrow(() -> new NotFoundDataException("회원 정보를 조회할 수 없습니다."));
+        // request 에서 serviceId 추출
+        List<Long> serviceAgreeIds = request.getServiceAgreeLists()
+                .stream()
+                .map(UserModifyServiceAgreeList::getServiceAgreeId)
+                .collect(Collectors.toList());
 
-        userServiceAgreement.modifyMarketing(request.getIsUserServiceAgree());
+        // request serviceId 에 해당하는 serviceAgreement 정보 담기
+        List<ServiceAgreement> serviceAgreements = serviceAgreementRepository.findAllById(serviceAgreeIds);
+
+        // serviceAgreements 와 요청받은 List 사이즈가 같지 않다는 것은 존재하지 않는 서비스에 대한 요청이 있다는 것
+        if (serviceAgreements.size() != request.getServiceAgreeLists().size()) throw new NotFoundDataException("존재하지 않는 서비스 이용 동의입니다.");
+
+        serviceAgreements.forEach(serviceAgreement -> {
+            if (serviceAgreement.getIsServiceAgreeRequired().equals(YnType.Y)) throw new BadRequestApiException("필수 항목은 수정할 수 없습니다.");
+
+            UserServiceAgreement userServiceAgreement = userServiceAgreementRepository.findByServiceAgreeIdAndUserId(serviceAgreement.getServiceAgreeId(), user.getUserId())
+                    .orElseThrow(() -> new NotFoundDataException("회원 정보를 조회할 수 없습니다."));
+
+            userServiceAgreement.modifyServiceAgree(serviceAgreement.getIsServiceAgreeRequired());
+        });
 
         return UserModifyServiceAgreeDto.builder()
-                .isUserServiceAgree(userServiceAgreement.getIsUserServiceAgree())
+                .serviceAgreeLists(request.getServiceAgreeLists())
                 .build();
-
     }
 
     /**
