@@ -65,7 +65,6 @@ public class ServiceAgreementControllerTest extends ControllerTest {
                         .id(1L)
                         .name("서비스 이용약관 동의")
                         .menuName("서비스 이용약관")
-                        .footerName("이용약관")
                         .isServiceAgreeRequired(YnType.Y)
                         .path("http://dthi-dev.kai-i.com/")
                         .build(),
@@ -73,7 +72,6 @@ public class ServiceAgreementControllerTest extends ControllerTest {
                         .id(2L)
                         .name("개인정보 수집 및 이용 동의")
                         .menuName("개인정보 수집 및 이용")
-                        .footerName("개인정보취급방침")
                         .isServiceAgreeRequired(YnType.Y)
                         .path("http://dtroka-dev.kai-i.com/")
                         .build(),
@@ -81,7 +79,6 @@ public class ServiceAgreementControllerTest extends ControllerTest {
                         .id(3L)
                         .name("마케팅 정보 수신 동의")
                         .menuName("마케팅 정보 수신")
-                        .footerName("마케팅 정보 수신")
                         .isServiceAgreeRequired(YnType.N)
                         .path("http://dentix-api-dev.kai-i.com/docs/app-api-guide.html")
                         .build()
@@ -111,7 +108,6 @@ public class ServiceAgreementControllerTest extends ControllerTest {
                                 fieldWithPath("response.serviceAgreement[].id").type(JsonFieldType.NUMBER).description("서비스 동의 고유 번호"),
                                 fieldWithPath("response.serviceAgreement[].name").type(JsonFieldType.STRING).description("서비스 동의 이름"),
                                 fieldWithPath("response.serviceAgreement[].menuName").type(JsonFieldType.STRING).description("서비스 동의 메뉴 이름"),
-                                fieldWithPath("response.serviceAgreement[].footerName").type(JsonFieldType.STRING).description("서비스 동의 푸터 이름"),
                                 fieldWithPath("response.serviceAgreement[].isServiceAgreeRequired").type(JsonFieldType.STRING).attributes(isRequiredFormat()).description("서비스 동의 필수 여부"),
                                 fieldWithPath("response.serviceAgreement[].path").type(JsonFieldType.STRING).description("서비스 동의 경로")
                                 )

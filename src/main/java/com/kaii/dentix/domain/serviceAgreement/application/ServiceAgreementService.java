@@ -26,7 +26,6 @@ public class ServiceAgreementService {
                         .id(serviceAgreement.getServiceAgreeId())
                         .name(serviceAgreement.getServiceAgreeName())
                         .menuName(serviceAgreement.getServiceAgreeMenuName())
-                        .footerName(serviceAgreement.getServiceAgreeFooterName())
                         .isServiceAgreeRequired(serviceAgreement.getIsServiceAgreeRequired())
                         .path(serviceAgreement.getServiceAgreePath())
                         .build())

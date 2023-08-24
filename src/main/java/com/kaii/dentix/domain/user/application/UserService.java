@@ -5,11 +5,12 @@ import com.kaii.dentix.domain.jwt.JwtTokenUtil;
 import com.kaii.dentix.domain.jwt.TokenType;
 import com.kaii.dentix.domain.patient.dao.PatientRepository;
 import com.kaii.dentix.domain.patient.domain.Patient;
+import com.kaii.dentix.domain.serviceAgreement.dao.ServiceAgreementCustomRepository;
 import com.kaii.dentix.domain.serviceAgreement.dao.ServiceAgreementRepository;
 import com.kaii.dentix.domain.serviceAgreement.domain.ServiceAgreement;
 import com.kaii.dentix.domain.type.DeviceType;
-import com.kaii.dentix.domain.type.ServiceAgreeType;
 import com.kaii.dentix.domain.type.UserRole;
+import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.domain.user.dao.UserRepository;
 import com.kaii.dentix.domain.user.domain.User;
 import com.kaii.dentix.domain.user.dto.UserInfoDto;
@@ -23,11 +24,9 @@ import com.kaii.dentix.domain.userDeviceType.domain.UserDeviceType;
 import com.kaii.dentix.domain.userServiceAgreement.dao.UserServiceAgreementRepository;
 import com.kaii.dentix.domain.userServiceAgreement.domain.UserServiceAgreement;
 import com.kaii.dentix.domain.userServiceAgreement.dto.UserModifyServiceAgreeDto;
+import com.kaii.dentix.domain.userServiceAgreement.dto.UserServiceAgreeList;
 import com.kaii.dentix.domain.userServiceAgreement.dto.request.UserModifyServiceAgreeRequest;
-import com.kaii.dentix.global.common.error.exception.NotFoundDataException;
-import com.kaii.dentix.global.common.error.exception.RequiredVersionInfoException;
-import com.kaii.dentix.global.common.error.exception.TokenExpiredException;
-import com.kaii.dentix.global.common.error.exception.UnauthorizedException;
+import com.kaii.dentix.global.common.error.exception.*;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +35,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -58,6 +60,8 @@ public class UserService {
     private final ServiceAgreementRepository serviceAgreementRepository;
 
     private final PatientRepository patientRepository;
+
+    private final ServiceAgreementCustomRepository serviceAgreementCustomRepository;
 
 
     /**
@@ -215,24 +219,33 @@ public class UserService {
     }
 
     /**
-     *  사용자 마케팅 수신 여부 수정
+     *  사용자 서비스 이용동의 여부 수정
      */
     @Transactional
     public UserModifyServiceAgreeDto userModifyServiceAgree(HttpServletRequest httpServletRequest, UserModifyServiceAgreeRequest request){
         User user = this.getTokenUser(httpServletRequest);
 
-        // 사용자 마케팅 동의 여부 조회를 위해 serviceAgreementId 조회
-        ServiceAgreement serviceAgreement = serviceAgreementRepository.findByServiceAgreeType(ServiceAgreeType.MARKETING)
-                .orElseThrow(() -> new NotFoundDataException("존재하지 않는 서비스 이용 동의입니다."));
-        UserServiceAgreement userServiceAgreement = userServiceAgreementRepository.findByServiceAgreeIdAndUserId(serviceAgreement.getServiceAgreeId(), user.getUserId())
-                .orElseThrow(() -> new NotFoundDataException("회원 정보를 조회할 수 없습니다."));
+        ServiceAgreement serviceAgreement = serviceAgreementRepository.findById(request.getServiceAgreeId()).orElseThrow(() -> new NotFoundDataException("존재하지 않는 서비스 이용 동의입니다."));
+        if (serviceAgreement.getIsServiceAgreeRequired().equals(YnType.Y)) throw new BadRequestApiException("필수 항목은 수정할 수 없습니다.");
 
-        userServiceAgreement.modifyMarketing(request.getIsUserServiceAgree());
+        UserServiceAgreement userServiceAgreement = userServiceAgreementRepository.findByServiceAgreeIdAndUserId(serviceAgreement.getServiceAgreeId(), user.getUserId()).orElse(null);
+
+        if (userServiceAgreement == null) {
+            userServiceAgreement = userServiceAgreementRepository.save(UserServiceAgreement.builder()
+                    .userId(user.getUserId())
+                    .serviceAgreeId(serviceAgreement.getServiceAgreeId())
+                    .isUserServiceAgree(request.getIsUserServiceAgree())
+                    .userServiceAgreeDate(new Date())
+                    .build());
+        } else {
+            userServiceAgreement.modifyServiceAgree(request.getIsUserServiceAgree());
+        }
 
         return UserModifyServiceAgreeDto.builder()
+                .serviceAgreeId(userServiceAgreement.getServiceAgreeId())
                 .isUserServiceAgree(userServiceAgreement.getIsUserServiceAgree())
+                .date(userServiceAgreement.getUserServiceAgreeDate())
                 .build();
-
     }
 
     /**
@@ -241,11 +254,8 @@ public class UserService {
     public UserInfoDto userInfo(HttpServletRequest httpServletRequest){
         User user = this.getTokenUser(httpServletRequest);
 
-        // 사용자 마케팅 동의 여부 조회를 위해 serviceAgreementId 조회
-        ServiceAgreement serviceAgreement = serviceAgreementRepository.findByServiceAgreeType(ServiceAgreeType.MARKETING)
-                .orElseThrow(() -> new NotFoundDataException("존재하지 않는 서비스 이용 동의입니다."));
-        UserServiceAgreement userServiceAgreement = userServiceAgreementRepository.findByServiceAgreeIdAndUserId(serviceAgreement.getServiceAgreeId(), user.getUserId())
-                .orElseThrow(() -> new NotFoundDataException("회원 정보를 조회할 수 없습니다."));
+        // 사용자 서비스 '선택' 이용 동의 여부 조회
+        List<UserServiceAgreeList> serviceAgreementList = serviceAgreementCustomRepository.findAllByNotRequiredServiceAgreement(user.getUserId());
 
         String patientPhoneNumber = null;
 
@@ -258,7 +268,7 @@ public class UserService {
                 .userName(user.getUserName())
                 .userLoginIdentifier(user.getUserLoginIdentifier())
                 .patientPhoneNumber(patientPhoneNumber)
-                .isUserMarketingAgree(userServiceAgreement.getIsUserServiceAgree())
+                .userServiceAgreeLists(serviceAgreementList)
                 .userGender(user.getUserGender())
                 .build();
     }

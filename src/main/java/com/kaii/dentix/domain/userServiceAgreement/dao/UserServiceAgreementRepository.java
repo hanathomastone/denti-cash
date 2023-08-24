@@ -9,6 +9,6 @@ public interface UserServiceAgreementRepository extends JpaRepository<UserServic
 
     UserServiceAgreement save(UserServiceAgreement userServiceAgreement);
 
-    Optional<UserServiceAgreement> findByServiceAgreeIdAndUserId(Long userServiceAgreeId, Long userId);
+    Optional<UserServiceAgreement> findByServiceAgreeIdAndUserId(Long serviceAgreeId, Long userId);
 
 }

@@ -68,9 +68,9 @@ public class UserController {
     }
 
     /**
-     *  사용자 마케팅 정보 수신 동의 수정
+     *  사용자 서비스 이용 동의 수정
      */
-    @PutMapping(value = "/service-agreement", name = "사용자 마케팅 정보 수신 동의 수정")
+    @PutMapping(value = "/service-agreement", name = "사용자 서비스 이용 동의 수정")
     public DataResponse<UserModifyServiceAgreeDto> userModifyServiceAgree(HttpServletRequest httpServletRequest, @Valid @RequestBody UserModifyServiceAgreeRequest request){
         DataResponse<UserModifyServiceAgreeDto> response = new DataResponse<>(userService.userModifyServiceAgree(httpServletRequest, request));
         return response;

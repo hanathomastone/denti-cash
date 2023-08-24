@@ -2,15 +2,13 @@ package com.kaii.dentix.domain.userServiceAgreement.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.kaii.dentix.domain.type.YnType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.Date;
 
 @Getter @Builder
-@AllArgsConstructor
-public class UserModifyServiceAgreeDto {
+@AllArgsConstructor @NoArgsConstructor
+public class UserServiceAgreeList {
 
     private Long serviceAgreeId;
 
@@ -19,4 +17,9 @@ public class UserModifyServiceAgreeDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Date date;
 
+    public UserServiceAgreeList(Long serviceAgreeId, String isUserServiceAgree, Date date) {
+        this.serviceAgreeId = serviceAgreeId;
+        this.isUserServiceAgree = YnType.valueOf(isUserServiceAgree);
+        this.date = date;
+    }
 }
