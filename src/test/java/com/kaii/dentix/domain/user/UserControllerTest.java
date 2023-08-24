@@ -12,6 +12,7 @@ import com.kaii.dentix.domain.user.dto.UserInfoModifyQnADto;
 import com.kaii.dentix.domain.user.dto.UserLoginDto;
 import com.kaii.dentix.domain.user.dto.request.*;
 import com.kaii.dentix.domain.userServiceAgreement.dto.UserModifyServiceAgreeDto;
+import com.kaii.dentix.domain.userServiceAgreement.dto.UserServiceAgreeList;
 import com.kaii.dentix.domain.userServiceAgreement.dto.request.UserModifyServiceAgreeRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +30,9 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentRequest;
 import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentResponse;
@@ -96,11 +99,19 @@ public class UserControllerTest extends ControllerTest {
     }
 
     private UserInfoDto userInfoDto(){
+        Date date = new Date();
+        List<UserServiceAgreeList> userServiceAgreeLists = Arrays.asList(
+                UserServiceAgreeList.builder()
+                        .serviceAgreeId(3L)
+                        .isUserServiceAgree(YnType.Y)
+                        .date(date).build()
+        );
+
         return UserInfoDto.builder()
                 .userName("김덴티")
                 .userLoginIdentifier("detix123")
                 .patientPhoneNumber("01012345678")
-                .isUserMarketingAgree(YnType.Y)
+                .userServiceAgreeLists(userServiceAgreeLists)
                 .userGender(GenderType.W)
                 .build();
     }
@@ -408,7 +419,7 @@ public class UserControllerTest extends ControllerTest {
     }
 
     /**
-     *  사용자 마케팅 수신 정보 동의 수정
+     *  사용자 서비스 이용 동의 수정
      */
     @Test
     public void userModifyServiceAgree() throws Exception{
@@ -486,7 +497,10 @@ public class UserControllerTest extends ControllerTest {
                                 fieldWithPath("response.userName").type(JsonFieldType.STRING).description("사용자 닉네임"),
                                 fieldWithPath("response.userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디"),
                                 fieldWithPath("response.patientPhoneNumber").type(JsonFieldType.STRING).optional().attributes(userNumberFormat()).description("사용자(환자) 연락처"),
-                                fieldWithPath("response.isUserMarketingAgree").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("사용자 마케팅 동의 여부"),
+                                fieldWithPath("response.userServiceAgreeLists").type(JsonFieldType.ARRAY).description("사용자 서비스 이용동의 목록"),
+                                fieldWithPath("response.userServiceAgreeLists[].serviceAgreeId").type(JsonFieldType.NUMBER).description("서비스 이용동의 고유 번호"),
+                                fieldWithPath("response.userServiceAgreeLists[].isUserServiceAgree").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("사용자 서비스 이용동의 여부"),
+                                fieldWithPath("response.userServiceAgreeLists[].date").type(JsonFieldType.STRING).attributes(dateTimeFormat()).description("사용자 서비스 이용동의 수정 시각"),
                                 fieldWithPath("response.userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별")
 
                         )

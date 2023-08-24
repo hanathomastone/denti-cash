@@ -5,10 +5,10 @@ import com.kaii.dentix.domain.jwt.JwtTokenUtil;
 import com.kaii.dentix.domain.jwt.TokenType;
 import com.kaii.dentix.domain.patient.dao.PatientRepository;
 import com.kaii.dentix.domain.patient.domain.Patient;
+import com.kaii.dentix.domain.serviceAgreement.dao.ServiceAgreementCustomRepository;
 import com.kaii.dentix.domain.serviceAgreement.dao.ServiceAgreementRepository;
 import com.kaii.dentix.domain.serviceAgreement.domain.ServiceAgreement;
 import com.kaii.dentix.domain.type.DeviceType;
-import com.kaii.dentix.domain.type.ServiceAgreeType;
 import com.kaii.dentix.domain.type.UserRole;
 import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.domain.user.dao.UserRepository;
@@ -24,6 +24,7 @@ import com.kaii.dentix.domain.userDeviceType.domain.UserDeviceType;
 import com.kaii.dentix.domain.userServiceAgreement.dao.UserServiceAgreementRepository;
 import com.kaii.dentix.domain.userServiceAgreement.domain.UserServiceAgreement;
 import com.kaii.dentix.domain.userServiceAgreement.dto.UserModifyServiceAgreeDto;
+import com.kaii.dentix.domain.userServiceAgreement.dto.UserServiceAgreeList;
 import com.kaii.dentix.domain.userServiceAgreement.dto.request.UserModifyServiceAgreeRequest;
 import com.kaii.dentix.global.common.error.exception.*;
 import io.micrometer.common.util.StringUtils;
@@ -34,6 +35,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -56,6 +59,8 @@ public class UserService {
     private final ServiceAgreementRepository serviceAgreementRepository;
 
     private final PatientRepository patientRepository;
+
+    private final ServiceAgreementCustomRepository serviceAgreementCustomRepository;
 
 
     /**
@@ -240,11 +245,8 @@ public class UserService {
     public UserInfoDto userInfo(HttpServletRequest httpServletRequest){
         User user = this.getTokenUser(httpServletRequest);
 
-        // 사용자 마케팅 동의 여부 조회를 위해 serviceAgreementId 조회
-        ServiceAgreement serviceAgreement = serviceAgreementRepository.findByServiceAgreeType(ServiceAgreeType.MARKETING)
-                .orElseThrow(() -> new NotFoundDataException("존재하지 않는 서비스 이용 동의입니다."));
-        UserServiceAgreement userServiceAgreement = userServiceAgreementRepository.findByServiceAgreeIdAndUserId(serviceAgreement.getServiceAgreeId(), user.getUserId())
-                .orElseThrow(() -> new NotFoundDataException("회원 정보를 조회할 수 없습니다."));
+        // 사용자 서비스 '선택' 이용 동의 여부 조회
+        List<UserServiceAgreeList> serviceAgreementList = serviceAgreementCustomRepository.findAll(user.getUserId());
 
         String patientPhoneNumber = null;
 
@@ -257,7 +259,7 @@ public class UserService {
                 .userName(user.getUserName())
                 .userLoginIdentifier(user.getUserLoginIdentifier())
                 .patientPhoneNumber(patientPhoneNumber)
-                .isUserMarketingAgree(userServiceAgreement.getIsUserServiceAgree())
+                .userServiceAgreeLists(serviceAgreementList)
                 .userGender(user.getUserGender())
                 .build();
     }
