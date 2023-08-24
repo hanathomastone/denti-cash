@@ -36,6 +36,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -227,15 +228,23 @@ public class UserService {
         ServiceAgreement serviceAgreement = serviceAgreementRepository.findById(request.getServiceAgreeId()).orElseThrow(() -> new NotFoundDataException("존재하지 않는 서비스 이용 동의입니다."));
         if (serviceAgreement.getIsServiceAgreeRequired().equals(YnType.Y)) throw new BadRequestApiException("필수 항목은 수정할 수 없습니다.");
 
-        UserServiceAgreement userServiceAgreement = userServiceAgreementRepository.findByServiceAgreeIdAndUserId(serviceAgreement.getServiceAgreeId(), user.getUserId())
-                .orElseThrow(() -> new NotFoundDataException("회원 정보를 조회할 수 없습니다."));
+        UserServiceAgreement userServiceAgreement = userServiceAgreementRepository.findByServiceAgreeIdAndUserId(serviceAgreement.getServiceAgreeId(), user.getUserId()).orElse(null);
 
-        userServiceAgreement.modifyServiceAgree(request.getIsUserServiceAgree());
+        if (userServiceAgreement == null) {
+            userServiceAgreement = userServiceAgreementRepository.save(UserServiceAgreement.builder()
+                    .userId(user.getUserId())
+                    .serviceAgreeId(serviceAgreement.getServiceAgreeId())
+                    .isUserServiceAgree(request.getIsUserServiceAgree())
+                    .userServiceAgreeDate(new Date())
+                    .build());
+        } else {
+            userServiceAgreement.modifyServiceAgree(request.getIsUserServiceAgree());
+        }
 
         return UserModifyServiceAgreeDto.builder()
                 .serviceAgreeId(userServiceAgreement.getServiceAgreeId())
                 .isUserServiceAgree(userServiceAgreement.getIsUserServiceAgree())
-                .date(userServiceAgreement.getModified())
+                .date(userServiceAgreement.getUserServiceAgreeDate())
                 .build();
     }
 
@@ -246,7 +255,7 @@ public class UserService {
         User user = this.getTokenUser(httpServletRequest);
 
         // 사용자 서비스 '선택' 이용 동의 여부 조회
-        List<UserServiceAgreeList> serviceAgreementList = serviceAgreementCustomRepository.findAll(user.getUserId());
+        List<UserServiceAgreeList> serviceAgreementList = serviceAgreementCustomRepository.findAllByNotRequiredServiceAgreement(user.getUserId());
 
         String patientPhoneNumber = null;
 

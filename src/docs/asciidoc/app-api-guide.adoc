@@ -272,7 +272,6 @@ include::{snippets}/user/response-body.adoc[]
 - 사용자 권한이 아닌 경우 : `"권한이 없는 사용자입니다."` (rt : 401)
 - 잘못된 서비스 수정인 경우 : `"존재하지 않는 서비스 이용 동의입니다."` (rt : 416)
 - '필수' 항목 수정 요청인 경우 : `"필수 항목은 수정할 수 없습니다."` (rt : 400)
-- 사용자 조회 불가능 : `"회원 정보를 조회할 수 없습니다."` (rt : 416)
 
 === Http
 include::{snippets}/user/service-agreement/http-request.adoc[]

@@ -26,7 +26,7 @@ public class ServiceAgreementRepositoryImpl implements ServiceAgreementCustomRep
      *  사용자 서비스 이용 동의 '선택' 항목 리스트 조회
      */
     @Override
-    public List<UserServiceAgreeList> findAll(Long userId){
+    public List<UserServiceAgreeList> findAllByNotRequiredServiceAgreement(Long userId){
         return queryFactory
                 .select(Projections.constructor(UserServiceAgreeList.class,
                         serviceAgreement.serviceAgreeId,
@@ -34,7 +34,7 @@ public class ServiceAgreementRepositoryImpl implements ServiceAgreementCustomRep
                                 .when(userServiceAgreement.isUserServiceAgree.isNull())
                                 .then(YnType.N.toString())
                                 .otherwise(userServiceAgreement.isUserServiceAgree.stringValue()).as("isUserServiceAgree"),
-                        userServiceAgreement.modified.as("date")
+                        userServiceAgreement.userServiceAgreeDate.as("date")
                 ))
                 .from(serviceAgreement)
                 .leftJoin(userServiceAgreement).on(userServiceAgreement.serviceAgreeId.eq(serviceAgreement.serviceAgreeId)

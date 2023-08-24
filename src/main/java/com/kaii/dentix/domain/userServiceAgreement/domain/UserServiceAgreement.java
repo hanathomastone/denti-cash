@@ -36,7 +36,10 @@ public class UserServiceAgreement extends TimeEntity {
      *  사용자 서비스 이용동의 여부 수정
      */
     public void modifyServiceAgree(YnType isUserServiceAgree){
-        this.isUserServiceAgree = isUserServiceAgree;
+        if (!this.isUserServiceAgree.equals(isUserServiceAgree)){
+            this.isUserServiceAgree = isUserServiceAgree;
+            this.userServiceAgreeDate = new Date();
+        }
     }
 
 }

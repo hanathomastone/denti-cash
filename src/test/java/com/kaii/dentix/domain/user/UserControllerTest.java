@@ -500,7 +500,7 @@ public class UserControllerTest extends ControllerTest {
                                 fieldWithPath("response.userServiceAgreeLists").type(JsonFieldType.ARRAY).description("사용자 서비스 이용동의 목록"),
                                 fieldWithPath("response.userServiceAgreeLists[].serviceAgreeId").type(JsonFieldType.NUMBER).description("서비스 이용동의 고유 번호"),
                                 fieldWithPath("response.userServiceAgreeLists[].isUserServiceAgree").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("사용자 서비스 이용동의 여부"),
-                                fieldWithPath("response.userServiceAgreeLists[].date").type(JsonFieldType.STRING).attributes(dateTimeFormat()).description("사용자 서비스 이용동의 수정 시각"),
+                                fieldWithPath("response.userServiceAgreeLists[].date").type(JsonFieldType.STRING).attributes(dateTimeFormat()).optional().description("사용자 서비스 이용동의 수정 시각"),
                                 fieldWithPath("response.userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별")
 
                         )

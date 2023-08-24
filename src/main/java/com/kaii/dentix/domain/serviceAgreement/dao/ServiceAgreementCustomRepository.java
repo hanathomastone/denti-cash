@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface ServiceAgreementCustomRepository {
 
-    List<UserServiceAgreeList> findAll(Long userId);
+    List<UserServiceAgreeList> findAllByNotRequiredServiceAgreement(Long userId);
 
 }
