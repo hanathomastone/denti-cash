@@ -46,12 +46,8 @@ public class UserRepositoryImpl implements UserCustomRepository{
 
         Pageable paging = new PagingRequest(request.getPage(), request.getSize()).of();
 
-        // fetchCount Deprecated 로 인해 count 쿼리 구현
-        long total = Optional.ofNullable(queryFactory.select(user.count()).from(user).fetchOne())
-                .orElse(0L);
-
         // total 이 0보다 크면 조건에 맞게 페이징 처리 , 0 이면 빈 리스트 반환
-        List<AdminUserInfoDto> result = total > 0 ? queryFactory
+        List<AdminUserInfoDto> result = queryFactory
                 .select(Projections.constructor(AdminUserInfoDto.class,
                         user.userId, user.userLoginIdentifier, user.userName,
                         userOralStatus.oralStatus.oralStatusType, questionnaire.created.as("questionnaireDate"),
@@ -83,7 +79,35 @@ public class UserRepositoryImpl implements UserCustomRepository{
                 .orderBy(user.created.desc())
                 .offset(paging.getOffset())
                 .limit(paging.getPageSize())
-                .fetch() : new ArrayList<>();
+                .fetch();
+
+        // fetchCount Deprecated 로 인해 count 쿼리 구현
+        Long total = Optional.ofNullable(queryFactory
+                .select(user.count())
+                .from(user)
+                .leftJoin(questionnaire).on(questionnaire.userId.eq(user.userId)
+                        .and(questionnaire.created.eq(JPAExpressions.select(questionnaire.created.max())
+                                .from(questionnaire)
+                                .where(questionnaire.userId.eq(user.userId))
+                        )))
+                .leftJoin(userOralStatus).on(questionnaire.questionnaireId.eq(userOralStatus.questionnaire.questionnaireId))
+                .leftJoin(oralCheck).on(user.userId.eq(oralCheck.userId)
+                        .and(oralCheck.created.eq(JPAExpressions.select(oralCheck.created.max())
+                                .from(oralCheck)
+                                .where(oralCheck.userId.eq(user.userId))
+                        )))
+                .where(
+                        StringUtils.isNotBlank(request.getUserIdentifierOrName()) ?
+                                user.userLoginIdentifier.contains(request.getUserIdentifierOrName()).or(user.userName.contains(request.getUserIdentifierOrName())) : null,
+                        whereOralCheckResult(request.getOralCheckResultTotalType()),
+                        request.getOralStatus() != null ? userOralStatus.oralStatus.oralStatusType.eq(request.getOralStatus()) : null,
+                        request.getUserGender() != null ? user.userGender.eq(request.getUserGender()) : null,
+                        request.getIsVerify() != null ? user.isVerify.eq(request.getIsVerify()) : null,
+                        whereAllDatePeriod(request.getAllDatePeriod()),
+                        whereStartDate(request.getStartDate()),
+                        whereEndDate(request.getEndDate())
+                )
+                .fetchOne()).orElse(0L);
 
         return new PageImpl<>(result, paging, total);
 
