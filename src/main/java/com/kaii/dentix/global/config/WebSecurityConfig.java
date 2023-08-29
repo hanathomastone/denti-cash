@@ -1,8 +1,11 @@
 package com.kaii.dentix.global.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaii.dentix.domain.jwt.JwtAuthenticationFilter;
 import com.kaii.dentix.domain.jwt.JwtTokenUtil;
+import com.kaii.dentix.domain.systemLog.dao.SystemLogRepository;
 import com.kaii.dentix.domain.userDeviceType.application.UserDeviceTypeService;
+import com.kaii.dentix.global.common.filter.LoggingFilter;
 import com.kaii.dentix.global.common.filter.VersionCheckFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -22,8 +25,9 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
+    private final ObjectMapper objectMapper;
     private final JwtTokenUtil jwtTokenUtil;
-
+    private final SystemLogRepository systemLogRepository;
     private final UserDeviceTypeService userDeviceTypeService;
 
     public static String[] EXCLUDE_URLS = {
@@ -59,7 +63,8 @@ public class WebSecurityConfig {
                         .anyRequest().hasAnyRole("USER", "ADMIN")
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenUtil), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new VersionCheckFilter(userDeviceTypeService), JwtAuthenticationFilter.class);
+                .addFilterBefore(new VersionCheckFilter(userDeviceTypeService), JwtAuthenticationFilter.class)
+                .addFilterBefore(new LoggingFilter(objectMapper, jwtTokenUtil, systemLogRepository), VersionCheckFilter.class);
         return http.build();
     }
 
