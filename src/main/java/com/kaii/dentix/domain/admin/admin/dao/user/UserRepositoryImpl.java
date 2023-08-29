@@ -10,6 +10,8 @@ import com.kaii.dentix.domain.user.domain.QUser;
 import com.kaii.dentix.domain.userOralStatus.domain.QUserOralStatus;
 import com.kaii.dentix.global.common.dto.PagingRequest;
 import com.kaii.dentix.global.common.util.DateFormatUtil;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
@@ -46,7 +48,6 @@ public class UserRepositoryImpl implements UserCustomRepository{
 
         Pageable paging = new PagingRequest(request.getPage(), request.getSize()).of();
 
-        // total 이 0보다 크면 조건에 맞게 페이징 처리 , 0 이면 빈 리스트 반환
         List<AdminUserInfoDto> result = queryFactory
                 .select(Projections.constructor(AdminUserInfoDto.class,
                         user.userId, user.userLoginIdentifier, user.userName,
@@ -65,17 +66,7 @@ public class UserRepositoryImpl implements UserCustomRepository{
                                 .from(oralCheck)
                                 .where(oralCheck.userId.eq(user.userId))
                         )))
-                .where(
-                        StringUtils.isNotBlank(request.getUserIdentifierOrName()) ?
-                                user.userLoginIdentifier.contains(request.getUserIdentifierOrName()).or(user.userName.contains(request.getUserIdentifierOrName())) : null,
-                        whereOralCheckResult(request.getOralCheckResultTotalType()),
-                        request.getOralStatus() != null ? userOralStatus.oralStatus.oralStatusType.eq(request.getOralStatus()) : null,
-                        request.getUserGender() != null ? user.userGender.eq(request.getUserGender()) : null,
-                        request.getIsVerify() != null ? user.isVerify.eq(request.getIsVerify()) : null,
-                        whereAllDatePeriod(request.getAllDatePeriod()),
-                        whereStartDate(request.getStartDate()),
-                        whereEndDate(request.getEndDate())
-                )
+                .where(whereSearch(request))
                 .orderBy(user.created.desc())
                 .offset(paging.getOffset())
                 .limit(paging.getPageSize())
@@ -96,21 +87,49 @@ public class UserRepositoryImpl implements UserCustomRepository{
                                 .from(oralCheck)
                                 .where(oralCheck.userId.eq(user.userId))
                         )))
-                .where(
-                        StringUtils.isNotBlank(request.getUserIdentifierOrName()) ?
-                                user.userLoginIdentifier.contains(request.getUserIdentifierOrName()).or(user.userName.contains(request.getUserIdentifierOrName())) : null,
-                        whereOralCheckResult(request.getOralCheckResultTotalType()),
-                        request.getOralStatus() != null ? userOralStatus.oralStatus.oralStatusType.eq(request.getOralStatus()) : null,
-                        request.getUserGender() != null ? user.userGender.eq(request.getUserGender()) : null,
-                        request.getIsVerify() != null ? user.isVerify.eq(request.getIsVerify()) : null,
-                        whereAllDatePeriod(request.getAllDatePeriod()),
-                        whereStartDate(request.getStartDate()),
-                        whereEndDate(request.getEndDate())
-                )
+                .where(whereSearch(request))
                 .fetchOne()).orElse(0L);
 
         return new PageImpl<>(result, paging, total);
 
+    }
+
+    /**
+     *  검색 필터링
+     */
+    private Predicate whereSearch(AdminUserListRequest request) {
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+
+        // 검색어 (아이디 혹은 이름)
+        if (StringUtils.isNotBlank(request.getUserIdentifierOrName())) {
+            booleanBuilder.or(user.userLoginIdentifier.contains(request.getUserIdentifierOrName())
+                    .or(user.userName.contains(request.getUserIdentifierOrName())));
+        }
+
+        // 구강 상태
+        booleanBuilder.and(whereOralCheckResult(request.getOralCheckResultTotalType()));
+
+        // 문진표 유형
+        if (request.getOralStatus() != null) {
+            booleanBuilder.and(userOralStatus.oralStatus.oralStatusType.eq(request.getOralStatus()));
+        }
+
+        // 성별
+        if (request.getUserGender() != null) {
+            booleanBuilder.and(user.userGender.eq(request.getUserGender()));
+        }
+
+        // 사용자 인증 여부
+        if (request.getIsVerify() != null) {
+            booleanBuilder.and(user.isVerify.eq(request.getIsVerify()));
+        }
+
+        // 기간 설정
+        booleanBuilder.and(whereAllDatePeriod(request.getAllDatePeriod()));
+        booleanBuilder.and(whereStartDate(request.getStartDate()));
+        booleanBuilder.and(whereEndDate(request.getEndDate()));
+
+        return booleanBuilder;
     }
 
     /**
