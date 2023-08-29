@@ -48,6 +48,9 @@ public class ToothBrushingService {
             // 양치한지 아직 1시간이 되지 않은 경우
             if (latestToothBrushingCreated.after(calendar.getTime())) {
                 return ToothBrushingRegisterDto.builder()
+                    .toothBrushingList(toothBrushingList.stream()
+                            .map(t -> new ToothBrushingDto(t.getToothBrushingId(), t.getCreated()))
+                            .toList())
                     .timeInterval((today.getTime() - latestToothBrushingCreated.getTime()) / 1000)
                     .build();
             }
