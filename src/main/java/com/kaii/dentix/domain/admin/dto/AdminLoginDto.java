@@ -1,4 +1,4 @@
-package com.kaii.dentix.domain.admin.admin.dto;
+package com.kaii.dentix.domain.admin.dto;
 
 import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.domain.user.dto.TokenDto;

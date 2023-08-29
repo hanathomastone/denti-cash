@@ -4,10 +4,7 @@ import com.kaii.dentix.domain.type.GenderType;
 import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.global.common.entity.TimeEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Where;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -29,7 +26,7 @@ public class User extends TimeEntity {
     @Column(nullable = false)
     private String userPassword;
 
-    @Column(length = 45, nullable = false)
+    @Column(length = 100, nullable = false)
     private String userName;
 
     @Enumerated(EnumType.STRING)
@@ -52,6 +49,7 @@ public class User extends TimeEntity {
 
     private Long patientId;
 
+    @Setter
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum", nullable = false)
     private YnType isVerify;

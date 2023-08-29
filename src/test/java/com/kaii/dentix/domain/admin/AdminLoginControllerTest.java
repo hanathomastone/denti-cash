@@ -2,10 +2,10 @@ package com.kaii.dentix.domain.admin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaii.dentix.common.ControllerTest;
-import com.kaii.dentix.domain.admin.admin.application.AdminLoginService;
-import com.kaii.dentix.domain.admin.admin.controller.AdminLoginController;
-import com.kaii.dentix.domain.admin.admin.dto.AdminLoginDto;
-import com.kaii.dentix.domain.admin.admin.dto.request.AdminLoginRequest;
+import com.kaii.dentix.domain.admin.application.AdminLoginService;
+import com.kaii.dentix.domain.admin.controller.AdminLoginController;
+import com.kaii.dentix.domain.admin.dto.AdminLoginDto;
+import com.kaii.dentix.domain.admin.dto.request.AdminLoginRequest;
 import com.kaii.dentix.domain.type.YnType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

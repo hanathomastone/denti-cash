@@ -1,11 +1,11 @@
-package com.kaii.dentix.domain.admin.admin.controller;
+package com.kaii.dentix.domain.admin.controller;
 
-import com.kaii.dentix.domain.admin.admin.application.AdminService;
-import com.kaii.dentix.domain.admin.admin.dto.AdminPasswordResetDto;
-import com.kaii.dentix.domain.admin.admin.dto.AdminListDto;
-import com.kaii.dentix.domain.admin.admin.dto.AdminSignUpDto;
-import com.kaii.dentix.domain.admin.admin.dto.request.AdminModifyPasswordRequest;
-import com.kaii.dentix.domain.admin.admin.dto.request.AdminSignUpRequest;
+import com.kaii.dentix.domain.admin.application.AdminService;
+import com.kaii.dentix.domain.admin.dto.AdminPasswordResetDto;
+import com.kaii.dentix.domain.admin.dto.AdminListDto;
+import com.kaii.dentix.domain.admin.dto.AdminSignUpDto;
+import com.kaii.dentix.domain.admin.dto.request.AdminModifyPasswordRequest;
+import com.kaii.dentix.domain.admin.dto.request.AdminSignUpRequest;
 import com.kaii.dentix.global.common.dto.PageAndSizeRequest;
 import com.kaii.dentix.global.common.response.DataResponse;
 import com.kaii.dentix.global.common.response.SuccessResponse;

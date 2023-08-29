@@ -1,9 +1,9 @@
-package com.kaii.dentix.domain.admin.admin.application;
+package com.kaii.dentix.domain.admin.application;
 
-import com.kaii.dentix.domain.admin.admin.dao.AdminRepository;
-import com.kaii.dentix.domain.admin.admin.domain.Admin;
-import com.kaii.dentix.domain.admin.admin.dto.AdminLoginDto;
-import com.kaii.dentix.domain.admin.admin.dto.request.AdminLoginRequest;
+import com.kaii.dentix.domain.admin.dao.AdminRepository;
+import com.kaii.dentix.domain.admin.domain.Admin;
+import com.kaii.dentix.domain.admin.dto.AdminLoginDto;
+import com.kaii.dentix.domain.admin.dto.request.AdminLoginRequest;
 import com.kaii.dentix.domain.jwt.JwtTokenUtil;
 import com.kaii.dentix.domain.jwt.TokenType;
 import com.kaii.dentix.domain.type.YnType;
