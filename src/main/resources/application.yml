@@ -23,6 +23,7 @@ spring:
       max-request-size: 10MB
 
 server:
+  forward-headers-strategy: native
   servlet:
     encoding:
       charset: UTF-8
