@@ -43,7 +43,7 @@ public class ToothBrushingService {
 
         if (toothBrushingList.size() > 0) {
             Date latestToothBrushingCreated = toothBrushingList.get(toothBrushingList.size() - 1).getCreated();
-            calendar.add(Calendar.MINUTE, -1);
+            calendar.add(Calendar.HOUR, -1);
 
             // 양치한지 아직 1시간이 되지 않은 경우
             if (latestToothBrushingCreated.after(calendar.getTime())) {
@@ -51,7 +51,7 @@ public class ToothBrushingService {
                     .toothBrushingList(toothBrushingList.stream()
                             .map(t -> new ToothBrushingDto(t.getToothBrushingId(), t.getCreated()))
                             .toList())
-                    .timeInterval((today.getTime() - latestToothBrushingCreated.getTime()) / 1000)
+                    .timeInterval(3600 - (today.getTime() - latestToothBrushingCreated.getTime()) / 1000)
                     .build();
             }
         }

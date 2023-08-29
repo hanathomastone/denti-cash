@@ -87,7 +87,7 @@ public class ToothBrushingControllerTest extends ControllerTest {
                     fieldWithPath("response.toothBrushingList").type(JsonFieldType.ARRAY).description("금일 양치질 목록 (양치 실패 시 null)"),
                     fieldWithPath("response.toothBrushingList[].toothBrushingId").type(JsonFieldType.NUMBER).description("양치질 고유번호"),
                     fieldWithPath("response.toothBrushingList[].created").type(JsonFieldType.STRING).attributes(dateTimeFormat()).description("양치질 시각"),
-                    fieldWithPath("response.timeInterval").type(JsonFieldType.NUMBER).optional().attributes(timeIntervalFormat()).description("금일 내 최근 양치 시차 (양치 성공 시 null)")
+                    fieldWithPath("response.timeInterval").type(JsonFieldType.NUMBER).optional().attributes(timeIntervalFormat()).description("양치 실패 시 다음 양치 가능까지 남은 시각 (양치 성공 시 null)")
                 )
             ));
 
