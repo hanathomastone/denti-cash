@@ -1,8 +1,8 @@
-package com.kaii.dentix.domain.admin.admin.controller;
+package com.kaii.dentix.domain.admin.controller;
 
-import com.kaii.dentix.domain.admin.admin.application.AdminLoginService;
-import com.kaii.dentix.domain.admin.admin.dto.AdminLoginDto;
-import com.kaii.dentix.domain.admin.admin.dto.request.AdminLoginRequest;
+import com.kaii.dentix.domain.admin.application.AdminLoginService;
+import com.kaii.dentix.domain.admin.dto.AdminLoginDto;
+import com.kaii.dentix.domain.admin.dto.request.AdminLoginRequest;
 import com.kaii.dentix.global.common.response.DataResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

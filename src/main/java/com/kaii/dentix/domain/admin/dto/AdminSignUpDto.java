@@ -1,4 +1,4 @@
-package com.kaii.dentix.domain.admin.admin.dto;
+package com.kaii.dentix.domain.admin.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

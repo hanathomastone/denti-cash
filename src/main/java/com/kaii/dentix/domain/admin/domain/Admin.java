@@ -1,4 +1,4 @@
-package com.kaii.dentix.domain.admin.admin.domain;
+package com.kaii.dentix.domain.admin.domain;
 
 import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.global.common.entity.TimeEntity;

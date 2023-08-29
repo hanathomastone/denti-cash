@@ -1,8 +1,8 @@
-package com.kaii.dentix.domain.admin.admin.controller;
+package com.kaii.dentix.domain.admin.controller;
 
-import com.kaii.dentix.domain.admin.admin.application.AdminUserService;
-import com.kaii.dentix.domain.admin.admin.dto.AdminUserListDto;
-import com.kaii.dentix.domain.admin.admin.dto.request.AdminUserListRequest;
+import com.kaii.dentix.domain.admin.application.AdminUserService;
+import com.kaii.dentix.domain.admin.dto.AdminUserListDto;
+import com.kaii.dentix.domain.admin.dto.request.AdminUserListRequest;
 import com.kaii.dentix.global.common.response.DataResponse;
 import com.kaii.dentix.global.common.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;

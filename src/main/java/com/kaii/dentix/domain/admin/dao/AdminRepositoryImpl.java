@@ -1,7 +1,7 @@
-package com.kaii.dentix.domain.admin.admin.dao;
+package com.kaii.dentix.domain.admin.dao;
 
 import com.kaii.dentix.domain.admin.admin.domain.QAdmin;
-import com.kaii.dentix.domain.admin.admin.dto.AdminAccountDto;
+import com.kaii.dentix.domain.admin.dto.AdminAccountDto;
 import com.kaii.dentix.global.common.dto.PageAndSizeRequest;
 import com.kaii.dentix.global.common.dto.PagingRequest;
 import com.querydsl.core.types.Projections;

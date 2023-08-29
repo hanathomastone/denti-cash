@@ -1,14 +1,14 @@
-package com.kaii.dentix.domain.admin.admin.application;
+package com.kaii.dentix.domain.admin.application;
 
-import com.kaii.dentix.domain.admin.admin.dao.AdminCustomRepository;
-import com.kaii.dentix.domain.admin.admin.dao.AdminRepository;
-import com.kaii.dentix.domain.admin.admin.domain.Admin;
-import com.kaii.dentix.domain.admin.admin.dto.AdminAccountDto;
-import com.kaii.dentix.domain.admin.admin.dto.AdminListDto;
-import com.kaii.dentix.domain.admin.admin.dto.AdminPasswordResetDto;
-import com.kaii.dentix.domain.admin.admin.dto.AdminSignUpDto;
-import com.kaii.dentix.domain.admin.admin.dto.request.AdminModifyPasswordRequest;
-import com.kaii.dentix.domain.admin.admin.dto.request.AdminSignUpRequest;
+import com.kaii.dentix.domain.admin.dao.AdminCustomRepository;
+import com.kaii.dentix.domain.admin.dao.AdminRepository;
+import com.kaii.dentix.domain.admin.domain.Admin;
+import com.kaii.dentix.domain.admin.dto.AdminAccountDto;
+import com.kaii.dentix.domain.admin.dto.AdminListDto;
+import com.kaii.dentix.domain.admin.dto.AdminPasswordResetDto;
+import com.kaii.dentix.domain.admin.dto.AdminSignUpDto;
+import com.kaii.dentix.domain.admin.dto.request.AdminModifyPasswordRequest;
+import com.kaii.dentix.domain.admin.dto.request.AdminSignUpRequest;
 import com.kaii.dentix.domain.jwt.JwtTokenUtil;
 import com.kaii.dentix.domain.jwt.TokenType;
 import com.kaii.dentix.domain.type.UserRole;

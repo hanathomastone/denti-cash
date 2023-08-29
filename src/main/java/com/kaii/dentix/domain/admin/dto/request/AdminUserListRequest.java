@@ -1,4 +1,4 @@
-package com.kaii.dentix.domain.admin.admin.dto.request;
+package com.kaii.dentix.domain.admin.dto.request;
 
 import com.kaii.dentix.domain.type.DatePeriodType;
 import com.kaii.dentix.domain.type.GenderType;

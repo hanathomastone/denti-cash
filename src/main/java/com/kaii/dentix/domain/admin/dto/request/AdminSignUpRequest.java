@@ -1,4 +1,4 @@
-package com.kaii.dentix.domain.admin.admin.dto.request;
+package com.kaii.dentix.domain.admin.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

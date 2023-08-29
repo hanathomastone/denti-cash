@@ -1,7 +1,7 @@
-package com.kaii.dentix.domain.admin.admin.dao.user;
+package com.kaii.dentix.domain.admin.dao.user;
 
-import com.kaii.dentix.domain.admin.admin.dto.AdminUserInfoDto;
-import com.kaii.dentix.domain.admin.admin.dto.request.AdminUserListRequest;
+import com.kaii.dentix.domain.admin.dto.AdminUserInfoDto;
+import com.kaii.dentix.domain.admin.dto.request.AdminUserListRequest;
 import com.kaii.dentix.domain.oralCheck.domain.QOralCheck;
 import com.kaii.dentix.domain.questionnaire.domain.QQuestionnaire;
 import com.kaii.dentix.domain.type.DatePeriodType;

@@ -1,7 +1,7 @@
 package com.kaii.dentix.domain.jwt;
 
-import com.kaii.dentix.domain.admin.admin.dao.AdminRepository;
-import com.kaii.dentix.domain.admin.admin.domain.Admin;
+import com.kaii.dentix.domain.admin.dao.AdminRepository;
+import com.kaii.dentix.domain.admin.domain.Admin;
 import com.kaii.dentix.domain.type.UserRole;
 import com.kaii.dentix.domain.user.dao.UserRepository;
 import com.kaii.dentix.domain.user.domain.User;

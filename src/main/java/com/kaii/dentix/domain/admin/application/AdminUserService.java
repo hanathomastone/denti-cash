@@ -1,9 +1,9 @@
-package com.kaii.dentix.domain.admin.admin.application;
+package com.kaii.dentix.domain.admin.application;
 
-import com.kaii.dentix.domain.admin.admin.dao.user.UserCustomRepository;
-import com.kaii.dentix.domain.admin.admin.dto.AdminUserInfoDto;
-import com.kaii.dentix.domain.admin.admin.dto.AdminUserListDto;
-import com.kaii.dentix.domain.admin.admin.dto.request.AdminUserListRequest;
+import com.kaii.dentix.domain.admin.dao.user.UserCustomRepository;
+import com.kaii.dentix.domain.admin.dto.AdminUserInfoDto;
+import com.kaii.dentix.domain.admin.dto.AdminUserListDto;
+import com.kaii.dentix.domain.admin.dto.request.AdminUserListRequest;
 import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.domain.user.dao.UserRepository;
 import com.kaii.dentix.domain.user.domain.User;
