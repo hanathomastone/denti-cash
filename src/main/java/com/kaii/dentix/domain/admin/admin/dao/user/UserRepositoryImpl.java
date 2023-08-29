@@ -51,7 +51,7 @@ public class UserRepositoryImpl implements UserCustomRepository{
         List<AdminUserInfoDto> result = queryFactory
                 .select(Projections.constructor(AdminUserInfoDto.class,
                         user.userId, user.userLoginIdentifier, user.userName,
-                        Expressions.stringTemplate("group_concat", userOralStatus.oralStatus.oralStatusType),
+                        Expressions.stringTemplate("group_concat({0})", userOralStatus.oralStatus.oralStatusType),
                         questionnaire.created.as("questionnaireDate"),
                         oralCheck.oralCheckResultTotalType, oralCheck.created.as("oralCheckDate"), user.isVerify
                 ))
@@ -68,6 +68,7 @@ public class UserRepositoryImpl implements UserCustomRepository{
                                 .where(oralCheck.userId.eq(user.userId))
                         )))
                 .where(whereSearch(request))
+                .groupBy(user.userId, questionnaire.questionnaireId, oralCheck.oralCheckId)
                 .orderBy(user.created.desc())
                 .offset(paging.getOffset())
                 .limit(paging.getPageSize())
@@ -75,7 +76,7 @@ public class UserRepositoryImpl implements UserCustomRepository{
 
         // fetchCount Deprecated 로 인해 count 쿼리 구현
         Long total = Optional.ofNullable(queryFactory
-                .select(user.count())
+                .select(user.countDistinct())
                 .from(user)
                 .leftJoin(questionnaire).on(questionnaire.userId.eq(user.userId)
                         .and(questionnaire.created.eq(JPAExpressions.select(questionnaire.created.max())
