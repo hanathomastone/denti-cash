@@ -13,7 +13,7 @@ public class LoggerDTO {
     private Long tokenUserId;
     private UserRole tokenUserRole;
     private String requestName;
-    private String requestURL;
+    private String requestUrl;
     private String header;
     private String requestBody;
 
@@ -23,7 +23,7 @@ public class LoggerDTO {
             + "\"tokenUserId\":" + tokenUserId
             + ", \"tokenUserRole\":\"" + tokenUserRole + "\""
             + ", \"requestName\":\"" + requestName + "\""
-            + ", \"requestURL\":\"" + requestURL + "\""
+            + ", \"requestUrl\":\"" + requestUrl + "\""
             + ", \"header\":\"" + header + "\""
             + ", \"requestBody\":\"" + requestBody + "\""
             + "}";
