@@ -288,7 +288,6 @@ public class OralCheckControllerTest extends ControllerTest {
                     fieldWithPath("response.dailyList[].detailList[].identifier").type(JsonFieldType.NUMBER).description("고유번호"),
                     fieldWithPath("response.dailyList[].detailList[].oralCheckResultTotalType").type(JsonFieldType.STRING).optional().attributes(oralCheckResultTotalFormat()).description("전체 구강 상태"),
                     fieldWithPath("response.dailyList[].detailList[].toothBrushingCount").type(JsonFieldType.NUMBER).optional().description("양치 횟수"),
-                    fieldWithPath("response.dailyList[].detailList[].oralCheckResultTotalType").type(JsonFieldType.STRING).optional().attributes(oralCheckResultTotalFormat()).description("전체 구강 상태"),
                     fieldWithPath("response.dailyList[].detailList[].oralStatusList").type(JsonFieldType.ARRAY).description("구강 상태 목록"),
                     fieldWithPath("response.dailyList[].detailList[].oralStatusList[].type").type(JsonFieldType.STRING).description("구강 상태 타입"),
                     fieldWithPath("response.dailyList[].detailList[].oralStatusList[].title").type(JsonFieldType.STRING).description("구강 상태 제목")
