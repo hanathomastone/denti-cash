@@ -204,7 +204,7 @@ public class OralCheckControllerTest extends ControllerTest {
                     .build(),
                 OralCheckSectionListDto.builder()
                     .sort(3)
-                    .sectionType(OralSectionType.ORAL_CHECK)
+                    .sectionType(OralSectionType.QUESTIONNAIRE)
                     .date(date)
                     .timeInterval(1000L)
                     .build()
