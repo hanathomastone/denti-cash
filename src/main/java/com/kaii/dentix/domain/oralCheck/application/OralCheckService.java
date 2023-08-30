@@ -181,11 +181,19 @@ public class OralCheckService {
             return divisionCommentTypeList;
         } else {
             boolean allEquals = (upRightRange == upLeftRange) && (upLeftRange == downRightRange) && (downRightRange == downLeftRange);
-
             if (allEquals) { // 부위별 플라그 비율이 모두 동일한 경우
                 divisionCommentTypeList.add(ALL_EQUALS);
                 return divisionCommentTypeList;
             }
+
+            // 플라그 비율이 가장 높은 부위
+            int highestOralCheckRange = Math.max(upRightRange, Math.max(upLeftRange, Math.max(downRightRange, downLeftRange)));
+
+            // 플라그 비율이 가장 높은 부위와 동일한 값을 가진 부위 List 에 추가
+            if (upRightRange == highestOralCheckRange) divisionCommentTypeList.add(UR);
+            if (upLeftRange == highestOralCheckRange) divisionCommentTypeList.add(UL);
+            if (downRightRange == highestOralCheckRange) divisionCommentTypeList.add(DR);
+            if (downLeftRange == highestOralCheckRange) divisionCommentTypeList.add(DL);
 
         }
 
