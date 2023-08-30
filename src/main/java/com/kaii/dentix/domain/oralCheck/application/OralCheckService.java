@@ -347,10 +347,12 @@ public class OralCheckService {
         List<UserOralStatus> userOralStatusList = userOralStatusRepository.findAllByQuestionnaireIn(questionnaireList);
         List<OralStatus> oralStatusList = oralStatusRepository.findAll();
 
-        Calendar calendar = Calendar.getInstance();
-        Date today = calendar.getTime();
-
         final String datePattern = "yyyy-MM-dd";
+
+        Calendar calendar = Calendar.getInstance();
+
+        Date today = calendar.getTime();
+        String todayString = DateFormatUtil.dateToString(datePattern, today);
 
         // 구강 상태 화면 최상단 섹션 순서
         List<OralCheckSectionListDto> sectionList = new ArrayList<>();
@@ -412,7 +414,6 @@ public class OralCheckService {
         calendar.add(Calendar.DATE, 1 - calendar.get(Calendar.DAY_OF_WEEK)); // 30일 전날이 포함된 일요일부터 시작
 
         while (calendar.getTime().before(today) || calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
-            OralDateStatusType dailyStatusType = null;
             List<OralCheckListDto> detailList = new ArrayList<>();
             String dateString = DateFormatUtil.dateToString(datePattern, calendar.getTime());
 
@@ -465,24 +466,35 @@ public class OralCheckService {
                     .build()
                 ).toList());
 
-            // 전체 목록을 역순으로 정렬 후 가장 최신의 상태값 적용
-            if (detailList.size() > 0) {
-                detailList.sort(Comparator.comparing(OralCheckListDto::getDate).reversed());
-                OralCheckListDto latestDto = detailList.get(0);
-                switch (latestDto.getSectionType()) {
-                    case ORAL_CHECK -> {
-                        switch (latestDto.getOralCheckResultTotalType()) {
-                            case HEALTHY -> dailyStatusType = OralDateStatusType.HEALTHY;
-                            case GOOD -> dailyStatusType = OralDateStatusType.GOOD;
-                            case ATTENTION -> dailyStatusType = OralDateStatusType.ATTENTION;
-                            case DANGER -> dailyStatusType = OralDateStatusType.DANGER;
+            // 전체 목록을 역순으로 정렬
+            detailList.sort(Comparator.comparing(OralCheckListDto::getDate).reversed());
+
+            OralDateStatusType dailyStatusType = null;
+            if (dateString.equals(todayString)) {
+                // 오늘인 경우 오늘 상태값 적용
+                dailyStatusType = OralDateStatusType.TODAY;
+            } else if (!detailList.isEmpty()) {
+                // 양치를 제외한 가장 최신의 상태값 적용
+                for (OralCheckListDto dto : detailList) {
+                    switch (dto.getSectionType()) {
+                        case ORAL_CHECK -> {
+                            switch (dto.getOralCheckResultTotalType()) {
+                                case HEALTHY -> dailyStatusType = OralDateStatusType.HEALTHY;
+                                case GOOD -> dailyStatusType = OralDateStatusType.GOOD;
+                                case ATTENTION -> dailyStatusType = OralDateStatusType.ATTENTION;
+                                case DANGER -> dailyStatusType = OralDateStatusType.DANGER;
+                            }
+                        }
+                        case QUESTIONNAIRE -> dailyStatusType = OralDateStatusType.QUESTIONNAIRE;
+                        default -> {
+                            continue;
                         }
                     }
-                    case QUESTIONNAIRE -> dailyStatusType = OralDateStatusType.QUESTIONNAIRE;
+                    break;
                 }
             }
-            // 권장 촬영기간
             if (dailyStatusType == null && latestOralCheck != null && dateString.compareTo(oralCheckPeriodBefore) >= 0 && dateString.compareTo(oralCheckPeriodAfter) <= 0) {
+                // 권장 촬영기간
                 dailyStatusType = OralDateStatusType.ORAL_CHECK_PERIOD;
             }
 

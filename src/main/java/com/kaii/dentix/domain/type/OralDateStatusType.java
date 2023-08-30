@@ -15,7 +15,8 @@ public enum OralDateStatusType {
 
     DANGER(3, "일별 구강 상태값", "위험"),
     QUESTIONNAIRE(4, "일별 구강 상태값", "문진표"),
-    ORAL_CHECK_PERIOD(5, "일별 구강 상태값", "권장 촬영 기간");
+    ORAL_CHECK_PERIOD(5, "일별 구강 상태값", "권장 촬영 기간"),
+    TODAY(6, "일별 구강 상태값", "오늘");
 
     private final int id;
     private final String description;
