@@ -2,6 +2,7 @@ package com.kaii.dentix.global.common.error;
 
 import com.kaii.dentix.global.common.error.exception.*;
 import com.kaii.dentix.global.common.response.ResponseMessage;
+import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +49,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.OK)
     public ErrorResponse UnauthorizedException(HttpServletRequest request, UnauthorizedException e) {
         log.info("error : ", e);
-        return ErrorResponse.of(HttpStatus.UNAUTHORIZED, ResponseMessage.UNAUTHORIZED_MSG.replace("{Msg}", e.getMessage()));
+        return ErrorResponse.of(HttpStatus.UNAUTHORIZED, StringUtils.isNotBlank(e.getMessage()) ? e.getMessage() : ResponseMessage.UNAUTHORIZED_MSG);
     }
     
     /**
