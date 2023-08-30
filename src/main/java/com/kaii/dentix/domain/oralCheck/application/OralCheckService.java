@@ -165,41 +165,31 @@ public class OralCheckService {
     /**
      * 4등분 코멘트 유형 계산
      *
-     * @param totalRange     : 전체 비율
      * @param upRightRange   : 우상 비율
      * @param upLeftRange    : 좌상 비율
      * @param downRightRange : 우하 비율
      * @param downLeftRange  : 좌하 비율
      * @return ToothColoringDivisionCommentType : 4등분 코멘트 유형
      */
-    public OralCheckDivisionCommentType calcDivisionCommentType(int totalRange, int upRightRange, int upLeftRange, int downRightRange, int downLeftRange) {
+    public List<OralCheckDivisionCommentType> calcDivisionCommentType(int upRightRange, int upLeftRange, int downRightRange, int downLeftRange) {
 
         // 부위별 구강 상태 Comment
-        OralCheckDivisionCommentType divisionCommentType = null;
+        List<OralCheckDivisionCommentType> divisionCommentTypeList = new ArrayList<>();
 
-        int upDivision = upRightRange + upLeftRange; // 윗니
-        int downDivision = downRightRange + downLeftRange; // 아랫니
-        int rightDivision = upRightRange + downRightRange; // 오른쪽
-        int leftDivision = upLeftRange + downLeftRange; // 왼쪽
-
-        if (totalRange == 0) { // 전체 플라그 비율이 0일 경우
-            divisionCommentType = HEALTHY;
+        if (upRightRange == 0 && upLeftRange == 0 && downRightRange == 0 && downLeftRange == 0) { // 모든 부위의 플라그 비율이 0일 경우
+            divisionCommentTypeList.add(HEALTHY);
+            return divisionCommentTypeList;
         } else {
-            boolean rightBool = rightDivision > 0;
-            boolean leftBool = leftDivision > 0;
-            boolean upBool = upDivision > 0;
-            boolean downBool = downDivision > 0;
+            boolean allEquals = (upRightRange == upLeftRange) && (upLeftRange == downRightRange) && (downRightRange == downLeftRange);
 
-            boolean rightGtLeftBool = rightBool && leftBool ? rightDivision > leftDivision : rightBool; // true : 오른쪽, false : 왼쪽
-            boolean downGtUpBool = upBool && downBool ? downDivision > upDivision : downBool; // true : 아래, false : 위
+            if (allEquals) { // 부위별 플라그 비율이 모두 동일한 경우
+                divisionCommentTypeList.add(ALL_EQUALS);
+                return divisionCommentTypeList;
+            }
 
-            divisionCommentType = rightGtLeftBool && downGtUpBool ? DR
-                    : rightGtLeftBool && !downGtUpBool ? UR
-                    : !rightGtLeftBool && downGtUpBool ? DL
-                    : UL; // !rightGtLeftBool && !downGtUpBool --> UL
         }
 
-        return divisionCommentType;
+        return divisionCommentTypeList;
     }
 
     /**
@@ -228,9 +218,6 @@ public class OralCheckService {
         int totalRange = totalGroupRatio != null ? totalGroupRatio < 1 ? 0 : round(totalGroupRatio) : 0; // 전체 비율
 
         String resultJsonData = objectMapper.writeValueAsString(resource); // 분석 결과 JSON data 전체
-
-        // 4등분 코멘트 유형
-        OralCheckDivisionCommentType divisionCommentType = this.calcDivisionCommentType(totalRange, upRightRange, upLeftRange, downRightRange, downLeftRange);
 
         // 4등분 점수 유형
         OralCheckDivisionScoreType upRightScoreType = this.calcDivisionScoreType(upRightGroupRatio);
@@ -262,7 +249,6 @@ public class OralCheckService {
                 .oralCheckDownLeftRange(downLeftRange)
                 .oralCheckResultJsonData(resultJsonData)
                 .oralCheckResultTotalType(resultTotalType)
-                .oralCheckDivisionCommentType(divisionCommentType)
                 .oralCheckUpRightScoreType(upRightScoreType)
                 .oralCheckUpLeftScoreType(upLeftScoreType)
                 .oralCheckDownRightScoreType(downRightScoreType)
@@ -314,6 +300,10 @@ public class OralCheckService {
 
         if (!oralCheck.getUserId().equals(user.getUserId())) throw new BadRequestApiException("회원 정보와 구강 검진 정보가 일치하지 않습니다.");
 
+        // 부위별 코멘트 리스트
+        List<OralCheckDivisionCommentType> oralCheckCommentList = this.calcDivisionCommentType(oralCheck.getOralCheckUpRightRange(), oralCheck.getOralCheckUpLeftRange(),
+                oralCheck.getOralCheckDownRightRange(), oralCheck.getOralCheckDownLeftRange());
+
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
         return OralCheckResultDto.builder()
@@ -329,7 +319,7 @@ public class OralCheckService {
                 .oralCheckDownLeftScoreType(oralCheck.getOralCheckDownLeftScoreType())
                 .oralCheckDownRightRange(oralCheck.getOralCheckDownRightRange())
                 .oralCheckDownRightScoreType(oralCheck.getOralCheckDownRightScoreType())
-                .oralCheckDivisionCommentType(oralCheck.getOralCheckDivisionCommentType())
+                .oralCheckCommentList(oralCheckCommentList)
                 .build();
 
     }

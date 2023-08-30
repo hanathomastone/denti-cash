@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter @Builder
 @AllArgsConstructor
 public class OralCheckResultDto {
@@ -35,6 +37,6 @@ public class OralCheckResultDto {
 
     private OralCheckDivisionScoreType oralCheckDownRightScoreType; // 우하 점수 유형
 
-    private OralCheckDivisionCommentType oralCheckDivisionCommentType; // 부위별 구강 상태 코멘트
+    private List<OralCheckDivisionCommentType> oralCheckCommentList; // 부위별 구강 상태 코멘트
 
 }

@@ -22,7 +22,10 @@ public enum OralCheckDivisionCommentType {
             "양치질을 할 때, 하악 우측을 조금 더 신경 써 주세요."),
 
     DL(4, "하악 좌측이 잘 안 닦인 경우",
-            "양치질을 할 때, 하악 우측을 조금 더 신경 써 주세요.");
+            "양치질을 할 때, 하악 우측을 조금 더 신경 써 주세요."),
+
+    ALL_EQUALS(4, "모든 부위의 플라그 수치가 동일한 경우",
+            "");
 
     private final int id;
     private final String type; // 유형

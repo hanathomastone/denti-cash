@@ -1,7 +1,6 @@
 package com.kaii.dentix.domain.oralCheck.domain;
 
 import com.kaii.dentix.domain.type.oral.OralCheckAnalysisState;
-import com.kaii.dentix.domain.type.oral.OralCheckDivisionCommentType;
 import com.kaii.dentix.domain.type.oral.OralCheckDivisionScoreType;
 import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
 import com.kaii.dentix.global.common.entity.TimeEntity;
@@ -50,10 +49,6 @@ public class OralCheck extends TimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum")
     private OralCheckResultTotalType oralCheckResultTotalType; // 종합 결과 유형
-
-    @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "enum")
-    private OralCheckDivisionCommentType oralCheckDivisionCommentType; // 부위별 구강 상태 코멘트
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum")
