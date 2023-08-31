@@ -45,14 +45,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.kaii.dentix.domain.type.oral.OralCheckDivisionCommentType.*;
 import static com.kaii.dentix.global.common.response.ResponseMessage.SUCCESS_MSG;
-import static java.lang.Math.round;
 
 @Service
 @RequiredArgsConstructor
@@ -163,36 +161,37 @@ public class OralCheckService {
 
     /**
      * 4등분 코멘트 유형 계산
-     *
-     * @param upRightRange   : 우상 비율
-     * @param upLeftRange    : 좌상 비율
-     * @param downRightRange : 우하 비율
-     * @param downLeftRange  : 좌하 비율
-     * @return ToothColoringDivisionCommentType : 4등분 코멘트 유형
      */
-    public List<String> calcDivisionCommentType(int upRightRange, int upLeftRange, int downRightRange, int downLeftRange) {
+    public List<String> calcDivisionCommentType(OralCheck oralCheck) {
 
         // 부위별 구강 상태 Comment
         List<String> divisionCommentTypeList = new ArrayList<>();
 
-        if (upRightRange == 0 && upLeftRange == 0 && downRightRange == 0 && downLeftRange == 0) { // 모든 부위의 플라그 비율이 0일 경우
-            divisionCommentTypeList.add(HEALTHY.getSummaryComment());
-            return divisionCommentTypeList;
+        // 모든 부위의 플라그 수치가 동일한 경우 true
+        boolean allEquals = (oralCheck.getOralCheckUpRightRange().equals(oralCheck.getOralCheckUpLeftRange())) &&
+                        (oralCheck.getOralCheckUpLeftRange().equals(oralCheck.getOralCheckDownRightRange()) &&
+                        (oralCheck.getOralCheckDownRightRange().equals(oralCheck.getOralCheckDownLeftRange())));
+
+        if (allEquals && oralCheck.getOralCheckResultTotalType().equals(OralCheckResultTotalType.HEALTHY)) { // 모든 부위의 플라그 비율이 동일하고 , '건강'인 경우
+            return divisionCommentTypeList; // 빈 배열 return
         } else {
-            boolean allEquals = (upRightRange == upLeftRange) && (upLeftRange == downRightRange) && (downRightRange == downLeftRange);
-            if (allEquals) { // 부위별 플라그 비율이 모두 동일한 경우
-                divisionCommentTypeList.add(ALL_EQUALS.getSummaryComment());
+
+            if (allEquals) { // 모든 부위의 플라그 비율이 동일하고 , '건강'이 아닌 경우
+                divisionCommentTypeList.add(UR.getSummaryComment());
+                divisionCommentTypeList.add(UL.getSummaryComment());
+                divisionCommentTypeList.add(DL.getSummaryComment());
+                divisionCommentTypeList.add(DR.getSummaryComment());
                 return divisionCommentTypeList;
             }
 
             // 플라그 비율이 가장 높은 부위
-            int highestOralCheckRange = Math.max(upRightRange, Math.max(upLeftRange, Math.max(downRightRange, downLeftRange)));
+            Float highestOralCheckRange = Math.max(oralCheck.getOralCheckUpRightRange(), Math.max(oralCheck.getOralCheckUpLeftRange(), Math.max(oralCheck.getOralCheckDownLeftRange(), oralCheck.getOralCheckDownRightRange())));
 
             // 플라그 비율이 가장 높은 부위와 동일한 값을 가진 부위 List 에 추가
-            if (upRightRange == highestOralCheckRange) divisionCommentTypeList.add(UR.getSummaryComment());
-            if (upLeftRange == highestOralCheckRange) divisionCommentTypeList.add(UL.getSummaryComment());
-            if (downLeftRange == highestOralCheckRange) divisionCommentTypeList.add(DL.getSummaryComment());
-            if (downRightRange == highestOralCheckRange) divisionCommentTypeList.add(DR.getSummaryComment());
+            if (oralCheck.getOralCheckUpRightRange().equals(highestOralCheckRange)) divisionCommentTypeList.add(UR.getSummaryComment());
+            if (oralCheck.getOralCheckUpLeftRange().equals(highestOralCheckRange)) divisionCommentTypeList.add(UL.getSummaryComment());
+            if (oralCheck.getOralCheckDownLeftRange().equals(highestOralCheckRange)) divisionCommentTypeList.add(DL.getSummaryComment());
+            if (oralCheck.getOralCheckDownRightRange().equals(highestOralCheckRange)) divisionCommentTypeList.add(DR.getSummaryComment());
 
         }
 
@@ -214,15 +213,15 @@ public class OralCheckService {
         Float downRightGroupRatio = tDivision.getDownRight().getGroup().getRatio();
         Float downLeftGroupRatio = tDivision.getDownLeft().getGroup().getRatio();
 
-        int upRightRange = upRightGroupRatio != null ? upRightGroupRatio < 1 ? 0 : round(upRightGroupRatio) : 0; // 우상 비율
-        int upLeftRange = upLeftGroupRatio != null ? upLeftGroupRatio < 1 ? 0 : round(upLeftGroupRatio) : 0; // 좌상 비율
-        int downRightRange = downRightGroupRatio != null ? downRightGroupRatio < 1 ? 0 : round(downRightGroupRatio) : 0; // 우하 비율
-        int downLeftRange = downLeftGroupRatio != null ? downLeftGroupRatio < 1 ? 0 : round(downLeftGroupRatio) : 0; // 좌하 비율
+        Float upRightRange = upRightGroupRatio != null ? upRightGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", upRightGroupRatio)) : 0; // 우상 비율
+        Float upLeftRange = upLeftGroupRatio != null ? upLeftGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", upRightGroupRatio)) : 0; // 좌상 비율
+        Float downRightRange = downRightGroupRatio != null ? downRightGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", upRightGroupRatio)) : 0; // 우하 비율
+        Float downLeftRange = downLeftGroupRatio != null ? downLeftGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", upRightGroupRatio)) : 0; // 좌하 비율
 
         OralCheckAnalysisTotalDto total = resource.getTotal();
         Float totalGroupRatio = total.getGroup().getRatio();
 
-        int totalRange = totalGroupRatio != null ? totalGroupRatio < 1 ? 0 : round(totalGroupRatio) : 0; // 전체 비율
+        Float totalRange = totalGroupRatio != null ? totalGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", upRightGroupRatio)) : 0; // 전체 비율
 
         String resultJsonData = objectMapper.writeValueAsString(resource); // 분석 결과 JSON data 전체
 
@@ -308,15 +307,12 @@ public class OralCheckService {
         if (!oralCheck.getUserId().equals(user.getUserId())) throw new BadRequestApiException("회원 정보와 구강 검진 정보가 일치하지 않습니다.");
 
         // 부위별 코멘트 리스트
-        List<String> oralCheckCommentList = this.calcDivisionCommentType(oralCheck.getOralCheckUpRightRange(), oralCheck.getOralCheckUpLeftRange(),
-                oralCheck.getOralCheckDownRightRange(), oralCheck.getOralCheckDownLeftRange());
-
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        List<String> oralCheckCommentList = this.calcDivisionCommentType(oralCheck);
 
         return OralCheckResultDto.builder()
                 .userId(user.getUserId())
                 .oralCheckResultTotalType(oralCheck.getOralCheckResultTotalType())
-                .created(formatter.format(oralCheck.getCreated()))
+                .created(oralCheck.getCreated())
                 .oralCheckTotalRange(oralCheck.getOralCheckTotalRange())
                 .oralCheckUpRightRange(oralCheck.getOralCheckUpRightRange())
                 .oralCheckUpRightScoreType(oralCheck.getOralCheckUpRightScoreType())

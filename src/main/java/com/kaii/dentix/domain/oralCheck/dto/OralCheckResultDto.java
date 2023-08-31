@@ -1,11 +1,13 @@
 package com.kaii.dentix.domain.oralCheck.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.kaii.dentix.domain.type.oral.OralCheckDivisionScoreType;
 import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.Date;
 import java.util.List;
 
 @Getter @Builder
@@ -16,23 +18,24 @@ public class OralCheckResultDto {
 
     private OralCheckResultTotalType oralCheckResultTotalType; // 전체 구강 상태 결과 타입
 
-    private String created; // 촬영일
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    private Date created; // 촬영일
 
-    private Integer oralCheckTotalRange; // 전체 플라그 퍼센트
+    private Float oralCheckTotalRange; // 전체 플라그 퍼센트
 
-    private Integer oralCheckUpRightRange; // 구강 검진 우상 비율
+    private Float oralCheckUpRightRange; // 구강 검진 우상 비율
 
     private OralCheckDivisionScoreType oralCheckUpRightScoreType; // 우상 점수 유형
 
-    private Integer oralCheckUpLeftRange; // 구강 검진 좌상 비율
+    private Float oralCheckUpLeftRange; // 구강 검진 좌상 비율
 
     private OralCheckDivisionScoreType oralCheckUpLeftScoreType; // 좌상 점수 유형
 
-    private Integer oralCheckDownLeftRange; // 구강 검진 좌하 비율
+    private Float oralCheckDownLeftRange; // 구강 검진 좌하 비율
 
     private OralCheckDivisionScoreType oralCheckDownLeftScoreType; // 좌하 점수 유형
 
-    private Integer oralCheckDownRightRange; // 구강 검진 우하 비율
+    private Float oralCheckDownRightRange; // 구강 검진 우하 비율
 
     private OralCheckDivisionScoreType oralCheckDownRightScoreType; // 우하 점수 유형
 

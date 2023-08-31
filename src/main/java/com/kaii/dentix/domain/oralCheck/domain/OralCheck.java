@@ -32,15 +32,15 @@ public class OralCheck extends TimeEntity {
     @Column(columnDefinition = "enum")
     private OralCheckAnalysisState oralCheckAnalysisState; // 구강 검진 분석 상태
 
-    private Integer oralCheckTotalRange; // 구강 검진 전체 비율
+    private Float oralCheckTotalRange; // 구강 검진 전체 비율
 
-    private Integer oralCheckUpRightRange; // 구강 검진 우상 비율
+    private Float oralCheckUpRightRange; // 구강 검진 우상 비율
 
-    private Integer oralCheckUpLeftRange; // 구강 검진 좌상 비율
+    private Float oralCheckUpLeftRange; // 구강 검진 좌상 비율
 
-    private Integer oralCheckDownRightRange; // 구강 검진 우하 비율
+    private Float oralCheckDownRightRange; // 구강 검진 우하 비율
 
-    private Integer oralCheckDownLeftRange; // 구강 검진 좌하 비율
+    private Float oralCheckDownLeftRange; // 구강 검진 좌하 비율
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "json")

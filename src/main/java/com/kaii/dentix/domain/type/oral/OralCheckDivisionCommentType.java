@@ -8,9 +8,6 @@ import lombok.Getter;
 public enum OralCheckDivisionCommentType {
 
     // 부위별 구강 상태 Comment
-    // TODO : HEALTHY , ALL_EQUALS 코멘트 수정
-    HEALTHY(0, "모두 잘 닦인 경우",
-            "전체적으로 양치를 잘하셨어요!"),
 
     UR(1, "상악 우측이 잘 안 닦인 경우",
             "상악우측"),
@@ -22,10 +19,7 @@ public enum OralCheckDivisionCommentType {
             "하악우측"),
 
     DL(4, "하악 좌측이 잘 안 닦인 경우",
-            "하악좌측"),
-
-    ALL_EQUALS(5, "모든 부위의 플라그 수치가 동일한 경우",
-            "");
+            "하악좌측");
 
     private final int id;
     private final String type; // 유형
