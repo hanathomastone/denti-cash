@@ -9,7 +9,6 @@ import com.kaii.dentix.domain.questionnaire.dto.OralStatusTypeDto;
 import com.kaii.dentix.domain.toothBrushing.dto.ToothBrushingDto;
 import com.kaii.dentix.domain.type.OralDateStatusType;
 import com.kaii.dentix.domain.type.OralSectionType;
-import com.kaii.dentix.domain.type.oral.OralCheckDivisionCommentType;
 import com.kaii.dentix.domain.type.oral.OralCheckDivisionScoreType;
 import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
 import com.kaii.dentix.global.common.response.DataResponse;
@@ -71,6 +70,8 @@ public class OralCheckControllerTest extends ControllerTest {
     @MockBean
     private OralCheckService oralCheckService;
 
+    private List<String> oralCheckCommentList = Arrays.asList("상악우측" , "상악좌측" , "하악우측");
+
     private OralCheckResultDto oralCheckResultDto(){
         return OralCheckResultDto.builder()
                 .userId(1L)
@@ -85,7 +86,7 @@ public class OralCheckControllerTest extends ControllerTest {
                 .oralCheckDownLeftScoreType(OralCheckDivisionScoreType.ATTENTION)
                 .oralCheckDownRightRange(20)
                 .oralCheckDownRightScoreType(OralCheckDivisionScoreType.ATTENTION)
-                .oralCheckDivisionCommentType(OralCheckDivisionCommentType.UL)
+                .oralCheckCommentList(oralCheckCommentList)
                 .build();
     }
 
@@ -172,7 +173,7 @@ public class OralCheckControllerTest extends ControllerTest {
                                 fieldWithPath("response.oralCheckDownLeftScoreType").type(JsonFieldType.STRING).attributes(oralCheckDivisionScoreFormat()).description("하악좌측 상태"),
                                 fieldWithPath("response.oralCheckDownRightRange").type(JsonFieldType.NUMBER).description("하악우측 플라그 비율"),
                                 fieldWithPath("response.oralCheckDownRightScoreType").type(JsonFieldType.STRING).attributes(oralCheckDivisionScoreFormat()).description("하악우측 상태"),
-                                fieldWithPath("response.oralCheckDivisionCommentType").type(JsonFieldType.STRING).attributes(oralCheckDivisionCommentFormat()).description("부위별 구강 상태 코멘트")
+                                fieldWithPath("response.oralCheckCommentList").type(JsonFieldType.ARRAY).description("부위별 구강 상태 코멘트")
                         )
                 ));
 

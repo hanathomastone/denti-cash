@@ -1,6 +1,5 @@
 package com.kaii.dentix.domain.oralCheck.dto;
 
-import com.kaii.dentix.domain.type.oral.OralCheckDivisionCommentType;
 import com.kaii.dentix.domain.type.oral.OralCheckDivisionScoreType;
 import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
 import lombok.AllArgsConstructor;
@@ -37,6 +36,6 @@ public class OralCheckResultDto {
 
     private OralCheckDivisionScoreType oralCheckDownRightScoreType; // 우하 점수 유형
 
-    private List<OralCheckDivisionCommentType> oralCheckCommentList; // 부위별 구강 상태 코멘트
+    private List<String> oralCheckCommentList; // 부위별 구강 상태 코멘트
 
 }

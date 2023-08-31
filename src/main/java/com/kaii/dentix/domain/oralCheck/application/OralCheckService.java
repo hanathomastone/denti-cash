@@ -21,7 +21,6 @@ import com.kaii.dentix.domain.toothBrushing.dto.ToothBrushingDto;
 import com.kaii.dentix.domain.type.OralDateStatusType;
 import com.kaii.dentix.domain.type.OralSectionType;
 import com.kaii.dentix.domain.type.oral.OralCheckAnalysisState;
-import com.kaii.dentix.domain.type.oral.OralCheckDivisionCommentType;
 import com.kaii.dentix.domain.type.oral.OralCheckDivisionScoreType;
 import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
 import com.kaii.dentix.domain.user.application.UserService;
@@ -171,18 +170,18 @@ public class OralCheckService {
      * @param downLeftRange  : 좌하 비율
      * @return ToothColoringDivisionCommentType : 4등분 코멘트 유형
      */
-    public List<OralCheckDivisionCommentType> calcDivisionCommentType(int upRightRange, int upLeftRange, int downRightRange, int downLeftRange) {
+    public List<String> calcDivisionCommentType(int upRightRange, int upLeftRange, int downRightRange, int downLeftRange) {
 
         // 부위별 구강 상태 Comment
-        List<OralCheckDivisionCommentType> divisionCommentTypeList = new ArrayList<>();
+        List<String> divisionCommentTypeList = new ArrayList<>();
 
         if (upRightRange == 0 && upLeftRange == 0 && downRightRange == 0 && downLeftRange == 0) { // 모든 부위의 플라그 비율이 0일 경우
-            divisionCommentTypeList.add(HEALTHY);
+            divisionCommentTypeList.add(HEALTHY.getSummaryComment());
             return divisionCommentTypeList;
         } else {
             boolean allEquals = (upRightRange == upLeftRange) && (upLeftRange == downRightRange) && (downRightRange == downLeftRange);
             if (allEquals) { // 부위별 플라그 비율이 모두 동일한 경우
-                divisionCommentTypeList.add(ALL_EQUALS);
+                divisionCommentTypeList.add(ALL_EQUALS.getSummaryComment());
                 return divisionCommentTypeList;
             }
 
@@ -190,10 +189,10 @@ public class OralCheckService {
             int highestOralCheckRange = Math.max(upRightRange, Math.max(upLeftRange, Math.max(downRightRange, downLeftRange)));
 
             // 플라그 비율이 가장 높은 부위와 동일한 값을 가진 부위 List 에 추가
-            if (upRightRange == highestOralCheckRange) divisionCommentTypeList.add(UR);
-            if (upLeftRange == highestOralCheckRange) divisionCommentTypeList.add(UL);
-            if (downRightRange == highestOralCheckRange) divisionCommentTypeList.add(DR);
-            if (downLeftRange == highestOralCheckRange) divisionCommentTypeList.add(DL);
+            if (upRightRange == highestOralCheckRange) divisionCommentTypeList.add(UR.getSummaryComment());
+            if (upLeftRange == highestOralCheckRange) divisionCommentTypeList.add(UL.getSummaryComment());
+            if (downLeftRange == highestOralCheckRange) divisionCommentTypeList.add(DL.getSummaryComment());
+            if (downRightRange == highestOralCheckRange) divisionCommentTypeList.add(DR.getSummaryComment());
 
         }
 
@@ -309,7 +308,7 @@ public class OralCheckService {
         if (!oralCheck.getUserId().equals(user.getUserId())) throw new BadRequestApiException("회원 정보와 구강 검진 정보가 일치하지 않습니다.");
 
         // 부위별 코멘트 리스트
-        List<OralCheckDivisionCommentType> oralCheckCommentList = this.calcDivisionCommentType(oralCheck.getOralCheckUpRightRange(), oralCheck.getOralCheckUpLeftRange(),
+        List<String> oralCheckCommentList = this.calcDivisionCommentType(oralCheck.getOralCheckUpRightRange(), oralCheck.getOralCheckUpLeftRange(),
                 oralCheck.getOralCheckDownRightRange(), oralCheck.getOralCheckDownLeftRange());
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
