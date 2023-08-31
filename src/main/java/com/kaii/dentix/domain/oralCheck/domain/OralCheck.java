@@ -1,7 +1,6 @@
 package com.kaii.dentix.domain.oralCheck.domain;
 
 import com.kaii.dentix.domain.type.oral.OralCheckAnalysisState;
-import com.kaii.dentix.domain.type.oral.OralCheckDivisionCommentType;
 import com.kaii.dentix.domain.type.oral.OralCheckDivisionScoreType;
 import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
 import com.kaii.dentix.global.common.entity.TimeEntity;
@@ -33,15 +32,15 @@ public class OralCheck extends TimeEntity {
     @Column(columnDefinition = "enum")
     private OralCheckAnalysisState oralCheckAnalysisState; // 구강 검진 분석 상태
 
-    private Integer oralCheckTotalRange; // 구강 검진 전체 비율
+    private Float oralCheckTotalRange; // 구강 검진 전체 비율
 
-    private Integer oralCheckUpRightRange; // 구강 검진 우상 비율
+    private Float oralCheckUpRightRange; // 구강 검진 우상 비율
 
-    private Integer oralCheckUpLeftRange; // 구강 검진 좌상 비율
+    private Float oralCheckUpLeftRange; // 구강 검진 좌상 비율
 
-    private Integer oralCheckDownRightRange; // 구강 검진 우하 비율
+    private Float oralCheckDownRightRange; // 구강 검진 우하 비율
 
-    private Integer oralCheckDownLeftRange; // 구강 검진 좌하 비율
+    private Float oralCheckDownLeftRange; // 구강 검진 좌하 비율
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "json")
@@ -50,10 +49,6 @@ public class OralCheck extends TimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum")
     private OralCheckResultTotalType oralCheckResultTotalType; // 종합 결과 유형
-
-    @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "enum")
-    private OralCheckDivisionCommentType oralCheckDivisionCommentType; // 부위별 구강 상태 코멘트
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum")
