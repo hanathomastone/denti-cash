@@ -2,10 +2,13 @@ package com.kaii.dentix.domain.questionnaire;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaii.dentix.common.ControllerTest;
+import com.kaii.dentix.domain.contents.dto.ContentsCategoryDto;
+import com.kaii.dentix.domain.contents.dto.ContentsDto;
 import com.kaii.dentix.domain.questionnaire.application.QuestionnaireService;
 import com.kaii.dentix.domain.questionnaire.controller.QuestionnaireController;
 import com.kaii.dentix.domain.questionnaire.dto.*;
 import com.kaii.dentix.domain.questionnaire.dto.request.QuestionnaireSubmitRequest;
+import com.kaii.dentix.domain.type.ContentsType;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +31,7 @@ import java.util.List;
 
 import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentRequest;
 import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentResponse;
+import static com.kaii.dentix.common.DocumentOptionalGenerator.contentsTypeFormat;
 import static com.kaii.dentix.common.DocumentOptionalGenerator.dateFormat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -211,8 +215,44 @@ public class QuestionnaireControllerTest extends ControllerTest {
             new OralStatusTypeInfoDto("B", "충치 관리형", "충치 관리형은 과거 충치 치료를 받았거나 충치가 발생할 가능성이 높은 생활 습관으로 충치 관리가 필요한 사람을 뜻해요. 충치는 음식물을 섭취한 후 남아있는 음식물 찌꺼기가 입 속에 있는 세균과 결합해, 분해되며 발생하는 산이 치아의 법랑질을 공격하며 생기는 손상 현상을 말해요. 충치를 예방하기 위해서는 올바른 양치법이 필요해요. 또한 물을 자주 마시도록 하며 자기 직전에는 음식물 섭취를 자제하는 것이 좋아요. 캐러멜과 젤리와 같은 끈적임이 많은 식품이나 단 음료는 섭취를 줄이시길 권장해요.")
         );
 
+        List<ContentsCategoryDto> categories = Arrays.asList(
+            ContentsCategoryDto.builder()
+                .id(0)
+                .name("김덴티님 맞춤")
+                .color(null)
+                .sort(0)
+                .build(),
+            ContentsCategoryDto.builder()
+                .id(1)
+                .name("질병")
+                .color("#98B4ED")
+                .sort(1)
+                .build(),
+            ContentsCategoryDto.builder()
+                .id(2)
+                .name("양치")
+                .color("#4B79EC")
+                .sort(2)
+                .build()
+        );
+
+        List<Integer> contentsLists = Arrays.asList(1, 2);
+
+        List<ContentsDto> contents = Arrays.asList(
+            ContentsDto.builder()
+                .id(1)
+                .sort(1)
+                .title("백살도 거뜬한 건강한 치아관리 방법")
+                .type(ContentsType.CARD)
+                .typeColor("#FF9F06")
+                .thumbnail("https://dentix-api-dev.kai-i.com")
+                .videoURL(null)
+                .categoryIds(contentsLists)
+                .build()
+        );
+
         // given
-        given(questionnaireService.questionnaireResult(anyLong())).willReturn(new QuestionnaireResultDto(new Date(), oralStatusList));
+        given(questionnaireService.questionnaireResult(any(HttpServletRequest.class), anyLong())).willReturn(new QuestionnaireResultDto(new Date(), oralStatusList, categories, contents));
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -241,10 +281,25 @@ public class QuestionnaireControllerTest extends ControllerTest {
                     fieldWithPath("response.oralStatusList").type(JsonFieldType.ARRAY).description("구강 상태 목록"),
                     fieldWithPath("response.oralStatusList[].type").type(JsonFieldType.STRING).description("구강 상태 타입"),
                     fieldWithPath("response.oralStatusList[].title").type(JsonFieldType.STRING).description("구강 상태 제목"),
-                    fieldWithPath("response.oralStatusList[].description").type(JsonFieldType.STRING).description("구강 상태 설명")
+                    fieldWithPath("response.oralStatusList[].description").type(JsonFieldType.STRING).description("구강 상태 설명"),
+                    fieldWithPath("response.categories").type(JsonFieldType.ARRAY).description("콘텐츠 카테고리 목록"),
+                    fieldWithPath("response.categories[].id").type(JsonFieldType.NUMBER).description("콘텐츠 카테고리 고유 번호"),
+                    fieldWithPath("response.categories[].name").type(JsonFieldType.STRING).description("콘텐츠 카테고리 이름"),
+                    fieldWithPath("response.categories[].color").type(JsonFieldType.STRING).optional().description("콘텐츠 카테고리 색상"),
+                    fieldWithPath("response.categories[].sort").type(JsonFieldType.NUMBER).description("콘텐츠 카테고리 정렬 순서"),
+                    fieldWithPath("response.contents").type(JsonFieldType.ARRAY).description("콘텐츠 목록 (최대 2개)"),
+                    fieldWithPath("response.contents[].id").type(JsonFieldType.NUMBER).description("콘텐츠 고유 번호"),
+                    fieldWithPath("response.contents[].title").type(JsonFieldType.STRING).description("콘텐츠 제목"),
+                    fieldWithPath("response.contents[].sort").type(JsonFieldType.NUMBER).description("콘텐츠 정렬 순서"),
+                    fieldWithPath("response.contents[].type").type(JsonFieldType.STRING).attributes(contentsTypeFormat()).description("콘텐츠 타입"),
+                    fieldWithPath("response.contents[].typeColor").type(JsonFieldType.STRING).description("콘텐츠 제목 색상"),
+                    fieldWithPath("response.contents[].thumbnail").type(JsonFieldType.STRING).description("콘텐츠 썸네일"),
+                    fieldWithPath("response.contents[].videoURL").type(JsonFieldType.STRING).optional().description("콘텐츠 동영상 경로"),
+                    fieldWithPath("response.contents[].categoryIds").type(JsonFieldType.ARRAY).description("콘텐츠 카테고리"),
+                    fieldWithPath("response.contents[].categoryIds[]").type(JsonFieldType.ARRAY).description("콘텐츠 카테고리 고유 번호")
                 )
             ));
 
-        verify(questionnaireService).questionnaireResult(anyLong());
+        verify(questionnaireService).questionnaireResult(any(HttpServletRequest.class), anyLong());
     }
 }

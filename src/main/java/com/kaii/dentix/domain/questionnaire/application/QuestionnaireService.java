@@ -2,6 +2,10 @@ package com.kaii.dentix.domain.questionnaire.application;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kaii.dentix.domain.contents.application.ContentsService;
+import com.kaii.dentix.domain.contents.dto.ContentsCategoryDto;
+import com.kaii.dentix.domain.contents.dto.ContentsDto;
+import com.kaii.dentix.domain.contents.dto.ContentsListDto;
 import com.kaii.dentix.domain.oralStatus.domain.OralStatus;
 import com.kaii.dentix.domain.questionnaire.dao.QuestionnaireRepository;
 import com.kaii.dentix.domain.questionnaire.domain.Questionnaire;
@@ -29,6 +33,7 @@ public class QuestionnaireService {
 
     private final ObjectMapper objectMapper;
     private final UserService userService;
+    private final ContentsService contentsService;
     private final QuestionnaireRepository questionnaireRepository;
 
     /**
@@ -85,7 +90,7 @@ public class QuestionnaireService {
      * 문진표 결과 조회
      */
     @Transactional(readOnly = true)
-    public QuestionnaireResultDto questionnaireResult(long questionnaireId) {
+    public QuestionnaireResultDto questionnaireResult(HttpServletRequest httpServletRequest, long questionnaireId) {
         Questionnaire questionnaire = questionnaireRepository.findById(questionnaireId).orElseThrow(() -> new NotFoundDataException("문진표가 존재하지 않습니다."));
 
         List<OralStatusTypeInfoDto> oralStatusList = questionnaire.getUserOralStatusList().stream()
@@ -98,7 +103,12 @@ public class QuestionnaireService {
                     .build();
             }).toList();
 
-        return new QuestionnaireResultDto(questionnaire.getCreated(), oralStatusList);
+        // TODO : 결과 맞춤
+        ContentsListDto contentsList = contentsService.contentsList(httpServletRequest);
+        List<ContentsCategoryDto> categories = contentsList.getCategories();
+        List<ContentsDto> contents = contentsList.getContents().subList(0, Math.min(contentsList.getContents().size(), 2)); // 최대 2개
+
+        return new QuestionnaireResultDto(questionnaire.getCreated(), oralStatusList, categories, contents);
     }
 
     /**

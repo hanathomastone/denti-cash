@@ -1,6 +1,8 @@
 package com.kaii.dentix.domain.questionnaire.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.kaii.dentix.domain.contents.dto.ContentsCategoryDto;
+import com.kaii.dentix.domain.contents.dto.ContentsDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,4 +19,8 @@ public class QuestionnaireResultDto {
     private Date created;
 
     private List<OralStatusTypeInfoDto> oralStatusList;
+
+    private List<ContentsCategoryDto> categories;
+
+    private List<ContentsDto> contents;
 }

@@ -34,7 +34,7 @@ public class QuestionnaireController {
     }
 
     @GetMapping(value = "/result", name = "문진표 결과 조회")
-    public DataResponse<QuestionnaireResultDto> questionnaireResult(@RequestParam @Min(1) long questionnaireId) {
-        return new DataResponse<>(questionnaireService.questionnaireResult(questionnaireId));
+    public DataResponse<QuestionnaireResultDto> questionnaireResult(HttpServletRequest httpServletRequest, @RequestParam @Min(1) long questionnaireId) {
+        return new DataResponse<>(questionnaireService.questionnaireResult(httpServletRequest, questionnaireId));
     }
 }
