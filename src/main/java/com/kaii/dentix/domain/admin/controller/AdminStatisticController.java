@@ -1,7 +1,7 @@
 package com.kaii.dentix.domain.admin.controller;
 
 import com.kaii.dentix.domain.admin.application.AdminStatisticService;
-import com.kaii.dentix.domain.admin.dto.AdminStatisticDto;
+import com.kaii.dentix.domain.admin.dto.statistic.AdminUserStatisticResponse;
 import com.kaii.dentix.domain.admin.dto.request.AdminStatisticRequest;
 import com.kaii.dentix.global.common.response.DataResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +22,9 @@ public class AdminStatisticController {
      *  사용자 통계
      */
     @GetMapping(name = "사용자 통계")
-    public DataResponse<AdminStatisticDto> userStatistic(AdminStatisticRequest request){
-        DataResponse<AdminStatisticDto> response = new DataResponse<>(adminStatisticService.userStatistic(request));
+    public DataResponse<AdminUserStatisticResponse> userStatistic(AdminStatisticRequest request){
+        DataResponse<AdminUserStatisticResponse> response = new DataResponse<>(adminStatisticService.userStatistic(request));
         return response;
     }
+
 }

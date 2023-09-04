@@ -585,4 +585,23 @@ public class OralCheckService {
             .oralCheckDailyList(oralCheckDailyChangeList)
             .build();
     }
+
+    /**
+     *  전체 평균 구강 상태
+     */
+    public OralCheckResultTotalType getState(OralCheckResultCount oralCheckResultCount){
+        if (oralCheckResultCount.getCountHealthy() >= oralCheckResultCount.getCountGood() &&
+                oralCheckResultCount.getCountHealthy() >= oralCheckResultCount.getCountAttention() &&
+                oralCheckResultCount.getCountHealthy() >= oralCheckResultCount.getCountDanger())
+            return OralCheckResultTotalType.HEALTHY;
+
+        if (oralCheckResultCount.getCountGood() >= oralCheckResultCount.getCountAttention() &&
+                oralCheckResultCount.getCountGood() >= oralCheckResultCount.getCountDanger())
+            return OralCheckResultTotalType.GOOD;
+
+        if (oralCheckResultCount.getCountAttention() >= oralCheckResultCount.getCountDanger())
+            return OralCheckResultTotalType.ATTENTION;
+
+        return OralCheckResultTotalType.DANGER;
+    }
 }

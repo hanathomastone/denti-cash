@@ -202,10 +202,10 @@ public class UserRepositoryImpl implements UserCustomRepository{
                 Wildcard.count.longValue(), // 전체 가입자 수
                 new CaseBuilder() // 남성 가입자 수
                         .when(user.userGender.eq(GenderType.M))
-                        .then(1).otherwise(0).sum(),
+                        .then(1L).otherwise(0L).sum(),
                 new CaseBuilder() // 여성 가입자 수
                         .when(user.userGender.eq(GenderType.W))
-                        .then(1).otherwise(0).sum()))
+                        .then(1L).otherwise(0L).sum()))
                 .from(user)
                 .where(whereUserEndDate(request.getEndDate()))
                 .fetchOne();
