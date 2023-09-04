@@ -66,21 +66,21 @@ public class ServiceAgreementControllerTest extends ControllerTest {
                         .name("서비스 이용약관 동의")
                         .menuName("서비스 이용약관")
                         .isServiceAgreeRequired(YnType.Y)
-                        .path("http://dthi-dev.kai-i.com/")
+                        .path("https://dthi-dev.kai-i.com/")
                         .build(),
                 ServiceAgreementDto.builder()
                         .id(2L)
                         .name("개인정보 수집 및 이용 동의")
                         .menuName("개인정보 수집 및 이용")
                         .isServiceAgreeRequired(YnType.Y)
-                        .path("http://dtroka-dev.kai-i.com/")
+                        .path("https://dtroka-dev.kai-i.com/")
                         .build(),
                 ServiceAgreementDto.builder()
                         .id(3L)
                         .name("마케팅 정보 수신 동의")
                         .menuName("마케팅 정보 수신")
                         .isServiceAgreeRequired(YnType.N)
-                        .path("http://dentix-api-dev.kai-i.com/docs/app-api-guide.html")
+                        .path("https://dentix-api-dev.kai-i.com/docs/app-api-guide.html")
                         .build()
         );
 

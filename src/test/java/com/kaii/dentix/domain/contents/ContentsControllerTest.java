@@ -94,7 +94,7 @@ public class ContentsControllerTest extends ControllerTest {
                         .title("백살도 거뜬한 건강한 치아관리 방법")
                         .type(ContentsType.CARD)
                         .typeColor("#FF9F06")
-                        .thumbnail("http://dentix-api-dev.kai-i.com")
+                        .thumbnail("https://dentix-api-dev.kai-i.com")
                         .videoURL(null)
                         .categoryIds(contentsLists)
                         .build()

@@ -7,7 +7,7 @@
 | 환경 | 도메인 주소
 
 | 개발서버
-| http://dentix-api-dev.kai-i.com
+| https://dentix-api-dev.kai-i.com
 
 | 운영서버
 | -

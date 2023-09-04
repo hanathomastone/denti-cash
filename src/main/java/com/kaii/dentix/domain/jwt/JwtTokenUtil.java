@@ -59,7 +59,7 @@ public class JwtTokenUtil {
         Date now = new Date();
         return Jwts.builder()
             .setClaims(claims) // 정보 저장
-            //.setIssuer("http://ondentii-dev.kai-i.com")
+            //.setIssuer("https://ondentii-dev.kai-i.com")
             .setIssuedAt(now) // 토큰 발행시간 정보
             .setExpiration(new Date(now.getTime() + tokenType.getValidTime())) // set Expire Time (유효기간)
             .signWith(SignatureAlgorithm.HS256, secretKey) // 사용할 암호화 알고리즘과 signature 에 들어갈 secret 값 셋팅
