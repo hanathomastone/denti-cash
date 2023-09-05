@@ -11,6 +11,8 @@ import java.util.List;
 @AllArgsConstructor @NoArgsConstructor
 public class ContentsCardListDto {
 
+    private String title;
+
     List<ContentsCardDto> cardList;
 
 }

@@ -111,7 +111,7 @@ public class ContentsService {
                 .map(contentsList -> new ContentsCardDto(contentsList.getContentsCardNumber(), contentsList.getContentsCardPath()))
                 .collect(Collectors.toList());
 
-        return new ContentsCardListDto(contentsCardList);
+        return new ContentsCardListDto(contents.getContentsTitle(), contentsCardList);
     }
 
 }
