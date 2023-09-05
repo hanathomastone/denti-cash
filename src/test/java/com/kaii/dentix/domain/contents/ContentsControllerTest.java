@@ -166,7 +166,7 @@ public class ContentsControllerTest extends ControllerTest {
                         .build()
         );
 
-        given(contentsService.contentsCard(any(Long.class))).willReturn(new ContentsCardListDto(contentsCardList));
+        given(contentsService.contentsCard(any(Long.class))).willReturn(new ContentsCardListDto("백살도 거뜬한 건강한 치아관리 방법", contentsCardList));
 
         // when
         ResultActions result = mockMvc.perform(
@@ -189,6 +189,7 @@ public class ContentsControllerTest extends ControllerTest {
                                 fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
                                 fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
                                 fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
+                                fieldWithPath("response.title").type(JsonFieldType.STRING).description("콘텐츠 카드뉴스 제목"),
                                 fieldWithPath("response.cardList").type(JsonFieldType.ARRAY).description("콘텐츠 카드뉴스 목록"),
                                 fieldWithPath("response.cardList[].number").type(JsonFieldType.NUMBER).description("콘텐츠 카드뉴스 카드 번호"),
                                 fieldWithPath("response.cardList[].path").type(JsonFieldType.STRING).description("콘텐츠 카드뉴스 경로")
