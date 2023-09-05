@@ -214,14 +214,14 @@ public class OralCheckService {
         Float downLeftGroupRatio = tDivision.getDownLeft().getGroup().getRatio();
 
         Float upRightRange = upRightGroupRatio != null ? upRightGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", upRightGroupRatio)) : 0; // 우상 비율
-        Float upLeftRange = upLeftGroupRatio != null ? upLeftGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", upRightGroupRatio)) : 0; // 좌상 비율
-        Float downRightRange = downRightGroupRatio != null ? downRightGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", upRightGroupRatio)) : 0; // 우하 비율
-        Float downLeftRange = downLeftGroupRatio != null ? downLeftGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", upRightGroupRatio)) : 0; // 좌하 비율
+        Float upLeftRange = upLeftGroupRatio != null ? upLeftGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", upLeftGroupRatio)) : 0; // 좌상 비율
+        Float downRightRange = downRightGroupRatio != null ? downRightGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", downRightGroupRatio)) : 0; // 우하 비율
+        Float downLeftRange = downLeftGroupRatio != null ? downLeftGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", downLeftGroupRatio)) : 0; // 좌하 비율
 
         OralCheckAnalysisTotalDto total = resource.getTotal();
         Float totalGroupRatio = total.getGroup().getRatio();
 
-        Float totalRange = totalGroupRatio != null ? totalGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", upRightGroupRatio)) : 0; // 전체 비율
+        Float totalRange = totalGroupRatio != null ? totalGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", totalGroupRatio)) : 0; // 전체 비율
 
         String resultJsonData = objectMapper.writeValueAsString(resource); // 분석 결과 JSON data 전체
 
