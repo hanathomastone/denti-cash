@@ -1,5 +1,6 @@
 package com.kaii.dentix.domain.admin.dto.statistic;
 
+import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,8 +14,12 @@ public class OralCheckStatisticDto {
 
     private int oralCheckCount; // 구강검진 횟수
 
-    private String oralCheckResultTotalType; // 구강검진 상태
+    private OralCheckResultTotalType oralCheckResultTotalType; // 구강검진 상태
 
-    private String created; // 최근 구강 촬영 일시
+    public OralCheckStatisticDto(Long userId, int oralCheckCount, String oralCheckResultTotalType) {
+        this.userId = userId;
+        this.oralCheckCount = oralCheckCount;
+        this.oralCheckResultTotalType = OralCheckResultTotalType.valueOf(oralCheckResultTotalType);
+    }
 
 }

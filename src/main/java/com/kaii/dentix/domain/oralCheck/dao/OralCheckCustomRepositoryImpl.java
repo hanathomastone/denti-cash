@@ -35,7 +35,7 @@ public class OralCheckCustomRepositoryImpl implements OralCheckCustomRepository 
      *  구강검진을 한 모든 사용자 리스트
      */
     @Override
-    public List<OralCheckStatisticDto> userStateAll(AdminStatisticRequest request){
+    public List<OralCheckStatisticDto> userOralCheckList(AdminStatisticRequest request){
         return queryFactory.select(Projections.constructor(OralCheckStatisticDto.class,
                 user.userId,
                 Wildcard.count.intValue().as("oralCheckCount"),
@@ -61,8 +61,7 @@ public class OralCheckCustomRepositoryImpl implements OralCheckCustomRepository 
                                         .goe(new CaseBuilder().when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultTotalType.DANGER)).then(1).otherwise(0).sum())
                         )
                         .then(OralCheckResultTotalType.ATTENTION.toString())
-                        .otherwise(OralCheckResultTotalType.DANGER.toString()),
-                Expressions.stringTemplate("DATE_FORMAT({0}, {1})", oralCheck.created.max(), "%Y-%m-%d")
+                        .otherwise(OralCheckResultTotalType.DANGER.toString())
                 ))
                 .from(oralCheck)
                 .join(user).on(oralCheck.userId.eq(user.userId))
@@ -75,10 +74,10 @@ public class OralCheckCustomRepositoryImpl implements OralCheckCustomRepository 
     }
 
     /**
-     *  구강검진을 한 사용자 수
+     *  구강검진을 한 총 사용자 수
      */
     @Override
-    public List<OralCheckUserCount> oralCheckUserCountAll(AdminStatisticRequest request){
+    public List<OralCheckUserCount> allUserOralCheckCount(AdminStatisticRequest request){
         return queryFactory.select(Projections.constructor(OralCheckUserCount.class,
                         Wildcard.count.intValue()
                 ))

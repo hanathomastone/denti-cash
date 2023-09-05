@@ -1,4 +1,4 @@
-package com.kaii.dentix.domain.oralCheck.dto;
+package com.kaii.dentix.domain.admin.dto.statistic;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Getter @Builder
 @AllArgsConstructor @NoArgsConstructor
-public class OralCheckResultCount {
+public class OralCheckResultTypeCount {
 
     private int countHealthy;
 

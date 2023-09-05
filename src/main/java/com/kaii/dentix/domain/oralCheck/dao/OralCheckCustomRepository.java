@@ -8,8 +8,8 @@ import java.util.List;
 
 public interface OralCheckCustomRepository {
 
-    List<OralCheckStatisticDto> userStateAll(AdminStatisticRequest request);
+    List<OralCheckStatisticDto> userOralCheckList(AdminStatisticRequest request);
 
-    List<OralCheckUserCount> oralCheckUserCountAll(AdminStatisticRequest request);
+    List<OralCheckUserCount> allUserOralCheckCount(AdminStatisticRequest request);
 
 }

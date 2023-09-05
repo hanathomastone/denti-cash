@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Getter @Builder
 @AllArgsConstructor @NoArgsConstructor
-public class QuestionnaireResultCount {
+public class AllQuestionnaireResultTypeCount {
 
     private int countA;
 

@@ -1,6 +1,7 @@
 package com.kaii.dentix.domain.questionnaire.dao;
 
 import com.kaii.dentix.domain.admin.dto.request.AdminStatisticRequest;
+import com.kaii.dentix.domain.admin.dto.statistic.AllQuestionnaireCount;
 import com.kaii.dentix.domain.admin.dto.statistic.QuestionnaireStatisticDto;
 import com.kaii.dentix.domain.oralCheck.domain.QOralCheck;
 import com.kaii.dentix.domain.oralStatus.domain.QOralStatus;
@@ -10,7 +11,6 @@ import com.kaii.dentix.domain.user.domain.QUser;
 import com.kaii.dentix.domain.userOralStatus.domain.QUserOralStatus;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -52,42 +52,32 @@ public class QuestionnaireCustomRepositoryImpl implements QuestionnaireCustomRep
     }
 
     /**
-     * 평균 문진표 유형
+     * 모든 문진표 리스트
      */
     @Override
-    public List<QuestionnaireStatisticDto> questionnaireStateAll(AdminStatisticRequest request) {
+    public List<QuestionnaireStatisticDto> questionnaireList(AdminStatisticRequest request) {
         return queryFactory.select(Projections.constructor(QuestionnaireStatisticDto.class,
-                user.userId,
-                Wildcard.count.intValue().as("questionnaireCount"),
-                new CaseBuilder()
-                        .when(
-                                new CaseBuilder().when(userOralStatus.oralStatus.oralStatusType.eq("A")).then(1).otherwise(0).sum()
-                                        .goe(new CaseBuilder().when(userOralStatus.oralStatus.oralStatusType.eq("B")).then(1).otherwise(0).sum())
-                                        .and(new CaseBuilder().when(userOralStatus.oralStatus.oralStatusType.eq("A")).then(1).otherwise(0).sum()
-                                                .goe(new CaseBuilder().when(userOralStatus.oralStatus.oralStatusType.eq("C")).then(1).otherwise(0).sum()))
-                                        .and(new CaseBuilder().when(userOralStatus.oralStatus.oralStatusType.eq("A")).then(1).otherwise(0).sum()
-                                                .goe(new CaseBuilder().when(userOralStatus.oralStatus.oralStatusType.eq("D")).then(1).otherwise(0).sum()))
-                                        .and(new CaseBuilder().when(userOralStatus.oralStatus.oralStatusType.eq("A")).then(1).otherwise(0).sum()
-                                                .goe(new CaseBuilder().when(userOralStatus.oralStatus.oralStatusType.eq("E")).then(1).otherwise(0).sum()))
-                                        .and(new CaseBuilder().when(userOralStatus.oralStatus.oralStatusType.eq("A")).then(1).otherwise(0).sum()
-                                                .goe(new CaseBuilder().when(userOralStatus.oralStatus.oralStatusType.eq("F")).then(1).otherwise(0).sum()))
-                                        .and(new CaseBuilder().when(userOralStatus.oralStatus.oralStatusType.eq("A")).then(1).otherwise(0).sum()
-                                                .goe(new CaseBuilder().when(userOralStatus.oralStatus.oralStatusType.eq("G")).then(1).otherwise(0).sum()))
-                                        .and(new CaseBuilder().when(userOralStatus.oralStatus.oralStatusType.eq("A")).then(1).otherwise(0).sum()
-                                                .goe(new CaseBuilder().when(userOralStatus.oralStatus.oralStatusType.eq("H")).then(1).otherwise(0).sum()))
-                                        .and(new CaseBuilder().when(userOralStatus.oralStatus.oralStatusType.eq("A")).then(1).otherwise(0).sum()
-                                                .goe(new CaseBuilder().when(userOralStatus.oralStatus.oralStatusType.eq("I")).then(1).otherwise(0).sum()))
-                                        .and(new CaseBuilder().when(userOralStatus.oralStatus.oralStatusType.eq("A")).then(1).otherwise(0).sum()
-                                                .goe(new CaseBuilder().when(userOralStatus.oralStatus.oralStatusType.eq("J")).then(1).otherwise(0).sum()))
-                                        .and(new CaseBuilder().when(userOralStatus.oralStatus.oralStatusType.eq("A")).then(1).otherwise(0).sum()
-                                                .goe(new CaseBuilder().when(userOralStatus.oralStatus.oralStatusType.eq("K")).then(1).otherwise(0).sum()))
-                        )
-                        .then("A")
-                        .otherwise("K"),
-                Expressions.stringTemplate("DATE_FORMAT({0}, {1})", questionnaire.created.max(), "%Y-%m-%d")
+                user.userId, userOralStatus.oralStatus.oralStatusType
                 ))
                 .from(questionnaire)
                 .join(user).on(questionnaire.userId.eq(user.userId))
+                .join(userOralStatus).on(questionnaire.questionnaireId.eq(userOralStatus.questionnaire.questionnaireId))
+                .where(
+                        whereStartDate(request.getStartDate()),
+                        whereEndDate(request.getEndDate())
+                )
+                .fetch();
+    }
+
+    /**
+     * 전체 문진표 검진 횟수
+     */
+    @Override
+    public List<AllQuestionnaireCount> questionnaireCountList(AdminStatisticRequest request) {
+        return queryFactory.select(Projections.constructor(AllQuestionnaireCount.class,
+                        Wildcard.count.intValue().as("questionnaireAllCount")
+                ))
+                .from(questionnaire)
                 .where(
                         whereStartDate(request.getStartDate()),
                         whereEndDate(request.getEndDate())

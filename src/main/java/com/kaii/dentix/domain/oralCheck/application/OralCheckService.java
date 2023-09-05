@@ -2,6 +2,7 @@ package com.kaii.dentix.domain.oralCheck.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kaii.dentix.domain.admin.dto.statistic.OralCheckResultTypeCount;
 import com.kaii.dentix.domain.oralCheck.dao.OralCheckRepository;
 import com.kaii.dentix.domain.oralCheck.domain.OralCheck;
 import com.kaii.dentix.domain.oralCheck.dto.*;
@@ -589,17 +590,17 @@ public class OralCheckService {
     /**
      *  전체 평균 구강 상태
      */
-    public OralCheckResultTotalType getState(OralCheckResultCount oralCheckResultCount){
-        if (oralCheckResultCount.getCountHealthy() >= oralCheckResultCount.getCountGood() &&
-                oralCheckResultCount.getCountHealthy() >= oralCheckResultCount.getCountAttention() &&
-                oralCheckResultCount.getCountHealthy() >= oralCheckResultCount.getCountDanger())
+    public OralCheckResultTotalType getState(OralCheckResultTypeCount oralCheckResultTypeCount){
+        if (oralCheckResultTypeCount.getCountHealthy() >= oralCheckResultTypeCount.getCountGood() &&
+                oralCheckResultTypeCount.getCountHealthy() >= oralCheckResultTypeCount.getCountAttention() &&
+                oralCheckResultTypeCount.getCountHealthy() >= oralCheckResultTypeCount.getCountDanger())
             return OralCheckResultTotalType.HEALTHY;
 
-        if (oralCheckResultCount.getCountGood() >= oralCheckResultCount.getCountAttention() &&
-                oralCheckResultCount.getCountGood() >= oralCheckResultCount.getCountDanger())
+        if (oralCheckResultTypeCount.getCountGood() >= oralCheckResultTypeCount.getCountAttention() &&
+                oralCheckResultTypeCount.getCountGood() >= oralCheckResultTypeCount.getCountDanger())
             return OralCheckResultTotalType.GOOD;
 
-        if (oralCheckResultCount.getCountAttention() >= oralCheckResultCount.getCountDanger())
+        if (oralCheckResultTypeCount.getCountAttention() >= oralCheckResultTypeCount.getCountDanger())
             return OralCheckResultTotalType.ATTENTION;
 
         return OralCheckResultTotalType.DANGER;

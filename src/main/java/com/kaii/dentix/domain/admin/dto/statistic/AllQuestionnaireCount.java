@@ -7,10 +7,8 @@ import lombok.NoArgsConstructor;
 
 @Getter @Builder
 @AllArgsConstructor @NoArgsConstructor
-public class QuestionnaireStatisticDto {
+public class AllQuestionnaireCount {
 
-    private Long userId; // 사용자 고유번호
-
-    private String questionnaireType; // 문진표 결과 타입
+    private int allQuestionnaireCount; // 전체 문진표 작성 횟수
 
 }
