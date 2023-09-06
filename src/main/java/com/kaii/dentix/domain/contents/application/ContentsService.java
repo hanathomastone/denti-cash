@@ -81,7 +81,7 @@ public class ContentsService {
                 ContentsCategoryDto userCategory = ContentsCategoryDto.builder()
                         .id(0)
                         .sort(1)
-                        .name(user.getUserName() + "님 맞춤")
+                        .name((user.getUserName().length() > 6 ? user.getUserName().substring(0, 6) + "・・・" : user.getUserName()) + "님 맞춤")
                         .color(null)
                         .build();
                 userCategoryList.add(0, userCategory);
