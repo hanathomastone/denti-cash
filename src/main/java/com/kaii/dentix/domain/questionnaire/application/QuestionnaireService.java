@@ -106,7 +106,8 @@ public class QuestionnaireService {
         // TODO : 결과 맞춤
         ContentsListDto contentsList = contentsService.contentsList(httpServletRequest);
         List<ContentsCategoryDto> categories = contentsList.getCategories();
-        List<ContentsDto> contents = contentsList.getContents().subList(0, Math.min(contentsList.getContents().size(), 2)); // 최대 2개
+//        List<ContentsDto> contents = contentsList.getContents().subList(0, Math.min(contentsList.getContents().size(), 2)); // 최대 2개
+        List<ContentsDto> contents = contentsList.getContents().subList(0, Math.min(contentsList.getContents().size(), new Random().nextInt(3))); // 임시 0 ~ 2개 랜덤
 
         return new QuestionnaireResultDto(questionnaire.getCreated(), oralStatusList, categories, contents);
     }
