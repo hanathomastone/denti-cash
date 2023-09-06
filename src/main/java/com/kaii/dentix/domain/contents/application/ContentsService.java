@@ -52,7 +52,7 @@ public class ContentsService {
                 ).toList();
 
         // 콘텐츠 리스트 - 비로그인 사용자의 경우
-        List<ContentsDto> contentsDto = contentsRepository.findAll(Sort.by(Sort.Direction.ASC, "contentsSort")).stream()
+        List<ContentsDto> userContentsList = contentsRepository.findAll(Sort.by(Sort.Direction.ASC, "contentsSort")).stream()
                 .map(contents -> {
                     // 콘텐츠 별 카테고리 Id 조회
                     List<Integer> contentsLists = contentsListRepository.findByContentsId(contents.getContentsId()).stream()
@@ -90,14 +90,18 @@ public class ContentsService {
                     userCategoryList.get(i).setSort(i + 1);
                 }
 
-                List<ContentsDto> userContentsList = new ArrayList<>(contentsDto);
+                // TODO : 사용자 맞춤 콘텐츠 리스트 조회
+                if (user.getUserId() == 26) {
+                    for (int i = 0; i < 3; i++) {
+                        ContentsDto dto = userContentsList.get(i);
+                        dto.getCategoryIds().add(0, 0);
+                    }
+                }
 
                 return new ContentsListDto(userCategoryList, userContentsList);
-
-                // TODO : 사용자 맞춤 콘텐츠 리스트 조회
             }
         }
-        return new ContentsListDto(categoryList, contentsDto);
+        return new ContentsListDto(categoryList, userContentsList);
     }
 
     /**
