@@ -3,9 +3,9 @@ package com.kaii.dentix.domain.questionnaire.application;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaii.dentix.domain.contents.application.ContentsService;
+import com.kaii.dentix.domain.contents.dao.ContentsCustomRepository;
 import com.kaii.dentix.domain.contents.dto.ContentsCategoryDto;
 import com.kaii.dentix.domain.contents.dto.ContentsDto;
-import com.kaii.dentix.domain.contents.dto.ContentsListDto;
 import com.kaii.dentix.domain.oralStatus.domain.OralStatus;
 import com.kaii.dentix.domain.questionnaire.dao.QuestionnaireRepository;
 import com.kaii.dentix.domain.questionnaire.domain.Questionnaire;
@@ -25,7 +25,10 @@ import org.springframework.util.FileCopyUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +38,7 @@ public class QuestionnaireService {
     private final UserService userService;
     private final ContentsService contentsService;
     private final QuestionnaireRepository questionnaireRepository;
+    private final ContentsCustomRepository contentsCustomRepository;
 
     /**
      * 문진표 양식 조회
@@ -103,11 +107,9 @@ public class QuestionnaireService {
                     .build();
             }).toList();
 
-        // TODO : 결과 맞춤
-        ContentsListDto contentsList = contentsService.contentsList(httpServletRequest);
-        List<ContentsCategoryDto> categories = contentsList.getCategories();
-//        List<ContentsDto> contents = contentsList.getContents().subList(0, Math.min(contentsList.getContents().size(), 2)); // 최대 2개
-        List<ContentsDto> contents = contentsList.getContents().subList(0, Math.min(contentsList.getContents().size(), new Random().nextInt(3))); // 임시 0 ~ 2개 랜덤
+        List<ContentsCategoryDto> categories = contentsService.getCategoryList(null);
+        List<ContentsDto> contents = contentsCustomRepository.getCustomizedContents(questionnaireId);
+        contents = contents.subList(0, Math.min(contents.size(), 2)); // 최대 2개
 
         return new QuestionnaireResultDto(questionnaire.getCreated(), oralStatusList, categories, contents);
     }

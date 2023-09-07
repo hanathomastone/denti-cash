@@ -2,14 +2,17 @@ package com.kaii.dentix.domain.contents.application;
 
 import com.kaii.dentix.domain.contents.dao.ContentsCardRepository;
 import com.kaii.dentix.domain.contents.dao.ContentsCategoryRepository;
+import com.kaii.dentix.domain.contents.dao.ContentsCustomRepository;
 import com.kaii.dentix.domain.contents.dao.ContentsRepository;
-import com.kaii.dentix.domain.contents.dao.ContentsToCategoryRepository;
 import com.kaii.dentix.domain.contents.domain.Contents;
-import com.kaii.dentix.domain.contents.domain.ContentsToCategory;
 import com.kaii.dentix.domain.contents.dto.*;
+import com.kaii.dentix.domain.questionnaire.dao.QuestionnaireRepository;
+import com.kaii.dentix.domain.questionnaire.domain.Questionnaire;
+import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.domain.User;
 import com.kaii.dentix.global.common.error.exception.NotFoundDataException;
+import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -18,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,9 +34,46 @@ public class ContentsService {
 
     private final UserService userService;
 
-    private final ContentsToCategoryRepository contentsToCategoryRepository;
-
     private final ContentsCardRepository contentsCardRepository;
+
+    private final ContentsCustomRepository contentsCustomRepository;
+
+    private final QuestionnaireRepository questionnaireRepository;
+
+
+    /**
+     *  콘텐츠 카테고리 조회
+     */
+    public List<ContentsCategoryDto> getCategoryList(String userName) {
+        List<ContentsCategoryDto> categoryList = contentsCategoryRepository.findAll(Sort.by(Sort.Direction.ASC, "contentsCategorySort")).stream()
+            .map(contentsCategory ->
+                ContentsCategoryDto.builder()
+                    .id(contentsCategory.getContentsCategoryId())
+                    .sort(contentsCategory.getContentsCategorySort())
+                    .name(contentsCategory.getContentsCategoryName())
+                    .color(contentsCategory.getContentsCategoryColor())
+                    .build()
+            ).toList();
+
+        List<ContentsCategoryDto> userCategoryList = new ArrayList<>(categoryList);
+
+        // 사용자 맞춤 카테고리 추가
+        if (StringUtils.isNotBlank(userName)) {
+            ContentsCategoryDto userCategory = ContentsCategoryDto.builder()
+                .id(0)
+                .sort(1)
+                .name((userName.length() > 6 ? userName.substring(0, 6) + "・・・" : userName) + "님 맞춤")
+                .color(null)
+                .build();
+            userCategoryList.add(0, userCategory);
+
+            for (int i = 0; i < userCategoryList.size(); i++) {
+                userCategoryList.get(i).setSort(i + 1);
+            }
+        }
+
+        return userCategoryList;
+    }
 
     /**
      *  콘텐츠 조회
@@ -40,67 +81,28 @@ public class ContentsService {
     @Transactional
     public ContentsListDto contentsList(HttpServletRequest httpServletRequest){
 
-        // 카테고리 리스트 - 비로그인 사용자의 경우
-        List<ContentsCategoryDto> categoryList = contentsCategoryRepository.findAll(Sort.by(Sort.Direction.ASC, "contentsCategorySort")).stream()
-                .map(contentsCategory ->
-                        ContentsCategoryDto.builder()
-                                .id(contentsCategory.getContentsCategoryId())
-                                .sort(contentsCategory.getContentsCategorySort())
-                                .name(contentsCategory.getContentsCategoryName())
-                                .color(contentsCategory.getContentsCategoryColor())
-                                .build()
-                ).toList();
-
-        // 콘텐츠 리스트 - 비로그인 사용자의 경우
-        List<ContentsDto> userContentsList = contentsRepository.findAll(Sort.by(Sort.Direction.ASC, "contentsSort")).stream()
-                .map(contents -> {
-                    // 콘텐츠 별 카테고리 Id 조회
-                    List<Integer> contentsLists = contentsToCategoryRepository.findByContentsId(contents.getContentsId()).stream()
-                            .map(ContentsToCategory::getContentsCategoryId)
-                            .collect(Collectors.toList());
-
-                    return new ContentsDto(
-                            contents.getContentsId(),
-                            contents.getContentsTitle(),
-                            contents.getContentsSort(),
-                            contents.getContentsType(),
-                            contents.getContentsTypeColor(),
-                            contents.getContentsThumbnail(),
-                            contents.getContentsPath(),
-                            contentsLists);
-                }).toList();
-
         User user = userService.getTokenUserNullable(httpServletRequest);
+        boolean isVerifiedUser = user != null && user.getIsVerify().equals(YnType.Y);
 
-        // 로그인 한 사용자
-        if (user != null){
+        // 카테고리 리스트 (인증된 사용자의 경우 사용자 맞춤 카테고리 추가)
+        List<ContentsCategoryDto> categoryList = this.getCategoryList(isVerifiedUser ? user.getUserName() : null);
 
-            // 사용자 맞춤 카테고리 추가 - 인증된 사용자의 경우
-            if (user.getPatientId() != null) {
-                List<ContentsCategoryDto> userCategoryList = new ArrayList<>(categoryList);
-                ContentsCategoryDto userCategory = ContentsCategoryDto.builder()
-                        .id(0)
-                        .sort(1)
-                        .name((user.getUserName().length() > 6 ? user.getUserName().substring(0, 6) + "・・・" : user.getUserName()) + "님 맞춤")
-                        .color(null)
-                        .build();
-                userCategoryList.add(0, userCategory);
+        // 콘텐츠 리스트
+        List<ContentsDto> userContentsList = contentsCustomRepository.getContents();
 
-                for (int i = 0; i < userCategoryList.size(); i++) {
-                    userCategoryList.get(i).setSort(i + 1);
-                }
-
-                // TODO : 사용자 맞춤 콘텐츠 리스트 조회
-                if (user.getUserId() == 26) {
-                    for (int i = 0; i < 3; i++) {
-                        ContentsDto dto = userContentsList.get(i);
-                        dto.getCategoryIds().add(0, 0);
-                    }
-                }
-
-                return new ContentsListDto(userCategoryList, userContentsList);
+        // 사용자 맞춤 카테고리 추가 - 인증된 사용자의 경우
+        if (isVerifiedUser) {
+            Optional<Questionnaire> questionnaireOpt = questionnaireRepository.findTopByUserIdOrderByCreatedDesc(user.getUserId());
+            if (questionnaireOpt.isPresent()) {
+                List<Integer> customizedContentsIdList = contentsCustomRepository.getCustomizedContentsIdList(questionnaireOpt.get().getQuestionnaireId());
+                customizedContentsIdList.forEach(id -> {
+                    userContentsList.stream().filter(o -> o.getId() == id).findAny().ifPresent(contentsDto -> {
+                        contentsDto.getCategoryIds().add(0, 0);
+                    });
+                });
             }
         }
+
         return new ContentsListDto(categoryList, userContentsList);
     }
 

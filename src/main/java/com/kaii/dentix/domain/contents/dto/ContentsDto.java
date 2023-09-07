@@ -1,7 +1,10 @@
 package com.kaii.dentix.domain.contents.dto;
 
 import com.kaii.dentix.domain.type.ContentsType;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -23,7 +26,5 @@ public class ContentsDto {
 
     private String videoURL;
 
-    @Setter
     private List<Integer> categoryIds;
-
 }
