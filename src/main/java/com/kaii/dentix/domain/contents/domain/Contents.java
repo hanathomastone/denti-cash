@@ -42,7 +42,7 @@ public class Contents extends TimeEntity {
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "contentsId")
-    private List<ContentsToCategory> categoryIds;
+    private List<ContentsToCategory> contentsToCategories;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "contentsId")

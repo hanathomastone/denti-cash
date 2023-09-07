@@ -2,8 +2,8 @@ package com.kaii.dentix.domain.contents.application;
 
 import com.kaii.dentix.domain.contents.dao.ContentsCardRepository;
 import com.kaii.dentix.domain.contents.dao.ContentsCategoryRepository;
-import com.kaii.dentix.domain.contents.dao.ContentsListRepository;
 import com.kaii.dentix.domain.contents.dao.ContentsRepository;
+import com.kaii.dentix.domain.contents.dao.ContentsToCategoryRepository;
 import com.kaii.dentix.domain.contents.domain.Contents;
 import com.kaii.dentix.domain.contents.domain.ContentsToCategory;
 import com.kaii.dentix.domain.contents.dto.*;
@@ -30,7 +30,7 @@ public class ContentsService {
 
     private final UserService userService;
 
-    private final ContentsListRepository contentsListRepository;
+    private final ContentsToCategoryRepository contentsToCategoryRepository;
 
     private final ContentsCardRepository contentsCardRepository;
 
@@ -55,7 +55,7 @@ public class ContentsService {
         List<ContentsDto> userContentsList = contentsRepository.findAll(Sort.by(Sort.Direction.ASC, "contentsSort")).stream()
                 .map(contents -> {
                     // 콘텐츠 별 카테고리 Id 조회
-                    List<Integer> contentsLists = contentsListRepository.findByContentsId(contents.getContentsId()).stream()
+                    List<Integer> contentsLists = contentsToCategoryRepository.findByContentsId(contents.getContentsId()).stream()
                             .map(ContentsToCategory::getContentsCategoryId)
                             .collect(Collectors.toList());
 

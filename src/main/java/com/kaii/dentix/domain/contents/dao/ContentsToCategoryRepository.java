@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface ContentsListRepository extends JpaRepository<ContentsToCategory, Long> {
+public interface ContentsToCategoryRepository extends JpaRepository<ContentsToCategory, Long> {
 
     List<ContentsToCategory> findByContentsId(int contentsId);
 
