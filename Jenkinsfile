@@ -50,7 +50,9 @@ pipeline {
         }
       }
       steps {
-        sh "SPRING_PROFILES_ACTIVE=dev ./gradlew clean build"
+        sh "chmod +x ./gradlew; \
+            SPRING_PROFILES_ACTIVE=dev ./gradlew clean build; \
+        "
       }
     }
 
@@ -106,9 +108,7 @@ pipeline {
       }
       steps {
         sshagent(credentials: [SSH_CONNECTION_CREDENTIAL]) {
-          sh "ssh -o StrictHostKeyChecking=no ${SSH_CONNECTION} 'IMAGE_NAME=${IMAGE_NAME} IMAGE_STORAGE=${IMAGE_STORAGE} BUILD_NUMBER=${BUILD_NUMBER} dentix-api/deploy.sh; \
-              docker system prune -af; \
-          '"
+          sh "ssh -o StrictHostKeyChecking=no ${SSH_CONNECTION} 'IMAGE_NAME=${IMAGE_NAME} IMAGE_STORAGE=${IMAGE_STORAGE} BUILD_NUMBER=${BUILD_NUMBER} dentix-api/deploy.sh'"
         }
       }
     }
