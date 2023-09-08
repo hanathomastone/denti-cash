@@ -104,7 +104,7 @@
       "key": "q_7",
       "number": "07",
       "title": "치아 닦는 방법을 (치과나 보건소 등에서) 배운 적이 있습니까?",
-      "description": "사용하시는 용품에 모두 표시해 주세요.",
+      "description": null,
       "minimum": 1,
       "maximum": 1,
       "contents": [
