@@ -1,6 +1,6 @@
 package com.kaii.dentix.domain.oralCheck.dao;
 
-import com.kaii.dentix.domain.admin.dto.statistic.OralCheckStatisticDto;
+import com.kaii.dentix.domain.admin.dto.statistic.OralCheckResultTypeCount;
 import com.kaii.dentix.domain.admin.dto.statistic.OralCheckUserCount;
 import com.kaii.dentix.domain.admin.dto.request.AdminStatisticRequest;
 import com.kaii.dentix.domain.oralCheck.domain.QOralCheck;
@@ -32,45 +32,40 @@ public class OralCheckCustomRepositoryImpl implements OralCheckCustomRepository 
     private final QQuestionnaire questionnaire = QQuestionnaire.questionnaire;
 
     /**
-     *  구강검진을 한 모든 사용자 리스트
+     *  구강검진 결과 타입별 횟수
      */
     @Override
-    public List<OralCheckStatisticDto> userOralCheckList(AdminStatisticRequest request){
-        return queryFactory.select(Projections.constructor(OralCheckStatisticDto.class,
-                user.userId,
-                Wildcard.count.intValue().as("oralCheckCount"),
+    public OralCheckResultTypeCount userOralCheckList(AdminStatisticRequest request){
+        return queryFactory.select(Projections.constructor(OralCheckResultTypeCount.class,
                 new CaseBuilder()
-                        .when(
-                                new CaseBuilder().when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultTotalType.HEALTHY)).then(1).otherwise(0).sum()
-                                        .goe(new CaseBuilder().when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultTotalType.GOOD)).then(1).otherwise(0).sum())
-                                        .and(new CaseBuilder().when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultTotalType.HEALTHY)).then(1).otherwise(0).sum()
-                                                .goe(new CaseBuilder().when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultTotalType.ATTENTION)).then(1).otherwise(0).sum()))
-                                        .and(new CaseBuilder().when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultTotalType.HEALTHY)).then(1).otherwise(0).sum()
-                                                .goe(new CaseBuilder().when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultTotalType.DANGER)).then(1).otherwise(0).sum()))
-                        )
-                        .then(OralCheckResultTotalType.HEALTHY.toString())
-                        .when(
-                                new CaseBuilder().when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultTotalType.GOOD)).then(1).otherwise(0).sum()
-                                        .goe(new CaseBuilder().when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultTotalType.ATTENTION)).then(1).otherwise(0).sum())
-                                        .and(new CaseBuilder().when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultTotalType.GOOD)).then(1).otherwise(0).sum()
-                                                .goe(new CaseBuilder().when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultTotalType.DANGER)).then(1).otherwise(0).sum()))
-                        )
-                        .then(OralCheckResultTotalType.GOOD.toString())
-                        .when(
-                                new CaseBuilder().when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultTotalType.ATTENTION)).then(1).otherwise(0).sum()
-                                        .goe(new CaseBuilder().when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultTotalType.DANGER)).then(1).otherwise(0).sum())
-                        )
-                        .then(OralCheckResultTotalType.ATTENTION.toString())
-                        .otherwise(OralCheckResultTotalType.DANGER.toString())
+                        .when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultTotalType.HEALTHY))
+                        .then(1)
+                        .otherwise(0)
+                        .sum(),
+                new CaseBuilder()
+                        .when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultTotalType.GOOD))
+                        .then(1)
+                        .otherwise(0)
+                        .sum(),
+                new CaseBuilder()
+                        .when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultTotalType.ATTENTION))
+                        .then(1)
+                        .otherwise(0)
+                        .sum(),
+                new CaseBuilder()
+                        .when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultTotalType.DANGER))
+                        .then(1)
+                        .otherwise(0)
+                        .sum()
                 ))
                 .from(oralCheck)
                 .join(user).on(oralCheck.userId.eq(user.userId))
                 .where(
+                        user.deleted.isNull(),
                         whereStartDate(request.getStartDate()),
                         whereEndDate(request.getEndDate())
                 )
-                .groupBy(oralCheck.oralCheckId)
-                .fetch();
+                .fetchOne();
     }
 
     /**
@@ -84,6 +79,7 @@ public class OralCheckCustomRepositoryImpl implements OralCheckCustomRepository 
                 .from(oralCheck)
                 .join(user).on(oralCheck.userId.eq(user.userId))
                 .where(
+                        user.deleted.isNull(),
                         whereStartDate(request.getStartDate()),
                         whereEndDate(request.getEndDate())
                 )

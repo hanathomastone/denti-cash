@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Objects;
 
 @Repository
 @RequiredArgsConstructor
@@ -63,6 +64,7 @@ public class QuestionnaireCustomRepositoryImpl implements QuestionnaireCustomRep
                 .join(user).on(questionnaire.userId.eq(user.userId))
                 .join(userOralStatus).on(questionnaire.questionnaireId.eq(userOralStatus.questionnaire.questionnaireId))
                 .where(
+                        user.deleted.isNull(),
                         whereStartDate(request.getStartDate()),
                         whereEndDate(request.getEndDate())
                 )
@@ -73,17 +75,18 @@ public class QuestionnaireCustomRepositoryImpl implements QuestionnaireCustomRep
      * 전체 문진표 검진 횟수
      */
     @Override
-    public List<AllQuestionnaireCount> questionnaireCountList(AdminStatisticRequest request) {
-        return queryFactory.select(Projections.constructor(AllQuestionnaireCount.class,
+    public int allQuestionnaireCount(AdminStatisticRequest request) {
+        return Objects.requireNonNull(queryFactory.select(Projections.constructor(AllQuestionnaireCount.class,
                         Wildcard.count.intValue().as("questionnaireAllCount")
                 ))
                 .from(questionnaire)
+                .join(user).on(questionnaire.userId.eq(user.userId))
                 .where(
+                        user.deleted.isNull(),
                         whereStartDate(request.getStartDate()),
                         whereEndDate(request.getEndDate())
                 )
-                .groupBy(questionnaire.questionnaireId)
-                .fetch();
+                .fetchOne()).getAllQuestionnaireCount();
     }
 
     /**

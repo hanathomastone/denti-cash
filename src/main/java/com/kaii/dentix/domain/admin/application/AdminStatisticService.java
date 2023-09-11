@@ -37,58 +37,29 @@ public class AdminStatisticService {
         AdminUserSignUpCountDto userSignUpCount = userCustomRepository.userSignUpCount(request);
 
         // 통계 2. 평균 구강검진
-        List<OralCheckStatisticDto> userOralCheckList = oralCheckCustomRepository.userOralCheckList(request); // 구강검진을 한 모든 사용자 리스트
+        OralCheckResultTypeCount userOralCheckList = oralCheckCustomRepository.userOralCheckList(request); // 구강검진 결과 타입별 횟수
 
         List<OralCheckUserCount> allUserOralCheckCount = oralCheckCustomRepository.allUserOralCheckCount(request);  // 구강검진을 한 총 사용자 수
         int userCount = allUserOralCheckCount.size();
 
-        int allOralCheckCount = 0; // 전체 구강검진 횟수
+        int allOralCheckCount = userOralCheckList.getCountHealthy() + userOralCheckList.getCountGood() + userOralCheckList.getCountAttention() + userOralCheckList.getCountDanger(); // 전체 구강검진 횟수
         int oralCheckAverage = 0; // 사용자 당 평균 구강검진 횟수
 
-        OralCheckResultTypeCount oralCheckResultTypeCount = new OralCheckResultTypeCount(); // 구강검진 결과 타입별 횟수
 
         if (userCount > 0) {
-            int countHealthy = 0;
-            int countGood = 0;
-            int countAttention = 0;
-            int countDanger = 0;
-
-            for (OralCheckStatisticDto oralCheckStatisticDto : userOralCheckList){
-                allOralCheckCount += oralCheckStatisticDto.getOralCheckCount();
-
-                switch (oralCheckStatisticDto.getOralCheckResultTotalType()) { // 구강검진 결과 타입별 횟수 count
-                    case HEALTHY -> countHealthy ++;
-                    case GOOD -> countGood ++;
-                    case ATTENTION -> countAttention ++;
-                    case DANGER -> countDanger ++;
-                }
-            }
-
-            oralCheckResultTypeCount = OralCheckResultTypeCount.builder()
-                    .countHealthy(countHealthy)
-                    .countGood(countGood)
-                    .countAttention(countAttention)
-                    .countDanger(countDanger)
-                    .build();
-
             oralCheckAverage = Math.round((float) allOralCheckCount / userCount);
         }
 
-        OralCheckResultTotalType averageState = oralCheckService.getState(oralCheckResultTypeCount); // 전체 평균 구강 상태
+        OralCheckResultTotalType averageState = oralCheckService.getState(userOralCheckList); // 전체 평균 구강 상태
 
         // 통계 3. 평균 문진표 유형
         List<QuestionnaireStatisticDto> questionnaireList = questionnaireCustomRepository.questionnaireList(request); // 모든 문진표 리스트
 
-        List<AllQuestionnaireCount> questionnaireCountList = questionnaireCustomRepository.questionnaireCountList(request);
-        int questionnaireAllCount = 0; // 전체 문진표 작성 횟수
+        int allQuestionnaireCount = questionnaireCustomRepository.allQuestionnaireCount(request); // 전체 문진표 작성 횟수
 
         AllQuestionnaireResultTypeCount allQuestionnaireResultTypeCount = new AllQuestionnaireResultTypeCount(); // 모든 문진표 결과 유형
 
-        for (AllQuestionnaireCount allQuestionnaireCount : questionnaireCountList) { // 전체 문진표 작성 횟수 count
-            questionnaireAllCount += allQuestionnaireCount.getAllQuestionnaireCount();
-        }
-
-        if (questionnaireAllCount > 0){
+        if (allQuestionnaireCount > 0){
             int countA = 0;
             int countB = 0;
             int countC = 0;
@@ -137,8 +108,8 @@ public class AdminStatisticService {
                 .averageState(averageState)
                 .oralCheckCount(allOralCheckCount)
                 .oralCheckAverage(oralCheckAverage)
-                .oralCheckResultTypeCount(oralCheckResultTypeCount)
-                .questionnaireAllCount(questionnaireAllCount)
+                .oralCheckResultTypeCount(userOralCheckList)
+                .questionnaireAllCount(allQuestionnaireCount)
                 .allQuestionnaireResultTypeCount(allQuestionnaireResultTypeCount)
                 .build();
     }
