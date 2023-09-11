@@ -1,13 +1,25 @@
 package com.kaii.dentix.domain.questionnaire.dao;
 
+import com.kaii.dentix.domain.admin.dto.request.AdminStatisticRequest;
+import com.kaii.dentix.domain.admin.dto.statistic.AllQuestionnaireCount;
+import com.kaii.dentix.domain.admin.dto.statistic.QuestionnaireStatisticDto;
+import com.kaii.dentix.domain.oralCheck.domain.QOralCheck;
 import com.kaii.dentix.domain.oralStatus.domain.QOralStatus;
 import com.kaii.dentix.domain.questionnaire.domain.QQuestionnaire;
 import com.kaii.dentix.domain.questionnaire.dto.QuestionnaireAndStatusDto;
+import com.kaii.dentix.domain.user.domain.QUser;
 import com.kaii.dentix.domain.userOralStatus.domain.QUserOralStatus;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Objects;
 
 @Repository
 @RequiredArgsConstructor
@@ -17,6 +29,10 @@ public class QuestionnaireCustomRepositoryImpl implements QuestionnaireCustomRep
     private final QQuestionnaire questionnaire = QQuestionnaire.questionnaire;
     private final QOralStatus oralStatus = QOralStatus.oralStatus;
     private final QUserOralStatus userOralStatus = QUserOralStatus.userOralStatus;
+
+    private final QUser user = QUser.user;
+
+    private final QOralCheck oralCheck = QOralCheck.oralCheck;
 
     /**
      * 최근 문진표 및 해당 문진표의 높은 우선순위 구강 상태 조회
@@ -35,5 +51,63 @@ public class QuestionnaireCustomRepositoryImpl implements QuestionnaireCustomRep
             .orderBy(questionnaire.created.desc(), oralStatus.oralStatusPriority.asc())
             .fetchFirst();
     }
+
+    /**
+     * 모든 문진표 리스트
+     */
+    @Override
+    public List<QuestionnaireStatisticDto> questionnaireList(AdminStatisticRequest request) {
+        return queryFactory.select(Projections.constructor(QuestionnaireStatisticDto.class,
+                user.userId, userOralStatus.oralStatus.oralStatusType
+                ))
+                .from(questionnaire)
+                .join(user).on(questionnaire.userId.eq(user.userId))
+                .join(userOralStatus).on(questionnaire.questionnaireId.eq(userOralStatus.questionnaire.questionnaireId))
+                .where(
+                        user.deleted.isNull(),
+                        whereStartDate(request.getStartDate()),
+                        whereEndDate(request.getEndDate())
+                )
+                .fetch();
+    }
+
+    /**
+     * 전체 문진표 검진 횟수
+     */
+    @Override
+    public int allQuestionnaireCount(AdminStatisticRequest request) {
+        return Objects.requireNonNull(queryFactory.select(Projections.constructor(AllQuestionnaireCount.class,
+                        Wildcard.count.intValue().as("questionnaireAllCount")
+                ))
+                .from(questionnaire)
+                .join(user).on(questionnaire.userId.eq(user.userId))
+                .where(
+                        user.deleted.isNull(),
+                        whereStartDate(request.getStartDate()),
+                        whereEndDate(request.getEndDate())
+                )
+                .fetchOne()).getAllQuestionnaireCount();
+    }
+
+    /**
+     *  기간 설정 '시작일' 필터링
+     */
+    private BooleanExpression whereStartDate(String date){
+        return StringUtils.isNotBlank(date) ?
+                Expressions.stringTemplate("DATE_FORMAT({0}, {1})", oralCheck.created, "%Y-%m-%d").goe(date).or
+                        (Expressions.stringTemplate("DATE_FORMAT({0}, {1})", questionnaire.created, "%Y-%m-%d").goe(date))
+                : null;
+    }
+
+    /**
+     *  기간 설정 '종료일' 필터링
+     */
+    private BooleanExpression whereEndDate(String date){
+        return StringUtils.isNotBlank(date) ?
+                Expressions.stringTemplate("DATE_FORMAT({0}, {1})", oralCheck.created, "%Y-%m-%d").loe(date).or
+                        (Expressions.stringTemplate("DATE_FORMAT({0}, {1})", questionnaire.created, "%Y-%m-%d").loe(date))
+                : null;
+    }
+
 }
 

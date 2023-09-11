@@ -191,3 +191,19 @@ include::{snippets}/admin/user/list/query-parameters.adoc[]
 === Response
 include::{snippets}/admin/user/list/response-fields.adoc[]
 include::{snippets}/admin/user/list/response-body.adoc[]
+
+[[userStatistic]]
+== 10. 사용자 통계
+*사용자 통계 API*
+
+*[ 개발 중 잘못된 Request나 데이터 오류로 인해 발생할 수 있는 경우 ]*::
+
+- 관리자 정보 조회 불가능 : `"존재하지 않는 관리자입니다."` (rt : 416)
+
+=== Http
+include::{snippets}/admin/statistic/http-request.adoc[]
+=== Request
+include::{snippets}/admin/statistic/query-parameters.adoc[]
+=== Response
+include::{snippets}/admin/statistic/response-fields.adoc[]
+include::{snippets}/admin/statistic/response-body.adoc[]

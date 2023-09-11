@@ -2,6 +2,7 @@ package com.kaii.dentix.domain.oralCheck.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kaii.dentix.domain.admin.dto.statistic.OralCheckResultTypeCount;
 import com.kaii.dentix.domain.oralCheck.dao.OralCheckRepository;
 import com.kaii.dentix.domain.oralCheck.domain.OralCheck;
 import com.kaii.dentix.domain.oralCheck.dto.*;
@@ -584,5 +585,24 @@ public class OralCheckService {
             .oralCheckDownRightScoreType(latestOralCheck.getOralCheckDownRightScoreType())
             .oralCheckDailyList(oralCheckDailyChangeList)
             .build();
+    }
+
+    /**
+     *  전체 평균 구강 상태
+     */
+    public OralCheckResultTotalType getState(OralCheckResultTypeCount oralCheckResultTypeCount){
+        if (oralCheckResultTypeCount.getCountHealthy() >= oralCheckResultTypeCount.getCountGood() &&
+                oralCheckResultTypeCount.getCountHealthy() >= oralCheckResultTypeCount.getCountAttention() &&
+                oralCheckResultTypeCount.getCountHealthy() >= oralCheckResultTypeCount.getCountDanger())
+            return OralCheckResultTotalType.HEALTHY;
+
+        if (oralCheckResultTypeCount.getCountGood() >= oralCheckResultTypeCount.getCountAttention() &&
+                oralCheckResultTypeCount.getCountGood() >= oralCheckResultTypeCount.getCountDanger())
+            return OralCheckResultTotalType.GOOD;
+
+        if (oralCheckResultTypeCount.getCountAttention() >= oralCheckResultTypeCount.getCountDanger())
+            return OralCheckResultTotalType.ATTENTION;
+
+        return OralCheckResultTotalType.DANGER;
     }
 }

@@ -1,10 +1,13 @@
 package com.kaii.dentix.domain.admin.dao.user;
 
 import com.kaii.dentix.domain.admin.dto.AdminUserInfoDto;
+import com.kaii.dentix.domain.admin.dto.AdminUserSignUpCountDto;
+import com.kaii.dentix.domain.admin.dto.request.AdminStatisticRequest;
 import com.kaii.dentix.domain.admin.dto.request.AdminUserListRequest;
 import com.kaii.dentix.domain.oralCheck.domain.QOralCheck;
 import com.kaii.dentix.domain.questionnaire.domain.QQuestionnaire;
 import com.kaii.dentix.domain.type.DatePeriodType;
+import com.kaii.dentix.domain.type.GenderType;
 import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
 import com.kaii.dentix.domain.user.domain.QUser;
 import com.kaii.dentix.domain.userOralStatus.domain.QUserOralStatus;
@@ -14,7 +17,9 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.micrometer.common.util.StringUtils;
@@ -186,6 +191,40 @@ public class UserRepositoryImpl implements UserCustomRepository{
                 Expressions.stringTemplate("DATE_FORMAT({0}, {1})", oralCheck.created, "%Y-%m-%d").loe(date).or
                         (Expressions.stringTemplate("DATE_FORMAT({0}, {1})", questionnaire.created, "%Y-%m-%d").loe(date))
                 : null;
+    }
+
+    /**
+     *  통계 - 전체 남녀 가입률
+     */
+    @Override
+    public AdminUserSignUpCountDto userSignUpCount(AdminStatisticRequest request){
+        return queryFactory.select(Projections.constructor(AdminUserSignUpCountDto.class,
+                Wildcard.count.longValue(), // 전체 가입자 수
+                new CaseBuilder() // 남성 가입자 수
+                        .when(user.userGender.eq(GenderType.M))
+                        .then(1L).otherwise(0L).sum(),
+                new CaseBuilder() // 여성 가입자 수
+                        .when(user.userGender.eq(GenderType.W))
+                        .then(1L).otherwise(0L).sum()))
+                .from(user)
+                .where(whereUserEndDate(request.getEndDate()))
+                .fetchOne();
+    }
+
+    /**
+     *  사용자 가입일 '종료일' 필터링
+     */
+    private BooleanExpression whereUserEndDate(String endDate){
+        Date date;
+        try {
+            date = DateFormatUtil.stringToDate("yyyy-MM-dd", endDate);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            cal.add(Calendar.DATE, 1);
+        } catch (Exception e) {
+            return null;
+        }
+        return user.created.lt(date);
     }
 
 }

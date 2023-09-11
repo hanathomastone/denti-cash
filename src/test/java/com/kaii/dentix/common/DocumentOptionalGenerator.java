@@ -62,4 +62,8 @@ public class DocumentOptionalGenerator {
         return setFormat("Y: 필수, N: 선택");
     }
 
+    public static Attributes.Attribute datePeriodTypeFormat() {
+        return setFormat("TODAY : 오늘, WEEK1 : 1주일, MONTH1 : 1개월, MONTH3 : 3개월, YEAR1 : 1년, ALL : 전체");
+    }
+
 }
