@@ -350,6 +350,8 @@ include::{snippets}/user/revoke/response-body.adoc[]
 
 === Http
 include::{snippets}/oralCheck/photo/http-request.adoc[]
+=== Request
+include::{snippets}/oralCheck/photo/request-parts.adoc[]
 === Response
 include::{snippets}/oralCheck/photo/response-fields.adoc[]
 include::{snippets}/oralCheck/photo/response-body.adoc[]

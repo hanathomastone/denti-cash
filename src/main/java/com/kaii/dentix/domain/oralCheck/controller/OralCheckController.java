@@ -5,9 +5,12 @@ import com.kaii.dentix.domain.oralCheck.dto.DashboardDto;
 import com.kaii.dentix.domain.oralCheck.dto.OralCheckDto;
 import com.kaii.dentix.domain.oralCheck.dto.OralCheckPhotoDto;
 import com.kaii.dentix.domain.oralCheck.dto.OralCheckResultDto;
+import com.kaii.dentix.global.common.error.exception.FormValidationException;
 import com.kaii.dentix.global.common.response.DataResponse;
+import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,6 +30,9 @@ public class OralCheckController {
      */
     @PostMapping(value = "/photo", name = "구강검진 사진 촬영")
     public DataResponse<OralCheckPhotoDto> oralCheckPhoto(HttpServletRequest httpServletRequest, @RequestParam MultipartFile file) throws IOException, NoSuchAlgorithmException, InvalidKeyException, InterruptedException {
+        if (file.isEmpty() || StringUtils.isBlank(file.getContentType())) throw new FormValidationException("파일을 업로드해 주세요.");
+        if (!file.getContentType().equals(MediaType.IMAGE_PNG_VALUE) && !file.getContentType().equals(MediaType.IMAGE_JPEG_VALUE)) throw new FormValidationException("png, jpg 형식만 업로드 가능합니다.");
+
         DataResponse<OralCheckPhotoDto> response = oralCheckService.oralCheckPhoto(httpServletRequest, file);
         return response;
     }
