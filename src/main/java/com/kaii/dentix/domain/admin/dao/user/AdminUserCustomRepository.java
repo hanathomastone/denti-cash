@@ -6,7 +6,7 @@ import com.kaii.dentix.domain.admin.dto.request.AdminStatisticRequest;
 import com.kaii.dentix.domain.admin.dto.request.AdminUserListRequest;
 import org.springframework.data.domain.Page;
 
-public interface UserCustomRepository {
+public interface AdminUserCustomRepository {
 
     Page<AdminUserInfoDto> findAll(AdminUserListRequest request);
 

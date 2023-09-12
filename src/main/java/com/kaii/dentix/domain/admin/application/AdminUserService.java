@@ -1,6 +1,6 @@
 package com.kaii.dentix.domain.admin.application;
 
-import com.kaii.dentix.domain.admin.dao.user.UserCustomRepository;
+import com.kaii.dentix.domain.admin.dao.user.AdminUserCustomRepository;
 import com.kaii.dentix.domain.admin.dto.AdminUserInfoDto;
 import com.kaii.dentix.domain.admin.dto.AdminUserListDto;
 import com.kaii.dentix.domain.admin.dto.request.AdminUserListRequest;
@@ -22,7 +22,7 @@ public class AdminUserService {
 
     private final UserRepository userRepository;
 
-    private final UserCustomRepository userCustomRepository;
+    private final AdminUserCustomRepository adminUserCustomRepository;
 
     private final ModelMapper modelMapper;
 
@@ -52,7 +52,7 @@ public class AdminUserService {
      *  사용자 목록 조회
      */
     public AdminUserListDto userList(AdminUserListRequest request){
-        Page<AdminUserInfoDto> userList = userCustomRepository.findAll(request);
+        Page<AdminUserInfoDto> userList = adminUserCustomRepository.findAll(request);
 
         PagingDTO pagingDTO = modelMapper.map(userList, PagingDTO.class);
 
