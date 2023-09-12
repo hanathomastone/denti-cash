@@ -1,6 +1,6 @@
 package com.kaii.dentix.domain.admin.application;
 
-import com.kaii.dentix.domain.admin.dao.user.UserCustomRepository;
+import com.kaii.dentix.domain.admin.dao.user.AdminUserCustomRepository;
 import com.kaii.dentix.domain.admin.dto.*;
 import com.kaii.dentix.domain.admin.dto.request.AdminStatisticRequest;
 import com.kaii.dentix.domain.admin.dto.statistic.*;
@@ -19,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminStatisticService {
 
-    private final UserCustomRepository userCustomRepository;
+    private final AdminUserCustomRepository adminUserCustomRepository;
 
     private final OralCheckCustomRepository oralCheckCustomRepository;
 
@@ -34,7 +34,7 @@ public class AdminStatisticService {
     public AdminUserStatisticResponse userStatistic(AdminStatisticRequest request){
 
         // 통계 1. 전체 남녀 가입률
-        AdminUserSignUpCountDto userSignUpCount = userCustomRepository.userSignUpCount(request);
+        AdminUserSignUpCountDto userSignUpCount = adminUserCustomRepository.userSignUpCount(request);
 
         // 통계 2. 평균 구강검진
         OralCheckResultTypeCount userOralCheckList = oralCheckCustomRepository.userOralCheckList(request); // 구강검진 결과 타입별 횟수

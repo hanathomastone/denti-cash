@@ -33,7 +33,7 @@ import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
-public class UserRepositoryImpl implements UserCustomRepository{
+public class AdminUserRepositoryImpl implements AdminUserCustomRepository {
 
     private final JPAQueryFactory queryFactory;
 
