@@ -407,7 +407,7 @@ public class OralCheckService {
         List<OralCheckDailyDto> dailyList = new ArrayList<>();
         calendar.add(Calendar.DATE, 1 - calendar.get(Calendar.DAY_OF_WEEK)); // 30일 전날이 포함된 일요일부터 시작
 
-        while (calendar.getTime().before(today) || calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+        while (true) {
             List<OralCheckListDto> detailList = new ArrayList<>();
             String dateString = DateFormatUtil.dateToString(datePattern, calendar.getTime());
 
@@ -499,6 +499,7 @@ public class OralCheckService {
                 .detailList(detailList)
                 .build());
 
+            if (dateString.compareTo(todayString) >= 0 && calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) break; // 이번 주 토요일까지
             calendar.add(Calendar.DATE, 1);
         }
 
