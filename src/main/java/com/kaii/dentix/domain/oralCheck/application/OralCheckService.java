@@ -569,6 +569,7 @@ public class OralCheckService {
         }
 
         return DashboardDto.builder()
+            .latestOralCheckId(latestOralCheck.getOralCheckId())
             .oralCheckTimeInterval((today.getTime() - latestOralCheck.getCreated().getTime()) / 1000)
             .oralCheckTotalCount(oralCheckList.size())
             .oralCheckHealthyCount(oralCheckHealthyCount)

@@ -306,6 +306,7 @@ public class OralCheckControllerTest extends ControllerTest {
     @Test
     public void dashboard() throws Exception {
         DashboardDto dashboardDto = DashboardDto.builder()
+            .latestOralCheckId(1L)
             .oralCheckTimeInterval(1000L)
             .oralCheckTotalCount(10)
             .oralCheckHealthyCount(4)
@@ -353,6 +354,7 @@ public class OralCheckControllerTest extends ControllerTest {
                     fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
                     fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
                     fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
+                    fieldWithPath("response.latestOralCheckId").type(JsonFieldType.NUMBER).optional().description("최신 구강 촬영 고유번호"),
                     fieldWithPath("response.oralCheckTimeInterval").type(JsonFieldType.NUMBER).optional().attributes(timeIntervalFormat()).description("구강 촬영 시차 (촬영 이력 없는 경우 null)"),
                     fieldWithPath("response.oralCheckTotalCount").type(JsonFieldType.NUMBER).description("구강 촬영 횟수"),
                     fieldWithPath("response.oralCheckHealthyCount").type(JsonFieldType.NUMBER).description("구강 촬영 건강 횟수"),

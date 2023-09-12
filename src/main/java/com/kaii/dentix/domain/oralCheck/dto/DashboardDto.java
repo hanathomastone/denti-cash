@@ -17,6 +17,8 @@ import java.util.List;
 @AllArgsConstructor @NoArgsConstructor
 public class DashboardDto {
 
+    private Long latestOralCheckId;
+
     private Long oralCheckTimeInterval;
 
     private int oralCheckTotalCount;
