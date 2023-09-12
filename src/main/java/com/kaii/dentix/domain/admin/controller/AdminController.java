@@ -1,6 +1,7 @@
 package com.kaii.dentix.domain.admin.controller;
 
 import com.kaii.dentix.domain.admin.application.AdminService;
+import com.kaii.dentix.domain.admin.dto.AdminAutoLoginDto;
 import com.kaii.dentix.domain.admin.dto.AdminPasswordResetDto;
 import com.kaii.dentix.domain.admin.dto.AdminListDto;
 import com.kaii.dentix.domain.admin.dto.AdminSignUpDto;
@@ -64,6 +65,15 @@ public class AdminController {
     @GetMapping(value = "/list", name = "관리자 목록 조회")
     public DataResponse<AdminListDto> adminList(PageAndSizeRequest request){
         DataResponse<AdminListDto> response = new DataResponse<>(adminService.adminList(request));
+        return response;
+    }
+
+    /**
+     *  관리자 자동 로그인
+     */
+    @PutMapping(value = "/auto-login", name = "관리자 자동 로그인")
+    public DataResponse<AdminAutoLoginDto> adminAutoLogin(HttpServletRequest httpServletRequest){
+        DataResponse<AdminAutoLoginDto> response = new DataResponse<>(adminService.adminAutoLogin(httpServletRequest));
         return response;
     }
 

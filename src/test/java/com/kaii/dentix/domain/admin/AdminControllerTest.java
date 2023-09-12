@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaii.dentix.common.ControllerTest;
 import com.kaii.dentix.domain.admin.application.AdminService;
 import com.kaii.dentix.domain.admin.controller.AdminController;
-import com.kaii.dentix.domain.admin.dto.AdminAccountDto;
-import com.kaii.dentix.domain.admin.dto.AdminListDto;
-import com.kaii.dentix.domain.admin.dto.AdminPasswordResetDto;
-import com.kaii.dentix.domain.admin.dto.AdminSignUpDto;
+import com.kaii.dentix.domain.admin.dto.*;
 import com.kaii.dentix.domain.admin.dto.request.AdminModifyPasswordRequest;
 import com.kaii.dentix.domain.admin.dto.request.AdminSignUpRequest;
 import com.kaii.dentix.domain.type.YnType;
@@ -76,6 +73,16 @@ public class AdminControllerTest extends ControllerTest {
     public AdminPasswordResetDto adminPasswordResetDto(){
         return AdminPasswordResetDto.builder()
                 .adminPassword("dentix2023!")
+                .build();
+    }
+
+    public AdminAutoLoginDto adminAutoLoginDto(){
+        return AdminAutoLoginDto.builder()
+                .accessToken("accessToken")
+                .refreshToken("refreshToken")
+                .adminId(1L)
+                .adminName("김관리자")
+                .adminIsSuper(YnType.N)
                 .build();
     }
 
@@ -300,6 +307,47 @@ public class AdminControllerTest extends ControllerTest {
                 ));
 
         verify(adminService).adminList(any(PageAndSizeRequest.class));
+
+    }
+
+    /**
+     *  관리자 자동 로그인
+     */
+    @Test
+    public void adminAutoLogin() throws Exception {
+
+        // given
+        given(adminService.adminAutoLogin(any(HttpServletRequest.class))).willReturn(adminAutoLoginDto());
+
+        // when
+        ResultActions result = mockMvc.perform(
+                RestDocumentationRequestBuilders.put("/admin/account/auto-login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "admin-auto-login.고유경.AccessToken")
+                        .with(user("user").roles("ADMIN"))
+        );
+
+        // then
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("rt").value(200))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andDo(document("admin/account/auto-login",
+                        getDocumentRequest(),
+                        getDocumentResponse(),
+                        responseFields(
+                                fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
+                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
+                                fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
+                                fieldWithPath("response.accessToken").type(JsonFieldType.STRING).description("Access Token"),
+                                fieldWithPath("response.refreshToken").type(JsonFieldType.STRING).description("Refresh Token"),
+                                fieldWithPath("response.adminId").type(JsonFieldType.NUMBER).description("관리자 고유 번호"),
+                                fieldWithPath("response.adminName").type(JsonFieldType.STRING).description("관리자 이름"),
+                                fieldWithPath("response.adminIsSuper").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("관리자 슈퍼계정 여부")
+                        )
+                ));
+
+        verify(adminService).adminAutoLogin(any(HttpServletRequest.class));
 
     }
 
