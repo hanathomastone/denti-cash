@@ -6,7 +6,10 @@ import com.kaii.dentix.domain.contents.dto.ContentsDto;
 import com.kaii.dentix.domain.oralStatusToContents.domain.QOralStatusToContents;
 import com.kaii.dentix.domain.userOralStatus.domain.QUserOralStatus;
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.JPQLTemplates;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -18,6 +21,9 @@ import static com.querydsl.core.group.GroupBy.list;
 @Repository
 @RequiredArgsConstructor
 public class ContentsCustomRepositoryImpl implements ContentsCustomRepository {
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     private final JPAQueryFactory queryFactory;
     private final QUserOralStatus userOralStatus = QUserOralStatus.userOralStatus;
@@ -31,7 +37,8 @@ public class ContentsCustomRepositoryImpl implements ContentsCustomRepository {
     @Override
     public List<ContentsDto> getContents() {
 
-        return queryFactory
+        // transform 사용 시 JPQLTemplates.DEFAULT 필요
+        return new JPAQueryFactory(JPQLTemplates.DEFAULT, entityManager)
             .from(contents)
             .leftJoin(contentsToCategory).on(contentsToCategory.contentsId.eq(contents.contentsId))
             .orderBy(contents.contentsSort.asc())
@@ -61,7 +68,8 @@ public class ContentsCustomRepositoryImpl implements ContentsCustomRepository {
     @Override
     public List<ContentsDto> getCustomizedContents(Long questionnaireId) {
 
-        return queryFactory
+        // transform 사용 시 JPQLTemplates.DEFAULT 필요
+        return new JPAQueryFactory(JPQLTemplates.DEFAULT, entityManager)
             .from(contents)
             .leftJoin(contentsToCategory).on(contentsToCategory.contentsId.eq(contents.contentsId))
             .join(oralStatusToContents).on(oralStatusToContents.contents.contentsId.eq(contents.contentsId))
