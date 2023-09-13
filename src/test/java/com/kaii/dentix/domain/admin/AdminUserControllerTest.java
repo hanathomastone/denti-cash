@@ -173,7 +173,15 @@ public class AdminUserControllerTest extends ControllerTest {
                         getDocumentResponse(),
                         queryParameters(
                                 parameterWithName("page").description("요청 페이지"),
-                                parameterWithName("size").description("한 페이지에 가져올 목록 개수")
+                                parameterWithName("size").description("한 페이지에 가져올 목록 개수"),
+                                parameterWithName("userIdentifierOrName").optional().description("아이디 혹은 이름"),
+                                parameterWithName("oralCheckResultTotalType").optional().attributes(oralCheckResultTotalFormat()).description("구강 상태"),
+                                parameterWithName("oralStatus").optional().description("문진표 유형"),
+                                parameterWithName("userGender").optional().attributes(genderFormat()).description("사용자 성별"),
+                                parameterWithName("isVerify").optional().attributes(yesNoFormat()).description("사용자 인증 여부"),
+                                parameterWithName("allDatePeriod").optional().attributes(datePeriodTypeFormat()).description("기간 설정 타입 (구강 촬영일 or 문진표 검사일)"),
+                                parameterWithName("startDate").optional().description("기간 설정 시작일"),
+                                parameterWithName("endDate").optional().description("기간 설정 종료일")
                         ),
                         responseFields(
                                 fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
