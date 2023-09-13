@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaii.dentix.common.ControllerTest;
 import com.kaii.dentix.domain.admin.application.AdminPatientService;
 import com.kaii.dentix.domain.admin.controller.AdminPatientController;
-import com.kaii.dentix.domain.admin.dto.AdminRegisterPatientDto;
+import com.kaii.dentix.domain.admin.dto.*;
+import com.kaii.dentix.domain.admin.dto.request.AdminPatientListRequest;
 import com.kaii.dentix.domain.admin.dto.request.AdminRegisterPatientRequest;
+import com.kaii.dentix.global.common.dto.PagingDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +23,11 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.ArrayList;
+
 import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentRequest;
 import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentResponse;
-import static com.kaii.dentix.common.DocumentOptionalGenerator.userNumberFormat;
+import static com.kaii.dentix.common.DocumentOptionalGenerator.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -31,6 +35,8 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -102,6 +108,61 @@ public class AdminPatientControllerTest extends ControllerTest {
                 ));
 
         verify(adminPatientService).adminRegisterPatient(any(AdminRegisterPatientRequest.class));
+    }
+
+    /**
+     *  관리자 환자 목록 조회
+     */
+    @Test
+    public void adminPatientList() throws Exception {
+
+        // given
+        AdminPatientListDto adminPatientList = AdminPatientListDto.builder()
+                .paging(new PagingDTO(1, 2, 15))
+                .patientList(new ArrayList<>(){{
+                    add(new AdminPatientInfoDto("김덴티", "01012345678"));
+                    add(new AdminPatientInfoDto("홍길동", "01098765432"));
+                }})
+                .build();
+
+        given(adminPatientService.adminPatientList(any(AdminPatientListRequest.class))).willReturn(adminPatientList);
+
+        // when
+        ResultActions result = mockMvc.perform(
+                RestDocumentationRequestBuilders.get("/admin/patient?page={page}&size={size}", 1, 10)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "admin-patient-list.고유경.AccessToken")
+                        .with(user("user").roles("ADMIN"))
+        );
+
+        // then
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("rt").value(200))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andDo(document("admin/patient/list",
+                        getDocumentRequest(),
+                        getDocumentResponse(),
+                        queryParameters(
+                                parameterWithName("page").description("요청 페이지"),
+                                parameterWithName("size").description("한 페이지에 가져올 목록 개수"),
+                                parameterWithName("patientNameOrPhoneNumber").optional().description("환자 이름 혹은 연락처")
+                        ),
+                        responseFields(
+                                fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
+                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
+                                fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
+                                fieldWithPath("response.paging").type(JsonFieldType.OBJECT).description("페이징 정보"),
+                                fieldWithPath("response.paging.number").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
+                                fieldWithPath("response.paging.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 개수"),
+                                fieldWithPath("response.paging.totalElements").type(JsonFieldType.NUMBER).description("총 데이터 개수"),
+                                fieldWithPath("response.patientList[]").type(JsonFieldType.ARRAY).description("환자 목록"),
+                                fieldWithPath("response.patientList[].patientName").type(JsonFieldType.STRING).description("환자 이름"),
+                                fieldWithPath("response.patientList[].patientPhoneNumber").type(JsonFieldType.STRING).attributes(userNumberFormat()).description("환자 연락처")
+                        )
+                ));
+
+        verify(adminPatientService).adminPatientList(any(AdminPatientListRequest.class));
     }
 
 }
