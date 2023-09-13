@@ -25,6 +25,7 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -44,7 +45,6 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -62,6 +62,9 @@ public class UserControllerTest extends ControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    private PasswordEncoder passwordEncoder;
 
     @MockBean
     private UserService userService;
@@ -180,9 +183,11 @@ public class UserControllerTest extends ControllerTest {
         // given
         doNothing().when(userService).userPasswordVerify(any(HttpServletRequest.class), any(UserPasswordVerifyRequest.class));
 
+        String password = "password";
         UserPasswordVerifyRequest userPasswordVerifyRequest = UserPasswordVerifyRequest.builder()
-                .userPassword("password")
+                .userPassword(password)
                 .build();
+        given(passwordEncoder.encode(any(String.class))).willReturn(password);
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -222,9 +227,11 @@ public class UserControllerTest extends ControllerTest {
         // given
         doNothing().when(userService).userModifyPassword(any(HttpServletRequest.class), any(UserInfoModifyPasswordRequest.class));
 
+        String password = "password!";
         UserInfoModifyPasswordRequest userInfoModifyPasswordRequest = UserInfoModifyPasswordRequest.builder()
-                .userPassword("password!")
+                .userPassword(password)
                 .build();
+        given(passwordEncoder.encode(any(String.class))).willReturn(password);
 
         // when
         ResultActions resultActions = mockMvc.perform(

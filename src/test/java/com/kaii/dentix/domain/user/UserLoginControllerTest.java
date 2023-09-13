@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -54,6 +55,9 @@ public class UserLoginControllerTest extends ControllerTest{
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    private PasswordEncoder passwordEncoder;
 
     @MockBean
     private UserLoginService userLoginService;
@@ -154,12 +158,13 @@ public class UserLoginControllerTest extends ControllerTest{
 
         List<Long> serviceAgreementList = Arrays.asList(1L, 2L, 3L);
 
+        String password = "password!";
         UserSignUpRequest userSignUpRequest = UserSignUpRequest.builder()
                 .patientId(1L)
                 .userServiceAgreementRequest(serviceAgreementList)
                 .userLoginIdentifier("dentix123")
                 .userName("김덴티")
-                .userPassword("password!")
+                .userPassword(password)
                 .userGender(GenderType.W)
                 .findPwdQuestionId(1L)
                 .findPwdAnswer("초록색")
@@ -168,6 +173,7 @@ public class UserLoginControllerTest extends ControllerTest{
                 .userOsVersion("1.1.1")
                 .userDeviceToken("DeviceToken")
                 .build();
+        given(passwordEncoder.encode(any(String.class))).willReturn(password);
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -262,14 +268,16 @@ public class UserLoginControllerTest extends ControllerTest{
         // given
         given(userLoginService.userLogin(any(HttpServletRequest.class), any(UserLoginRequest.class))).willReturn(userLoginDto());
 
+        String password = "password!";
         UserLoginRequest userLoginRequest = UserLoginRequest.builder()
                 .userLoginIdentifier("dentix123")
-                .userPassword("password!")
+                .userPassword(password)
                 .userDeviceModel("iPhone 14 Pro")
                 .userDeviceManufacturer("APPLE")
                 .userOsVersion("1.1.1")
                 .userDeviceToken("DeviceToken")
                 .build();
+        given(passwordEncoder.encode(any(String.class))).willReturn(password);
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -368,10 +376,12 @@ public class UserLoginControllerTest extends ControllerTest{
         // given
         doNothing().when(userLoginService).userModifyPassword(any(UserModifyPasswordRequest.class));
 
+        String password = "password!";
         UserModifyPasswordRequest userPasswordVerifyRequest = UserModifyPasswordRequest.builder()
                 .userId(1L)
-                .userPassword("password!")
+                .userPassword(password)
                 .build();
+        given(passwordEncoder.encode(any(String.class))).willReturn(password);
 
         // when
         ResultActions resultActions = mockMvc.perform(

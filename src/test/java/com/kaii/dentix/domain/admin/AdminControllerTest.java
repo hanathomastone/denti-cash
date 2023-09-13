@@ -21,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -39,7 +40,6 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -59,6 +59,9 @@ public class AdminControllerTest extends ControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    private PasswordEncoder passwordEncoder;
 
     @MockBean
     private AdminService adminService;
@@ -144,7 +147,9 @@ public class AdminControllerTest extends ControllerTest {
     public void adminModifyPassword() throws Exception{
 
         // given
-        AdminModifyPasswordRequest request = new AdminModifyPasswordRequest("qwer1234!");
+        String password = "qwer1234!";
+        AdminModifyPasswordRequest request = new AdminModifyPasswordRequest(password);
+        given(passwordEncoder.encode(any(String.class))).willReturn(password);
 
         // when
         ResultActions result = mockMvc.perform(

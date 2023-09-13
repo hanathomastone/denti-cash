@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -23,14 +24,13 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentRequest;
 import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentResponse;
-import static com.kaii.dentix.common.DocumentOptionalGenerator.*;
+import static com.kaii.dentix.common.DocumentOptionalGenerator.yesNoFormat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AdminLoginController.class)
@@ -47,6 +47,9 @@ public class AdminLoginControllerTest extends ControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    private PasswordEncoder passwordEncoder;
 
     @MockBean
     private AdminLoginService adminLoginService;
@@ -71,10 +74,12 @@ public class AdminLoginControllerTest extends ControllerTest {
         // given
         given(adminLoginService.adminLogin(any(AdminLoginRequest.class))).willReturn(adminLoginDto());
 
+        String password = "dentix2023!";
         AdminLoginRequest adminLoginRequest = AdminLoginRequest.builder()
                 .adminLoginIdentifier("adminhong")
-                .adminPassword("dentix2023!")
+                .adminPassword(password)
                 .build();
+        given(passwordEncoder.encode(any(String.class))).willReturn(password);
 
         // when
         ResultActions resultActions = mockMvc.perform(
