@@ -39,15 +39,13 @@ public class AdminStatisticService {
         // 통계 2. 평균 구강검진
         OralCheckResultTypeCount userOralCheckList = oralCheckCustomRepository.userOralCheckList(request); // 구강검진 결과 타입별 횟수
 
-        List<OralCheckUserCount> allUserOralCheckCount = oralCheckCustomRepository.allUserOralCheckCount(request);  // 구강검진을 한 총 사용자 수
-        int userCount = allUserOralCheckCount.size();
+        int allUserOralCheckCount = oralCheckCustomRepository.allUserOralCheckCount(request);  // 구강검진을 한 총 사용자 수
 
         int allOralCheckCount = userOralCheckList.getCountHealthy() + userOralCheckList.getCountGood() + userOralCheckList.getCountAttention() + userOralCheckList.getCountDanger(); // 전체 구강검진 횟수
         int oralCheckAverage = 0; // 사용자 당 평균 구강검진 횟수
 
-
-        if (userCount > 0) {
-            oralCheckAverage = Math.round((float) allOralCheckCount / userCount);
+        if (allUserOralCheckCount > 0) {
+            oralCheckAverage = Math.round((float) allOralCheckCount / allUserOralCheckCount);
         }
 
         OralCheckResultTotalType averageState = oralCheckService.getState(userOralCheckList); // 전체 평균 구강 상태

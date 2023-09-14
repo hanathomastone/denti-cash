@@ -17,8 +17,6 @@ import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
 @RequiredArgsConstructor
 public class OralCheckCustomRepositoryImpl implements OralCheckCustomRepository {
@@ -72,7 +70,7 @@ public class OralCheckCustomRepositoryImpl implements OralCheckCustomRepository 
      *  구강검진을 한 총 사용자 수
      */
     @Override
-    public List<OralCheckUserCount> allUserOralCheckCount(AdminStatisticRequest request){
+    public int allUserOralCheckCount(AdminStatisticRequest request){
         return queryFactory.select(Projections.constructor(OralCheckUserCount.class,
                         Wildcard.count.intValue()
                 ))
@@ -84,7 +82,7 @@ public class OralCheckCustomRepositoryImpl implements OralCheckCustomRepository 
                         whereEndDate(request.getEndDate())
                 )
                 .groupBy(user.userId)
-                .fetch();
+                .fetch().size();
     }
 
     /**
