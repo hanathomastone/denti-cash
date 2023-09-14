@@ -1,7 +1,6 @@
 package com.kaii.dentix.domain.oralCheck.dao;
 
 import com.kaii.dentix.domain.admin.dto.statistic.OralCheckResultTypeCount;
-import com.kaii.dentix.domain.admin.dto.statistic.OralCheckUserCount;
 import com.kaii.dentix.domain.admin.dto.request.AdminStatisticRequest;
 import com.kaii.dentix.domain.oralCheck.domain.QOralCheck;
 import com.kaii.dentix.domain.questionnaire.domain.QQuestionnaire;
@@ -11,13 +10,10 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
@@ -72,10 +68,10 @@ public class OralCheckCustomRepositoryImpl implements OralCheckCustomRepository 
      *  구강검진을 한 총 사용자 수
      */
     @Override
-    public List<OralCheckUserCount> allUserOralCheckCount(AdminStatisticRequest request){
-        return queryFactory.select(Projections.constructor(OralCheckUserCount.class,
-                        Wildcard.count.intValue()
-                ))
+    public Integer allUserOralCheckCount(AdminStatisticRequest request){
+        return queryFactory.select(
+                        user.userId.countDistinct().intValue()
+                )
                 .from(oralCheck)
                 .join(user).on(oralCheck.userId.eq(user.userId))
                 .where(
@@ -83,8 +79,7 @@ public class OralCheckCustomRepositoryImpl implements OralCheckCustomRepository 
                         whereStartDate(request.getStartDate()),
                         whereEndDate(request.getEndDate())
                 )
-                .groupBy(user.userId)
-                .fetch();
+                .fetchOne();
     }
 
     /**

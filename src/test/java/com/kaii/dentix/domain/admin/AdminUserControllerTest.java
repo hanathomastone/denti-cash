@@ -199,7 +199,7 @@ public class AdminUserControllerTest extends ControllerTest {
                                 fieldWithPath("response.userList[].questionnaireDate").type(JsonFieldType.STRING).optional().attributes(dateFormat()).description("문진표 작성일"),
                                 fieldWithPath("response.userList[].oralCheckResultTotalType").type(JsonFieldType.STRING).optional().attributes(oralCheckResultTotalFormat()).description("구강검진 결과"),
                                 fieldWithPath("response.userList[].oralCheckDate").type(JsonFieldType.STRING).optional().attributes(dateFormat()).description("구강검진 검사일"),
-                                fieldWithPath("response.userList[].isVerify").type(JsonFieldType.STRING).description("관리자 가입일")
+                                fieldWithPath("response.userList[].isVerify").type(JsonFieldType.STRING).description("사용자 인증 여부")
                         )
                 ));
 

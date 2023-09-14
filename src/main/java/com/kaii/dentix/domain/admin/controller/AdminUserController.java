@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin/user")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class AdminUserController {
 
     private final AdminUserService adminUserService;
