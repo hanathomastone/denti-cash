@@ -1,7 +1,6 @@
 package com.kaii.dentix.domain.oralCheck.dao;
 
 import com.kaii.dentix.domain.admin.dto.statistic.OralCheckResultTypeCount;
-import com.kaii.dentix.domain.admin.dto.statistic.OralCheckUserCount;
 import com.kaii.dentix.domain.admin.dto.request.AdminStatisticRequest;
 import com.kaii.dentix.domain.oralCheck.domain.QOralCheck;
 import com.kaii.dentix.domain.questionnaire.domain.QQuestionnaire;
@@ -11,13 +10,10 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-
-import java.util.Objects;
 
 @Repository
 @RequiredArgsConstructor
