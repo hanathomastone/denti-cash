@@ -7,6 +7,6 @@ public interface OralCheckCustomRepository {
 
     OralCheckResultTypeCount userOralCheckList(AdminStatisticRequest request);
 
-    int allUserOralCheckCount(AdminStatisticRequest request);
+    Integer allUserOralCheckCount(AdminStatisticRequest request);
 
 }
