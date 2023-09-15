@@ -49,7 +49,9 @@ public class AdminPatientCustomRepositoryImpl implements AdminPatientCustomRepos
                 ))
                 .from(patient)
                 .innerJoin(user).on(patient.patientId.eq(user.patientId))
-                .where(StringUtils.isNotBlank(request.getPatientNameOrPhoneNumber()) ?
+                .where(
+                        user.deleted.isNull(),
+                        StringUtils.isNotBlank(request.getPatientNameOrPhoneNumber()) ?
                         patient.patientName.contains(request.getPatientNameOrPhoneNumber()).or(patient.patientPhoneNumber.contains(request.getPatientNameOrPhoneNumber()))
                         : null)
                 .orderBy(patient.created.desc())
@@ -61,7 +63,10 @@ public class AdminPatientCustomRepositoryImpl implements AdminPatientCustomRepos
         Long total = Optional.ofNullable(queryFactory
                 .select(patient.countDistinct())
                 .from(patient)
-                .where(StringUtils.isNotBlank(request.getPatientNameOrPhoneNumber()) ?
+                .innerJoin(user).on(patient.patientId.eq(user.patientId))
+                .where(
+                        user.deleted.isNull(),
+                        StringUtils.isNotBlank(request.getPatientNameOrPhoneNumber()) ?
                         patient.patientName.contains(request.getPatientNameOrPhoneNumber()).or(patient.patientPhoneNumber.contains(request.getPatientNameOrPhoneNumber()))
                         : null)
                 .fetchOne()).orElse(0L);
