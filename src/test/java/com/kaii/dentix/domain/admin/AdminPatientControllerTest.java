@@ -7,6 +7,7 @@ import com.kaii.dentix.domain.admin.controller.AdminPatientController;
 import com.kaii.dentix.domain.admin.dto.*;
 import com.kaii.dentix.domain.admin.dto.request.AdminPatientListRequest;
 import com.kaii.dentix.domain.admin.dto.request.AdminRegisterPatientRequest;
+import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.global.common.dto.PagingDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentRequest;
 import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentResponse;
@@ -116,13 +118,14 @@ public class AdminPatientControllerTest extends ControllerTest {
      */
     @Test
     public void adminPatientList() throws Exception {
+        Date date = new Date();
 
         // given
         AdminPatientListDto adminPatientList = AdminPatientListDto.builder()
                 .paging(new PagingDTO(1, 2, 15))
                 .patientList(new ArrayList<>(){{
-                    add(new AdminPatientInfoDto("김덴티", "01012345678"));
-                    add(new AdminPatientInfoDto("홍길동", "01098765432"));
+                    add(new AdminPatientInfoDto("김덴티", "01012345678", date, YnType.Y));
+                    add(new AdminPatientInfoDto("홍길동", "01098765432", date, YnType.N));
                 }})
                 .build();
 
@@ -159,7 +162,9 @@ public class AdminPatientControllerTest extends ControllerTest {
                                 fieldWithPath("response.paging.totalElements").type(JsonFieldType.NUMBER).description("총 데이터 개수"),
                                 fieldWithPath("response.patientList[]").type(JsonFieldType.ARRAY).description("환자 목록"),
                                 fieldWithPath("response.patientList[].patientName").type(JsonFieldType.STRING).description("환자 이름"),
-                                fieldWithPath("response.patientList[].patientPhoneNumber").type(JsonFieldType.STRING).attributes(userNumberFormat()).description("환자 연락처")
+                                fieldWithPath("response.patientList[].patientPhoneNumber").type(JsonFieldType.STRING).attributes(userNumberFormat()).description("환자 연락처"),
+                                fieldWithPath("response.patientList[].created").type(JsonFieldType.STRING).attributes(dateFormat()).description("환자 등록일"),
+                                fieldWithPath("response.patientList[].isUser").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("환자 가입 여부")
                         )
                 ));
 
