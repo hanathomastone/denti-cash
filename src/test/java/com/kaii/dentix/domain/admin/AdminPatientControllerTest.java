@@ -30,6 +30,7 @@ import static com.kaii.dentix.common.ApiDocumentUtils.getDocumentResponse;
 import static com.kaii.dentix.common.DocumentOptionalGenerator.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
@@ -163,6 +164,42 @@ public class AdminPatientControllerTest extends ControllerTest {
                 ));
 
         verify(adminPatientService).adminPatientList(any(AdminPatientListRequest.class));
+    }
+
+    /**
+     *  관리자 환자 삭제
+     */
+    @Test
+    public void adminDeletePatient() throws Exception{
+        // given
+        doNothing().when(adminPatientService).adminDeletePatient(any(Long.class));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                RestDocumentationRequestBuilders.delete("/admin/patient?patientId={patientId}", 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "patient-delete.고유경.AccessToken")
+                        .with(user("user").roles("ADMIN"))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("rt").value(200))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andDo(document("admin/patient/delete",
+                        getDocumentRequest(),
+                        getDocumentResponse(),
+                        queryParameters(
+                                parameterWithName("patientId").description("환자 고유 번호")
+                        ),
+                        responseFields(
+                                fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
+                                fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지")
+                        )
+                ));
+
+        verify(adminPatientService).adminDeletePatient(any(Long.class));
     }
 
 }

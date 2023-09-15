@@ -6,6 +6,7 @@ import com.kaii.dentix.domain.admin.dto.AdminRegisterPatientDto;
 import com.kaii.dentix.domain.admin.dto.request.AdminPatientListRequest;
 import com.kaii.dentix.domain.admin.dto.request.AdminRegisterPatientRequest;
 import com.kaii.dentix.global.common.response.DataResponse;
+import com.kaii.dentix.global.common.response.SuccessResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +35,15 @@ public class AdminPatientController {
     public DataResponse<AdminPatientListDto> adminPatientList(AdminPatientListRequest request){
         DataResponse<AdminPatientListDto> response = new DataResponse<>(adminPatientService.adminPatientList(request));
         return response;
+    }
+
+    /**
+     *  관리자 환자 삭제
+     */
+    @DeleteMapping(name = "환자 삭제")
+    public SuccessResponse adminDeletePatient(@RequestParam Long patientId){
+        adminPatientService.adminDeletePatient(patientId);
+        return new SuccessResponse();
     }
 
 }
