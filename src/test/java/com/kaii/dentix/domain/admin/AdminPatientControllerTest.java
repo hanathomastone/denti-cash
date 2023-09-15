@@ -124,8 +124,8 @@ public class AdminPatientControllerTest extends ControllerTest {
         AdminPatientListDto adminPatientList = AdminPatientListDto.builder()
                 .paging(new PagingDTO(1, 2, 15))
                 .patientList(new ArrayList<>(){{
-                    add(new AdminPatientInfoDto("김덴티", "01012345678", date, YnType.Y));
-                    add(new AdminPatientInfoDto("홍길동", "01098765432", date, YnType.N));
+                    add(new AdminPatientInfoDto(1L, "김덴티", "01012345678", date, YnType.Y));
+                    add(new AdminPatientInfoDto(2L, "홍길동", "01098765432", date, YnType.N));
                 }})
                 .build();
 
@@ -161,6 +161,7 @@ public class AdminPatientControllerTest extends ControllerTest {
                                 fieldWithPath("response.paging.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 개수"),
                                 fieldWithPath("response.paging.totalElements").type(JsonFieldType.NUMBER).description("총 데이터 개수"),
                                 fieldWithPath("response.patientList[]").type(JsonFieldType.ARRAY).description("환자 목록"),
+                                fieldWithPath("response.patientList[].patientId").type(JsonFieldType.NUMBER).description("환자 고유 번호"),
                                 fieldWithPath("response.patientList[].patientName").type(JsonFieldType.STRING).description("환자 이름"),
                                 fieldWithPath("response.patientList[].patientPhoneNumber").type(JsonFieldType.STRING).attributes(userNumberFormat()).description("환자 연락처"),
                                 fieldWithPath("response.patientList[].created").type(JsonFieldType.STRING).attributes(dateFormat()).description("환자 등록일"),

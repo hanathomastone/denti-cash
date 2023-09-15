@@ -13,6 +13,8 @@ import java.util.Date;
 @AllArgsConstructor @NoArgsConstructor
 public class AdminPatientInfoDto {
 
+    private Long patientId; // 환자 고유 번호
+
     private String patientName; // 환자 이름
 
     private String patientPhoneNumber; // 환자 연락처
@@ -22,7 +24,8 @@ public class AdminPatientInfoDto {
 
     private YnType isUser; // 연계된 대상자 존재 여부
 
-    public AdminPatientInfoDto(String patientName, String patientPhoneNumber, Date created, String isUser){
+    public AdminPatientInfoDto(Long patientId, String patientName, String patientPhoneNumber, Date created, String isUser){
+        this.patientId = patientId;
         this.patientName = patientName;
         this.patientPhoneNumber = patientPhoneNumber;
         this.created = created;

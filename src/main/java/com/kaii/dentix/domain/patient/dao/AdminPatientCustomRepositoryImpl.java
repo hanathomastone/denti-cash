@@ -39,7 +39,7 @@ public class AdminPatientCustomRepositoryImpl implements AdminPatientCustomRepos
 
         List<AdminPatientInfoDto> result = queryFactory
                 .select(Projections.constructor(AdminPatientInfoDto.class,
-                        patient.patientName, patient.patientPhoneNumber, patient.created,
+                        patient.patientId, patient.patientName, patient.patientPhoneNumber, patient.created,
                         new CaseBuilder()
                                 .when(JPAExpressions
                                         .selectFrom(user)
