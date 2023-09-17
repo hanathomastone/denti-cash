@@ -8,7 +8,6 @@ import com.kaii.dentix.domain.user.domain.QUser;
 import com.kaii.dentix.global.common.dto.PagingRequest;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
@@ -40,17 +39,15 @@ public class AdminPatientCustomRepositoryImpl implements AdminPatientCustomRepos
         List<AdminPatientInfoDto> result = queryFactory
                 .select(Projections.constructor(AdminPatientInfoDto.class,
                         patient.patientId, patient.patientName, patient.patientPhoneNumber, patient.created,
-                        new CaseBuilder()
-                                .when(JPAExpressions
-                                        .selectFrom(user)
-                                        .where(patient.patientId.eq(user.patientId))
-                                        .exists())
-                                .then(YnType.Y.toString()).otherwise(YnType.N.toString()).as("isUser")
+                        new CaseBuilder() // 연계된 대상자 존재 여부 (isUser)
+                                .when(user.patientId.isNotNull().and(user.deleted.isNull())) // 회원가입을 한 환자의 경우
+                                .then(YnType.Y.toString())
+                                .otherwise(YnType.N.toString()) // 미가입 혹은 탈퇴한 환자의 경우
+                                .as("isUser")
                 ))
                 .from(patient)
-                .innerJoin(user).on(patient.patientId.eq(user.patientId))
+                .leftJoin(user).on(patient.patientId.eq(user.patientId))
                 .where(
-                        user.deleted.isNull(),
                         StringUtils.isNotBlank(request.getPatientNameOrPhoneNumber()) ?
                         patient.patientName.contains(request.getPatientNameOrPhoneNumber()).or(patient.patientPhoneNumber.contains(request.getPatientNameOrPhoneNumber()))
                         : null)
@@ -63,9 +60,8 @@ public class AdminPatientCustomRepositoryImpl implements AdminPatientCustomRepos
         Long total = Optional.ofNullable(queryFactory
                 .select(patient.countDistinct())
                 .from(patient)
-                .innerJoin(user).on(patient.patientId.eq(user.patientId))
+                .leftJoin(user).on(patient.patientId.eq(user.patientId))
                 .where(
-                        user.deleted.isNull(),
                         StringUtils.isNotBlank(request.getPatientNameOrPhoneNumber()) ?
                         patient.patientName.contains(request.getPatientNameOrPhoneNumber()).or(patient.patientPhoneNumber.contains(request.getPatientNameOrPhoneNumber()))
                         : null)
