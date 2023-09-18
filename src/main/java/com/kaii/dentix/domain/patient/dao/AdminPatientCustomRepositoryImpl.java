@@ -60,7 +60,7 @@ public class AdminPatientCustomRepositoryImpl implements AdminPatientCustomRepos
         Long total = Optional.ofNullable(queryFactory
                 .select(patient.countDistinct())
                 .from(patient)
-                .leftJoin(user).on(patient.patientId.eq(user.patientId))
+                .leftJoin(user).on(patient.patientId.eq(user.patientId).and(user.deleted.isNull()))
                 .where(
                         StringUtils.isNotBlank(request.getPatientNameOrPhoneNumber()) ?
                         patient.patientName.contains(request.getPatientNameOrPhoneNumber()).or(patient.patientPhoneNumber.contains(request.getPatientNameOrPhoneNumber()))
