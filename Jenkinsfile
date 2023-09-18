@@ -29,9 +29,9 @@ pipeline {
               env.IMAGE_STORAGE = 'dentix-dev.ncr.gov-ntruss.com'
               env.SSH_CONNECTION = 'ncloud@175.106.90.242'
               break
-            case 'prod' : // TODO
-//              env.IMAGE_STORAGE = 'dentix-prod.ncr.gov-ntruss.com'
-//              env.SSH_CONNECTION = 'ncloud@000.000.000.000'
+            case 'prod' :
+              env.IMAGE_STORAGE = 'dentix-prod.ncr.gov-ntruss.com'
+              env.SSH_CONNECTION = 'ncloud@175.106.93.58'
               break
           }
           GIT_COMMIT_AUTHOR = sh(script: "git --no-pager show -s --format=%an ${GIT_COMMIT}", returnStdout: true).trim();
