@@ -31,7 +31,7 @@ public class AdminLoginService {
      */
     @Transactional
     public AdminLoginDto adminLogin(AdminLoginRequest request){
-        Admin admin = adminRepository.findByAdminLoginIdentifier(request.getAdminLoginIdentifier()).orElseThrow(() -> new NotFoundDataException("입력하신 정보가 일치하지 않습니다. 다시 확인해주세요."));
+        Admin admin = adminRepository.findByAdminLoginIdentifier(request.getAdminLoginIdentifier()).orElseThrow(() -> new UnauthorizedException("입력하신 정보가 일치하지 않습니다. 다시 확인해주세요."));
 
         YnType isFirstLogin = admin.getAdminLastLoginDate() == null ? YnType.Y : YnType.N;
 
