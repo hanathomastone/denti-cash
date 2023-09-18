@@ -104,7 +104,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.OK)
     public ErrorResponse NotFoundDataException(HttpServletRequest request, NotFoundDataException e) {
         log.info("error : ", e);
-        return ErrorResponse.of(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE, ResponseMessage.UNPROCESSABLE_ENTITY_MSG.replace("{DataName}", e.getMessage()));
+        return ErrorResponse.of(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE, e.getMessage());
     }
     
     /**
