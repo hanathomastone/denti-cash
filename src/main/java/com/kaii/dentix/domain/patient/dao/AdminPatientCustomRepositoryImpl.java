@@ -40,13 +40,13 @@ public class AdminPatientCustomRepositoryImpl implements AdminPatientCustomRepos
                 .select(Projections.constructor(AdminPatientInfoDto.class,
                         patient.patientId, patient.patientName, patient.patientPhoneNumber, patient.created,
                         new CaseBuilder() // 연계된 대상자 존재 여부 (isUser)
-                                .when(user.patientId.isNotNull().and(user.deleted.isNull())) // 회원가입을 한 환자의 경우
+                                .when(user.patientId.isNotNull()) // 회원가입을 한 환자의 경우
                                 .then(YnType.Y.toString())
                                 .otherwise(YnType.N.toString()) // 미가입 혹은 탈퇴한 환자의 경우
                                 .as("isUser")
                 ))
                 .from(patient)
-                .leftJoin(user).on(patient.patientId.eq(user.patientId))
+                .leftJoin(user).on(patient.patientId.eq(user.patientId).and(user.deleted.isNull()))
                 .where(
                         StringUtils.isNotBlank(request.getPatientNameOrPhoneNumber()) ?
                         patient.patientName.contains(request.getPatientNameOrPhoneNumber()).or(patient.patientPhoneNumber.contains(request.getPatientNameOrPhoneNumber()))
