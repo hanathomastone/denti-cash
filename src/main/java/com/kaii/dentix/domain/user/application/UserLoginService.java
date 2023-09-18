@@ -1,5 +1,7 @@
 package com.kaii.dentix.domain.user.application;
 
+import com.kaii.dentix.domain.admin.dao.AdminRepository;
+import com.kaii.dentix.domain.admin.domain.Admin;
 import com.kaii.dentix.domain.findPwdQuestion.dao.FindPwdQuestionRepository;
 import com.kaii.dentix.domain.jwt.JwtTokenUtil;
 import com.kaii.dentix.domain.jwt.TokenType;
@@ -24,6 +26,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.Date;
 import java.util.List;
@@ -49,6 +52,8 @@ public class UserLoginService {
     private final PasswordEncoder passwordEncoder;
 
     private final ApplicationEventPublisher publisher;
+
+    private final AdminRepository adminRepository;
 
     /**
      * 사용자 서비스 이용동의 여부 확인 및 저장
@@ -253,21 +258,28 @@ public class UserLoginService {
     /**
      *  AccessToken 재발급
      */
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     public AccessTokenDto accessTokenReissue(HttpServletRequest request) {
 
         String refreshToken = jwtTokenUtil.getRefreshToken(request);
 
         if (jwtTokenUtil.isExpired(refreshToken, TokenType.RefreshToken)) throw new TokenExpiredException();
-        Long userId = jwtTokenUtil.getUserId(refreshToken, TokenType.RefreshToken);
+        Long roleId = jwtTokenUtil.getUserId(refreshToken, TokenType.RefreshToken);
         UserRole roles = jwtTokenUtil.getRoles(refreshToken, TokenType.RefreshToken);
 
         switch (roles) {
             case ROLE_USER:
-                User user = userRepository.findById(userId).orElseThrow(TokenExpiredException::new);
+                User user = userRepository.findById(roleId).orElseThrow(TokenExpiredException::new);
                 if (StringUtils.isBlank(user.getUserRefreshToken()) || !user.getUserRefreshToken().equals(refreshToken))
                     throw new UnauthorizedException();
 
                 return AccessTokenDto.builder().accessToken(jwtTokenUtil.createToken(user, TokenType.AccessToken)).build();
+            case ROLE_ADMIN:
+                Admin admin = adminRepository.findById(roleId).orElseThrow(TokenExpiredException::new);
+                if (StringUtils.isBlank(admin.getAdminRefreshToken()) || !admin.getAdminRefreshToken().equals(refreshToken))
+                    throw new UnauthorizedException();
+
+                return AccessTokenDto.builder().accessToken(jwtTokenUtil.createToken(admin, TokenType.AccessToken)).build();
 
             default:
                 throw new TokenExpiredException();

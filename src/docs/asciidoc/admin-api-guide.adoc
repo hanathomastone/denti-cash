@@ -258,3 +258,35 @@ include::{snippets}/admin/patient/list/query-parameters.adoc[]
 === Response
 include::{snippets}/admin/patient/list/response-fields.adoc[]
 include::{snippets}/admin/patient/list/response-body.adoc[]
+
+[[patientDelete]]
+== 14. 환자 삭제
+*환자 삭제 API*
+
+
+*[ 삭제 실패 ]*::
+
+- 환자 정보 조회 불가능 : `"존재하지 않는 환자입니다."` (rt : 416)
+- 가입한 환자 삭제 불가능 : `"가입된 환자는 삭제할 수 없습니다."` (rt : 400)
+
+*[ 개발 중 잘못된 Request나 데이터 오류로 인해 발생할 수 있는 경우 ]*::
+
+- 관리자 정보 조회 불가능 : `"존재하지 않는 관리자입니다."` (rt : 416)
+
+=== Http
+include::{snippets}/admin/patient/delete/http-request.adoc[]
+=== Request
+include::{snippets}/admin/patient/delete/query-parameters.adoc[]
+=== Response
+include::{snippets}/admin/patient/delete/response-fields.adoc[]
+include::{snippets}/admin/patient/delete/response-body.adoc[]
+
+[[accessTokenReissue]]
+== 15. AccessToken 재발급
+*AccessToken 재발급 API*
+
+=== Http
+include::{snippets}/login/access-token/http-request.adoc[]
+=== Response
+include::{snippets}/login/access-token/response-fields.adoc[]
+include::{snippets}/login/access-token/response-body.adoc[]

@@ -8,8 +8,11 @@ import com.kaii.dentix.domain.admin.dto.request.AdminRegisterPatientRequest;
 import com.kaii.dentix.domain.patient.dao.AdminPatientCustomRepository;
 import com.kaii.dentix.domain.patient.dao.PatientRepository;
 import com.kaii.dentix.domain.patient.domain.Patient;
+import com.kaii.dentix.domain.user.dao.UserRepository;
 import com.kaii.dentix.global.common.dto.PagingDTO;
 import com.kaii.dentix.global.common.error.exception.AlreadyDataException;
+import com.kaii.dentix.global.common.error.exception.BadRequestApiException;
+import com.kaii.dentix.global.common.error.exception.NotFoundDataException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -25,6 +28,8 @@ public class AdminPatientService {
     private final AdminPatientCustomRepository adminPatientCustomRepository;
 
     private final ModelMapper modelMapper;
+
+    private final UserRepository userRepository;
 
     /**
      *  관리자 환자 등록
@@ -59,6 +64,20 @@ public class AdminPatientService {
                 .paging(pagingDTO)
                 .patientList(patientList.getContent())
                 .build();
+    }
+
+    /**
+     *  관리자 환자 삭제
+     */
+    @Transactional
+    public void adminDeletePatient(Long patientId){
+        Patient patient = patientRepository.findById(patientId).orElseThrow(() -> new NotFoundDataException("존재하지 않는 환자입니다."));
+
+        // 회원 가입을 한 환자는 삭제 불가능
+        boolean isUser = userRepository.findByPatientId(patientId).isPresent();
+        if (isUser) throw new BadRequestApiException("가입된 환자는 삭제할 수 없습니다.");
+
+        patient.revoke();
     }
 
 }
