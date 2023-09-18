@@ -280,3 +280,13 @@ include::{snippets}/admin/patient/delete/query-parameters.adoc[]
 === Response
 include::{snippets}/admin/patient/delete/response-fields.adoc[]
 include::{snippets}/admin/patient/delete/response-body.adoc[]
+
+[[accessTokenReissue]]
+== 15. AccessToken 재발급
+*AccessToken 재발급 API*
+
+=== Http
+include::{snippets}/login/access-token/http-request.adoc[]
+=== Response
+include::{snippets}/login/access-token/response-fields.adoc[]
+include::{snippets}/login/access-token/response-body.adoc[]
