@@ -16,7 +16,7 @@ public class ResponseMessage {
 
     public static final String EXPECTATION_FAILED_MSG = "{FieldName} is required";
 
-    public static final String UNPROCESSABLE_ENTITY_MSG = "Not found Data {DataName}";
+    public static final String UNPROCESSABLE_ENTITY_MSG = "{DataName}";
 
     public static final String ALREADY_DATA_MSG = "Already Data";
 
