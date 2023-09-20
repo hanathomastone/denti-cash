@@ -2,7 +2,6 @@ package com.kaii.dentix.domain.oralCheck.dto.resoponse;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kaii.dentix.domain.oralCheck.dto.OralCheckAnalysisDivisionDto;
-import com.kaii.dentix.domain.oralCheck.dto.OralCheckAnalysisTotalDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,11 +14,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor @NoArgsConstructor
 public class OralCheckAnalysisResponse {
 
-    private int resultCode; // 결과 코드
+    @JsonProperty("status_code")
+    private int statusCode; // 결과 코드
 
-    private OralCheckAnalysisTotalDto total; // 전체
+    @JsonProperty("status_msg")
+    private String statusMsg; // 결과 메시지
 
-    @JsonProperty("tDivision")
-    private OralCheckAnalysisDivisionDto tDivision; // 4등분 목록
+    @JsonProperty("plaque")
+    private OralCheckAnalysisDivisionDto plaqueStats; // 4등분 목록
 
 }

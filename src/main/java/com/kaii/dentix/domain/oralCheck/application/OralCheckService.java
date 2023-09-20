@@ -33,7 +33,7 @@ import com.kaii.dentix.global.common.error.exception.BadRequestApiException;
 import com.kaii.dentix.global.common.error.exception.NotFoundDataException;
 import com.kaii.dentix.global.common.response.DataResponse;
 import com.kaii.dentix.global.common.util.DateFormatUtil;
-import com.kaii.dentix.global.common.util.LambdaService;
+import com.kaii.dentix.global.common.util.AiModelService;
 import com.kaii.dentix.global.common.util.Utils;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,7 +47,6 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.kaii.dentix.domain.type.oral.OralCheckDivisionCommentType.*;
@@ -61,7 +60,7 @@ public class OralCheckService {
 
     private final AWSS3Service awss3Service;
 
-    private final LambdaService lambdaService;
+    private final AiModelService aiModelService;
 
     private final OralCheckRepository oralCheckRepository;
     private final ToothBrushingRepository toothBrushingRepository;
@@ -86,63 +85,45 @@ public class OralCheckService {
         // 업로드 결과 경로 생성
         String uploadedUrl = awss3Service.upload(file, folderPath, true);
 
-        try {
+        // 업로드 경로가 없을 경우, 파일 저장 실패
+        if (StringUtils.isBlank(uploadedUrl)) throw new BadRequestApiException("파일 저장에 실패했습니다.");
 
-            TimeUnit.SECONDS.sleep(3);
+        // 람다 AI 서버로 업로드 경로 전달 후, AI 분석 결과 받아옴
+        OralCheckAnalysisResponse analysisData = aiModelService.getPyDentalAiModel(file);
 
-            // 업로드 경로가 없을 경우, 파일 저장 실패
-            if (StringUtils.isBlank(uploadedUrl)) throw new BadRequestApiException("파일 저장에 실패했습니다.");
+        OralCheck oralCheck = null;
 
-            // 불필요 경로를 제외하고 추출
-            String findText = "aws.com/";
-            int pathIndex = uploadedUrl.indexOf(findText);
-            String imagePath = uploadedUrl.substring(pathIndex + findText.length());
+        int resultCode = 500;
 
-            imagePath = "public/upload/tooth_coloration_test/1635829930233_tooth.jpg"; // TODO : 수정 필요
+        switch (analysisData.getStatusCode()) {
+            case 200: // Analysis OK
+                // 1. 분석 결과 저장
+                oralCheck = registAnalysisSuccessData(user.getUserId(), uploadedUrl, analysisData);
+                break;
+            case 402: // 치아 이미지 수신 및 읽기 실패
+            case 403: // 치아 분리 실패 또는 치아 영역별 한개도 검출이 되지 않는 경우
+            case 404: // 플라그 영역 계산 에러
+                // 1. 분석 실패 저장 (잘못된 사진에서 일어난 에러)
+                oralCheck = registAnalysisFailedData(user.getUserId(), uploadedUrl, analysisData);
+                resultCode = 410;
+                break;
+            default: // 그 외 Server Error
+                // 1. 분석 실패 저장 (서버에서 일어난 에러)
+                oralCheck = registAnalysisFailedData(user.getUserId(), uploadedUrl, analysisData);
+                resultCode = 411;
+                break;
+        }
 
-            // 람다 AI 서버로 업로드 경로 전달 후, AI 분석 결과 받아옴
-            OralCheckAnalysisResponse analysisData = lambdaService.getPyDentalLambda(imagePath);
-
-            OralCheck oralCheck = null;
-
-            int resultCode = 500;
-
-            switch (analysisData.getResultCode()) {
-                case 0: // Analysis OK
-                    // 1. 분석 결과 저장
-                    oralCheck = registAnalysisSuccessData(user.getUserId(), uploadedUrl, analysisData);
-                    break;
-                case 3: // Segment Error
-                case 4: // Division Error
-                case 5: // Calculation Error
-                case 10: // 사진 분석 실패
-                    // 1. 분석 실패 저장 (잘못된 사진에서 일어난 에러)
-                    oralCheck = registAnalysisFailedData(user.getUserId(), uploadedUrl, analysisData);
-                    resultCode = 410;
-                    break;
-                case 1: // Bad Request
-                case 2: // S3 Image Load Error
-                default: // 그 외 Lambda Server Error
-                    // 1. 분석 실패 저장 (서버에서 일어난 에러)
-                    oralCheck = registAnalysisFailedData(user.getUserId(), uploadedUrl, analysisData);
-                    resultCode = 411;
-                    break;
-            }
-
-            if (oralCheck == null) {
-                throw new BadRequestApiException("양치 상태 체크 확인 결과 저장에 실패했습니다... 관리자에게 문의 바랍니다.");
+        if (oralCheck == null) {
+            throw new BadRequestApiException("양치 상태 체크 확인 결과 저장에 실패했습니다... 관리자에게 문의 바랍니다.");
+        } else {
+            // 분석 결과 상태가 '성공'일 경우
+            if (oralCheck.getOralCheckAnalysisState() == OralCheckAnalysisState.SUCCESS) {
+                return new DataResponse<>(200, SUCCESS_MSG, new OralCheckPhotoDto(oralCheck.getOralCheckId()));
             } else {
-                // 분석 결과 상태가 '성공'일 경우
-                if (oralCheck.getOralCheckAnalysisState() == OralCheckAnalysisState.SUCCESS) {
-                    return new DataResponse<>(200, SUCCESS_MSG, new OralCheckPhotoDto(oralCheck.getOralCheckId()));
-                } else {
-                    // 분석 결과 상태가 '실패'일 경우
-                    return new DataResponse<>(resultCode, "양치 상태 체크 확인을 실패했습니다. 재촬영 바랍니다.", null);
-                }
+                // 분석 결과 상태가 '실패'일 경우
+                return new DataResponse<>(resultCode, "양치 상태 체크 확인을 실패했습니다. 재촬영 바랍니다.", null);
             }
-
-        } catch (InterruptedException e) {
-            throw new BadRequestApiException("Thread interrupted");
         }
 
     }
@@ -208,21 +189,19 @@ public class OralCheckService {
      */
     @Transactional
     public OralCheck registAnalysisSuccessData(Long userId, String filePath, OralCheckAnalysisResponse resource) throws JsonProcessingException {
-        OralCheckAnalysisDivisionDto tDivision = resource.getTDivision();
-        Float upRightGroupRatio = tDivision.getUpRight().getGroup().getRatio();
-        Float upLeftGroupRatio = tDivision.getUpLeft().getGroup().getRatio();
-        Float downRightGroupRatio = tDivision.getDownRight().getGroup().getRatio();
-        Float downLeftGroupRatio = tDivision.getDownLeft().getGroup().getRatio();
+        OralCheckAnalysisDivisionDto tDivision = resource.getPlaqueStats();
+        Float upRightGroupRatio = tDivision.getTopRight();
+        Float upLeftGroupRatio = tDivision.getTopLeft();
+        Float downRightGroupRatio = tDivision.getBtmRight();
+        Float downLeftGroupRatio = tDivision.getBtmLeft();
 
         Float upRightRange = upRightGroupRatio != null ? upRightGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", upRightGroupRatio)) : 0; // 우상 비율
         Float upLeftRange = upLeftGroupRatio != null ? upLeftGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", upLeftGroupRatio)) : 0; // 좌상 비율
         Float downRightRange = downRightGroupRatio != null ? downRightGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", downRightGroupRatio)) : 0; // 우하 비율
         Float downLeftRange = downLeftGroupRatio != null ? downLeftGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", downLeftGroupRatio)) : 0; // 좌하 비율
 
-        OralCheckAnalysisTotalDto total = resource.getTotal();
-        Float totalGroupRatio = total.getGroup().getRatio();
-
-        Float totalRange = totalGroupRatio != null ? totalGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", totalGroupRatio)) : 0; // 전체 비율
+        Float totalGroupRatio = (upRightRange + upLeftRange + downRightRange + downLeftRange) / 4;
+        Float totalRange = totalGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", totalGroupRatio)); // 전체 비율
 
         String resultJsonData = objectMapper.writeValueAsString(resource); // 분석 결과 JSON data 전체
 
