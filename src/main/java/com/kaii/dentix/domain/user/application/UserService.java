@@ -267,7 +267,7 @@ public class UserService {
         return UserInfoDto.builder()
                 .userName(user.getUserName())
                 .userLoginIdentifier(user.getUserLoginIdentifier())
-                .patientPhoneNumber(patientPhoneNumber)
+                .patientPhoneNumber(patientPhoneNumber != null ? patientPhoneNumber : user.getIsVerify().equals(YnType.Y) ? "-" : null)
                 .userServiceAgreeLists(serviceAgreementList)
                 .userGender(user.getUserGender())
                 .build();
