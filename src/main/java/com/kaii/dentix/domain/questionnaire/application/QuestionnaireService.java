@@ -7,15 +7,18 @@ import com.kaii.dentix.domain.contents.dao.ContentsCustomRepository;
 import com.kaii.dentix.domain.contents.dto.ContentsCategoryDto;
 import com.kaii.dentix.domain.contents.dto.ContentsDto;
 import com.kaii.dentix.domain.oralStatus.domain.OralStatus;
+import com.kaii.dentix.domain.oralStatus.jpa.OralStatusRepository;
 import com.kaii.dentix.domain.questionnaire.dao.QuestionnaireRepository;
 import com.kaii.dentix.domain.questionnaire.domain.Questionnaire;
 import com.kaii.dentix.domain.questionnaire.dto.*;
 import com.kaii.dentix.domain.questionnaire.dto.request.QuestionnaireSubmitRequest;
+import com.kaii.dentix.domain.questionnaire.dto.response.QuestionnaireAnalysisResponse;
 import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.domain.User;
 import com.kaii.dentix.global.common.error.exception.BadRequestApiException;
 import com.kaii.dentix.global.common.error.exception.FormValidationException;
 import com.kaii.dentix.global.common.error.exception.NotFoundDataException;
+import com.kaii.dentix.global.common.util.AiModelService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
@@ -25,10 +28,7 @@ import org.springframework.util.FileCopyUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +39,8 @@ public class QuestionnaireService {
     private final ContentsService contentsService;
     private final QuestionnaireRepository questionnaireRepository;
     private final ContentsCustomRepository contentsCustomRepository;
+    private final OralStatusRepository oralStatusRepository;
+    private final AiModelService aiModelService;
 
     /**
      * 문진표 양식 조회
@@ -65,25 +67,37 @@ public class QuestionnaireService {
         QuestionnaireTemplateJsonDto questionnaireTemplate = this.getQuestionnaireTemplate();
         this.questionnaireValidate(questionnaireTemplate.getTemplate(), request.getForm());
 
-        // TODO : AI 연동 및 상태값 도출
-        Random random = new Random();
-        int typeCount = random.nextInt(2) + 1;
-        String[] chars = new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"};
-        List<String> typeList = new ArrayList<>();
-        for (int i = 0; i < typeCount; i++) {
-            int randomIndex = random.nextInt(chars.length);
-            if (typeList.stream().anyMatch(type -> type.equals(chars[randomIndex]))) {
-                i--; continue;
+        // AI 서버로 문진표 전달 후, AI 분석 결과 받아옴
+        Map<String, Map<String, Object>> questionnaireForm = new HashMap<>();
+        Map<String, Object> form = new LinkedHashMap<>();
+
+        questionnaireTemplate.getTemplate().forEach(template -> {
+            Integer[] values = request.getForm().stream().filter(o -> o.getKey().equals(template.getKey()))
+                    .findAny().orElseThrow(() -> new FormValidationException(String.format("%s번 문항을 입력해 주세요.", template.getNumber())))
+                    .getValue();
+
+            Object value;
+            if (template.getMaximum() != null && template.getMaximum() == 1) { // 단일 선택
+                value = values.length == 1 ? values[0] : null;
+            } else {
+                value = values;
             }
-            typeList.add(chars[randomIndex]);
-        }
+            form.put(template.getKey(), value);
+        });
+
+        questionnaireForm.put("form", form);
+        QuestionnaireAnalysisResponse analysisData = aiModelService.getQuestionnaireAiModel(questionnaireForm);
+
+        List<OralStatus> oralStatusList = oralStatusRepository.findAllByOralStatusTypeInOrderByOralStatusPriority(analysisData.getContentsType());
+        List<String> oralStatusTypeList = oralStatusList.subList(0, Math.min(2, oralStatusList.size())) // 최대 2개
+            .stream().map(OralStatus::getOralStatusType).toList();
 
         Questionnaire questionnaire = questionnaireRepository.save(
             new Questionnaire(
                 user.getUserId(),
                 questionnaireTemplate.getVersion(),
-                objectMapper.writeValueAsString(request.getForm()),
-                typeList
+                objectMapper.writeValueAsString(request),
+                oralStatusTypeList
             )
         );
 

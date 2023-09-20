@@ -9,13 +9,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor @NoArgsConstructor
 public class OralCheckAnalysisDivisionDto {
 
-    private OralCheckAnalysisTotalDto upRight; // 우상 영역
+    private Float topRight; // 우상 영역
 
-    private OralCheckAnalysisTotalDto upLeft; // 좌상 영역
+    private Float topLeft; // 좌상 영역
 
-    private OralCheckAnalysisTotalDto downRight; // 우하 영역
+    private Float btmRight; // 우하 영역
 
-    private OralCheckAnalysisTotalDto downLeft; // 좌하 영역
-
+    private Float btmLeft; // 좌하 영역
 
 }

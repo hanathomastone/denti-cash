@@ -1,18 +1,19 @@
-package com.kaii.dentix.domain.oralCheck.dto.resoponse;
+package com.kaii.dentix.domain.questionnaire.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.kaii.dentix.domain.oralCheck.dto.OralCheckAnalysisDivisionDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
- *  구강 검진 사진 분석 결과
+ *  문진표 분석 결과
  */
 @Getter @Builder
 @AllArgsConstructor @NoArgsConstructor
-public class OralCheckAnalysisResponse {
+public class QuestionnaireAnalysisResponse {
 
     @JsonProperty("status_code")
     private int statusCode; // 결과 코드
@@ -20,7 +21,7 @@ public class OralCheckAnalysisResponse {
     @JsonProperty("status_msg")
     private String statusMsg; // 결과 메시지
 
-    @JsonProperty("plaque")
-    private OralCheckAnalysisDivisionDto plaqueStats; // 4등분 목록
+    @JsonProperty("contents_type")
+    private List<String> contentsType; // 문진표 컨텐츠 AI 모델 결과 값
 
 }
