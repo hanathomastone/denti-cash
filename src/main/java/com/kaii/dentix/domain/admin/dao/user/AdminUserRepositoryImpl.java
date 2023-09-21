@@ -5,6 +5,7 @@ import com.kaii.dentix.domain.admin.dto.AdminUserSignUpCountDto;
 import com.kaii.dentix.domain.admin.dto.request.AdminStatisticRequest;
 import com.kaii.dentix.domain.admin.dto.request.AdminUserListRequest;
 import com.kaii.dentix.domain.oralCheck.domain.QOralCheck;
+import com.kaii.dentix.domain.patient.domain.QPatient;
 import com.kaii.dentix.domain.questionnaire.domain.QQuestionnaire;
 import com.kaii.dentix.domain.type.DatePeriodType;
 import com.kaii.dentix.domain.type.GenderType;
@@ -45,6 +46,8 @@ public class AdminUserRepositoryImpl implements AdminUserCustomRepository {
 
     private final QQuestionnaire questionnaire = QQuestionnaire.questionnaire;
 
+    private final QPatient patient = QPatient.patient;
+
     /**
      *  사용자 목록 조회
      */
@@ -58,7 +61,9 @@ public class AdminUserRepositoryImpl implements AdminUserCustomRepository {
                         user.userId, user.userLoginIdentifier, user.userName,
                         Expressions.stringTemplate("group_concat({0})", userOralStatus.oralStatus.oralStatusType),
                         questionnaire.created.as("questionnaireDate"),
-                        oralCheck.oralCheckResultTotalType, oralCheck.created.as("oralCheckDate"), user.isVerify
+                        oralCheck.oralCheckResultTotalType, oralCheck.created.as("oralCheckDate"), user.isVerify,
+                        patient.patientPhoneNumber
+
                 ))
                 .from(user)
                 .leftJoin(questionnaire).on(questionnaire.userId.eq(user.userId)
@@ -72,6 +77,7 @@ public class AdminUserRepositoryImpl implements AdminUserCustomRepository {
                                 .from(oralCheck)
                                 .where(oralCheck.userId.eq(user.userId))
                         )))
+                .leftJoin(patient).on(user.patientId.eq(patient.patientId))
                 .where(whereSearch(request))
                 .groupBy(user.userId, questionnaire.questionnaireId, oralCheck.oralCheckId)
                 .orderBy(user.created.desc())
@@ -94,6 +100,7 @@ public class AdminUserRepositoryImpl implements AdminUserCustomRepository {
                                 .from(oralCheck)
                                 .where(oralCheck.userId.eq(user.userId))
                         )))
+                .leftJoin(patient).on(user.patientId.eq(patient.patientId))
                 .where(whereSearch(request))
                 .fetchOne()).orElse(0L);
 

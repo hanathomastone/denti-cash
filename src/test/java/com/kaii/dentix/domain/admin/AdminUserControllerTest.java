@@ -148,8 +148,8 @@ public class AdminUserControllerTest extends ControllerTest {
         AdminUserListDto userList = AdminUserListDto.builder()
                 .paging(new PagingDTO(1, 2, 15))
                 .userList(new ArrayList<>(){{
-                    add(new AdminUserInfoDto(1L, "dentix123", "김덴티", "K", date, OralCheckResultTotalType.HEALTHY, date, YnType.Y));
-                    add(new AdminUserInfoDto(2L, "test123", "홍길동", null, null, OralCheckResultTotalType.HEALTHY, date, YnType.Y));
+                    add(new AdminUserInfoDto(1L, "dentix123", "김덴티", "K", date, OralCheckResultTotalType.HEALTHY, date, YnType.Y, "01012345678"));
+                    add(new AdminUserInfoDto(2L, "test123", "홍길동", null, null, OralCheckResultTotalType.HEALTHY, date, YnType.Y, null));
                 }})
                 .build();
 
@@ -199,7 +199,8 @@ public class AdminUserControllerTest extends ControllerTest {
                                 fieldWithPath("response.userList[].questionnaireDate").type(JsonFieldType.STRING).optional().attributes(dateFormat()).description("문진표 작성일"),
                                 fieldWithPath("response.userList[].oralCheckResultTotalType").type(JsonFieldType.STRING).optional().attributes(oralCheckResultTotalFormat()).description("구강검진 결과"),
                                 fieldWithPath("response.userList[].oralCheckDate").type(JsonFieldType.STRING).optional().attributes(dateFormat()).description("구강검진 검사일"),
-                                fieldWithPath("response.userList[].isVerify").type(JsonFieldType.STRING).description("사용자 인증 여부")
+                                fieldWithPath("response.userList[].isVerify").type(JsonFieldType.STRING).description("사용자 인증 여부"),
+                                fieldWithPath("response.userList[].patientPhoneNumber").type(JsonFieldType.STRING).optional().attributes(userNumberFormat()).description("환자 연락처")
                         )
                 ));
 
