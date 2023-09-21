@@ -26,7 +26,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.Date;
 import java.util.List;
@@ -258,7 +257,6 @@ public class UserLoginService {
     /**
      *  AccessToken 재발급
      */
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     public AccessTokenDto accessTokenReissue(HttpServletRequest request) {
 
         String refreshToken = jwtTokenUtil.getRefreshToken(request);

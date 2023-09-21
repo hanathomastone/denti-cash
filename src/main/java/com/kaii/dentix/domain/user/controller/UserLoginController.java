@@ -77,6 +77,7 @@ public class UserLoginController {
      * AccessToken 재발급
      */
     @PutMapping(value = "/access-token", name = "AccessToken 재발급")
+    @CrossOrigin(origins = "*", allowedHeaders = "*")
     public DataResponse<AccessTokenDto> accessTokenReissue(HttpServletRequest httpServletRequest) {
         DataResponse<AccessTokenDto> response = new DataResponse<>(userLoginService.accessTokenReissue(httpServletRequest));
         return response;
