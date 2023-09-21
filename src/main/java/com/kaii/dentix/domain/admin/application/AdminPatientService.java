@@ -36,8 +36,8 @@ public class AdminPatientService {
      */
     @Transactional
     public AdminRegisterPatientDto adminRegisterPatient(AdminRegisterPatientRequest request){
-        boolean isExistPatient = patientRepository.findByPatientPhoneNumberAndPatientName(request.getPatientPhoneNumber(), request.getPatientName()).isPresent();
-        if (isExistPatient) throw new AlreadyDataException("이미 등록된 환자입니다.");
+        boolean isExistPhoneNumber = patientRepository.findByPatientPhoneNumber(request.getPatientPhoneNumber()).isPresent();
+        if (isExistPhoneNumber) throw new AlreadyDataException("이미 등록된 연락처입니다.");
 
         Patient patient = Patient.builder()
                 .patientName(request.getPatientName())
