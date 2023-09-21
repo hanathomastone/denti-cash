@@ -32,4 +32,6 @@ public class AdminUserInfoDto {
 
     private YnType isVerify; // 사용자 인증 여부
 
+    private String patientPhoneNumber; // 환자 연락처
+
 }
