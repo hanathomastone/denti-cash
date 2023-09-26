@@ -58,7 +58,7 @@ public class AdminUserRepositoryImpl implements AdminUserCustomRepository {
 
         List<AdminUserInfoDto> result = queryFactory
                 .select(Projections.constructor(AdminUserInfoDto.class,
-                        user.userId, user.userLoginIdentifier, user.userName,
+                        user.userId, user.userLoginIdentifier, user.userName, user.userGender,
                         Expressions.stringTemplate("group_concat({0})", userOralStatus.oralStatus.oralStatusType),
                         questionnaire.created.as("questionnaireDate"),
                         oralCheck.oralCheckResultTotalType, oralCheck.created.as("oralCheckDate"), user.isVerify,

@@ -7,6 +7,7 @@ import com.kaii.dentix.domain.admin.controller.AdminUserController;
 import com.kaii.dentix.domain.admin.dto.AdminUserInfoDto;
 import com.kaii.dentix.domain.admin.dto.AdminUserListDto;
 import com.kaii.dentix.domain.admin.dto.request.AdminUserListRequest;
+import com.kaii.dentix.domain.type.GenderType;
 import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
 import com.kaii.dentix.global.common.dto.PagingDTO;
@@ -148,8 +149,8 @@ public class AdminUserControllerTest extends ControllerTest {
         AdminUserListDto userList = AdminUserListDto.builder()
                 .paging(new PagingDTO(1, 2, 15))
                 .userList(new ArrayList<>(){{
-                    add(new AdminUserInfoDto(1L, "dentix123", "김덴티", "K", date, OralCheckResultTotalType.HEALTHY, date, YnType.Y, "01012345678"));
-                    add(new AdminUserInfoDto(2L, "test123", "홍길동", null, null, OralCheckResultTotalType.HEALTHY, date, YnType.Y, null));
+                    add(new AdminUserInfoDto(1L, "dentix123", "김덴티", GenderType.M, "K", date, OralCheckResultTotalType.HEALTHY, date, YnType.Y, "01012345678"));
+                    add(new AdminUserInfoDto(2L, "test123", "홍길동", GenderType.W, null, null, OralCheckResultTotalType.HEALTHY, date, YnType.Y, null));
                 }})
                 .build();
 
@@ -195,6 +196,7 @@ public class AdminUserControllerTest extends ControllerTest {
                                 fieldWithPath("response.userList[].userId").type(JsonFieldType.NUMBER).description("사용자 고유 번호"),
                                 fieldWithPath("response.userList[].userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디"),
                                 fieldWithPath("response.userList[].userName").type(JsonFieldType.STRING).description("사용자 이름"),
+                                fieldWithPath("response.userList[].userGender").attributes(genderFormat()).description("사용자 성별"),
                                 fieldWithPath("response.userList[].oralStatus").type(JsonFieldType.STRING).optional().description("문진표 유형"),
                                 fieldWithPath("response.userList[].questionnaireDate").type(JsonFieldType.STRING).optional().attributes(dateFormat()).description("문진표 작성일"),
                                 fieldWithPath("response.userList[].oralCheckResultTotalType").type(JsonFieldType.STRING).optional().attributes(oralCheckResultTotalFormat()).description("구강검진 결과"),

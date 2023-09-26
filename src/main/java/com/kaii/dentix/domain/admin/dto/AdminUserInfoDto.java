@@ -1,6 +1,7 @@
 package com.kaii.dentix.domain.admin.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.kaii.dentix.domain.type.GenderType;
 import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
 import lombok.AllArgsConstructor;
@@ -19,6 +20,8 @@ public class AdminUserInfoDto {
     private String userLoginIdentifier; // 사용자 아이디
 
     private String userName; // 사용자 이름
+
+    private GenderType userGender; // 사용자 성별
 
     private String oralStatus; // 문진표 유형
 
