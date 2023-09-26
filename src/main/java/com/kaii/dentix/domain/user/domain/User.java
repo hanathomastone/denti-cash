@@ -115,6 +115,15 @@ public class User extends TimeEntity {
     }
 
     /**
+     *  회원 정보 수정
+     */
+    public void adminModifyInfo(String userLoginIdentifier, String userName, GenderType userGender) {
+        this.userLoginIdentifier = userLoginIdentifier;
+        this.userName = userName;
+        this.userGender = userGender;
+    }
+
+    /**
      *  로그아웃
      */
     public void logout(){

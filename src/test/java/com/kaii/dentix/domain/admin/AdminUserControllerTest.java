@@ -6,7 +6,9 @@ import com.kaii.dentix.domain.admin.application.AdminUserService;
 import com.kaii.dentix.domain.admin.controller.AdminUserController;
 import com.kaii.dentix.domain.admin.dto.AdminUserInfoDto;
 import com.kaii.dentix.domain.admin.dto.AdminUserListDto;
+import com.kaii.dentix.domain.admin.dto.AdminUserModifyInfoDto;
 import com.kaii.dentix.domain.admin.dto.request.AdminUserListRequest;
+import com.kaii.dentix.domain.admin.dto.request.AdminUserModifyRequest;
 import com.kaii.dentix.domain.type.GenderType;
 import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
@@ -38,8 +40,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -98,6 +99,92 @@ public class AdminUserControllerTest extends ControllerTest {
                 ));
 
         verify(adminUserService).userVerify(any(Long.class));
+    }
+
+    /**
+     *  사용자 정보 조회
+     */
+    @Test
+    public void userInfo() throws Exception {
+
+        // given
+        AdminUserModifyInfoDto userInfo = new AdminUserModifyInfoDto("dentix123", "김덴티", GenderType.M);
+
+        given(adminUserService.userInfo(any(Long.class))).willReturn(userInfo);
+
+        // when
+        ResultActions result = mockMvc.perform(
+            RestDocumentationRequestBuilders.get("/admin/user/info?userId={userId}", 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "admin-user-info.이호준.AccessToken")
+                .with(user("user").roles("ADMIN"))
+        );
+
+        // then
+        result.andExpect(status().isOk())
+            .andExpect(jsonPath("rt").value(200))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andDo(document("admin/user/info",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                queryParameters(
+                    parameterWithName("userId").description("사용자 고유번호")
+                ),
+                responseFields(
+                    fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
+                    fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
+                    fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
+                    fieldWithPath("response.userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디"),
+                    fieldWithPath("response.userName").type(JsonFieldType.STRING).description("사용자 이름"),
+                    fieldWithPath("response.userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별")
+                )
+            ));
+
+        verify(adminUserService).userInfo(any(Long.class));
+    }
+
+    /**
+     *  사용자 정보 수정
+     */
+    @Test
+    public void userModify() throws Exception {
+
+        AdminUserModifyRequest request = new AdminUserModifyRequest(1L, "dentix123", "김덴티", GenderType.M);
+
+        // given
+        doNothing().when(adminUserService).userModify(any(AdminUserModifyRequest.class));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+            RestDocumentationRequestBuilders.put("/admin/user")
+                .content(objectMapper.writeValueAsString(request))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "admin-user-modify.이호준.AccessToken")
+                .with(user("user").roles("ADMIN"))
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+            .andExpect(jsonPath("rt").value(200))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andDo(document("admin/user/modify",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                requestFields(
+                    fieldWithPath("userId").type(JsonFieldType.NUMBER).description("사용자 고유번호"),
+                    fieldWithPath("userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디"),
+                    fieldWithPath("userName").type(JsonFieldType.STRING).description("사용자 이름"),
+                    fieldWithPath("userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별")
+                ),
+                responseFields(
+                    fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
+                    fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지")
+                )
+            ));
+
+        verify(adminUserService).userModify(any(AdminUserModifyRequest.class));
     }
 
     /**
