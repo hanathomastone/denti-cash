@@ -56,7 +56,7 @@ public class AdminLoginService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .adminName(admin.getAdminName())
-                .isSuper(admin.getAdminIsSuper())
+                .adminIsSuper(admin.getAdminIsSuper())
                 .build();
 
     }

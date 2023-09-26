@@ -61,7 +61,7 @@ public class AdminLoginControllerTest extends ControllerTest {
                 .adminName("홍길동")
                 .accessToken("AccessToken")
                 .refreshToken("RefreshToken")
-                .isSuper(YnType.N)
+                .adminIsSuper(YnType.N)
                 .build();
     }
 
@@ -108,7 +108,7 @@ public class AdminLoginControllerTest extends ControllerTest {
                                 fieldWithPath("response.accessToken").type(JsonFieldType.STRING).description("Access Token"),
                                 fieldWithPath("response.refreshToken").type(JsonFieldType.STRING).description("Refresh Token"),
                                 fieldWithPath("response.isFirstLogin").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("최초 로그인 여부"),
-                                fieldWithPath("response.isSuper").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("관리자 슈퍼계정 여부")
+                                fieldWithPath("response.adminIsSuper").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("관리자 슈퍼계정 여부")
                         )
                 ));
 

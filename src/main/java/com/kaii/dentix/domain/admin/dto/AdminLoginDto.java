@@ -17,6 +17,6 @@ public class AdminLoginDto extends TokenDto {
 
     private String adminName;
 
-    private YnType isSuper;
+    private YnType adminIsSuper;
 
 }
