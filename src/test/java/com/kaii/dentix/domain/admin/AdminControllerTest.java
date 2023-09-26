@@ -266,8 +266,8 @@ public class AdminControllerTest extends ControllerTest {
         AdminListDto response = AdminListDto.builder()
                 .paging(new PagingDTO(1, 1, 5))
                 .adminList(new ArrayList<>(){{
-                    add(new AdminAccountDto(1L, YnType.Y, "adminHong", "홍길동", "01012345678", "2023.01.02"));
-                    add(new AdminAccountDto(2L, YnType.N, "adminKim", "김길동", "01022222222", "2023.01.02"));
+                    add(new AdminAccountDto(1L, "adminHong", "홍길동", "01012345678", "2023.01.02"));
+                    add(new AdminAccountDto(2L, "adminKim", "김길동", "01022222222", "2023.01.02"));
                 }})
                 .build();
 
@@ -303,7 +303,6 @@ public class AdminControllerTest extends ControllerTest {
                                 fieldWithPath("response.paging.totalElements").type(JsonFieldType.NUMBER).description("총 데이터 개수"),
                                 fieldWithPath("response.adminList[]").type(JsonFieldType.ARRAY).optional().description("관리자 계정 목록"),
                                 fieldWithPath("response.adminList[].adminId").type(JsonFieldType.NUMBER).description("관리자 고유 번호"),
-                                fieldWithPath("response.adminList[].adminIsSuper").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("관리자 슈퍼계정 여부"),
                                 fieldWithPath("response.adminList[].adminLoginIdentifier").type(JsonFieldType.STRING).description("관리자 아이디"),
                                 fieldWithPath("response.adminList[].adminName").type(JsonFieldType.STRING).description("관리자 이름"),
                                 fieldWithPath("response.adminList[].adminPhoneNumber").type(JsonFieldType.STRING).attributes(userNumberFormat()).description("관리자 연락처"),

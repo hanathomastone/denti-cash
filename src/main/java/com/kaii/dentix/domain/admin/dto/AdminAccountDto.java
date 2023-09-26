@@ -12,8 +12,6 @@ public class AdminAccountDto {
 
     private Long adminId;
 
-    private YnType adminIsSuper;
-
     private String adminLoginIdentifier;
 
     private String adminName;

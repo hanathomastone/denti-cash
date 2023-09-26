@@ -6,6 +6,6 @@ import org.springframework.data.domain.Page;
 
 public interface AdminCustomRepository {
 
-    Page<AdminAccountDto> findAll(PageAndSizeRequest request);
+    Page<AdminAccountDto> findAllByNotSuper(PageAndSizeRequest request);
 
 }

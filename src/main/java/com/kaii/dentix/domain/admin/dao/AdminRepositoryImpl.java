@@ -2,6 +2,7 @@ package com.kaii.dentix.domain.admin.dao;
 
 import com.kaii.dentix.domain.admin.domain.QAdmin;
 import com.kaii.dentix.domain.admin.dto.AdminAccountDto;
+import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.global.common.dto.PageAndSizeRequest;
 import com.kaii.dentix.global.common.dto.PagingRequest;
 import com.querydsl.core.types.Projections;
@@ -29,21 +30,22 @@ public class AdminRepositoryImpl implements AdminCustomRepository {
      *  관리자 페이징 목록
      */
     @Override
-    public Page<AdminAccountDto> findAll(PageAndSizeRequest request){
+    public Page<AdminAccountDto> findAllByNotSuper(PageAndSizeRequest request){
 
         Pageable paging = new PagingRequest(request.getPage(), request.getSize()).of();
 
         // fetchCount Deprecated 로 인해 count 쿼리 구현
-        long total = Optional.ofNullable(queryFactory.select(admin.count()).from(admin).fetchOne())
+        long total = Optional.ofNullable(queryFactory.select(admin.count()).from(admin).where(admin.adminIsSuper.eq(YnType.N)).fetchOne())
                 .orElse(0L);
 
         // total 이 0보다 크면 조건에 맞게 페이징 처리 , 0 이면 빈 리스트 반환
         List<AdminAccountDto> result = total > 0 ? queryFactory
                 .select(Projections.constructor(AdminAccountDto.class,
-                        admin.adminId, admin.adminIsSuper, admin.adminLoginIdentifier, admin.adminName, admin.adminPhoneNumber,
+                        admin.adminId, admin.adminLoginIdentifier, admin.adminName, admin.adminPhoneNumber,
                         Expressions.stringTemplate("DATE_FORMAT({0}, {1})", admin.created, "%Y-%m-%d")
                 ))
                 .from(admin)
+                .where(admin.adminIsSuper.eq(YnType.N))
                 .orderBy(admin.created.desc())
                 .offset(paging.getOffset())
                 .limit(paging.getPageSize())

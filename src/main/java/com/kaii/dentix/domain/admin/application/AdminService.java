@@ -125,7 +125,7 @@ public class AdminService {
      *  관리자 목록 조회
      */
     public AdminListDto adminList(PageAndSizeRequest request){
-        Page<AdminAccountDto> adminList = adminCustomRepository.findAll(request);
+        Page<AdminAccountDto> adminList = adminCustomRepository.findAllByNotSuper(request);
 
         PagingDTO pagingDTO = modelMapper.map(adminList, PagingDTO.class);
 
