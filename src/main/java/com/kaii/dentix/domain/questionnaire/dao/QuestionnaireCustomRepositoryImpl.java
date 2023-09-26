@@ -3,12 +3,13 @@ package com.kaii.dentix.domain.questionnaire.dao;
 import com.kaii.dentix.domain.admin.dto.request.AdminStatisticRequest;
 import com.kaii.dentix.domain.admin.dto.statistic.AllQuestionnaireCount;
 import com.kaii.dentix.domain.admin.dto.statistic.QuestionnaireStatisticDto;
-import com.kaii.dentix.domain.oralCheck.domain.QOralCheck;
 import com.kaii.dentix.domain.oralStatus.domain.QOralStatus;
 import com.kaii.dentix.domain.questionnaire.domain.QQuestionnaire;
 import com.kaii.dentix.domain.questionnaire.dto.QuestionnaireAndStatusDto;
+import com.kaii.dentix.domain.type.DatePeriodType;
 import com.kaii.dentix.domain.user.domain.QUser;
 import com.kaii.dentix.domain.userOralStatus.domain.QUserOralStatus;
+import com.kaii.dentix.global.common.util.DateFormatUtil;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
@@ -18,6 +19,8 @@ import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,8 +34,6 @@ public class QuestionnaireCustomRepositoryImpl implements QuestionnaireCustomRep
     private final QUserOralStatus userOralStatus = QUserOralStatus.userOralStatus;
 
     private final QUser user = QUser.user;
-
-    private final QOralCheck oralCheck = QOralCheck.oralCheck;
 
     /**
      * 최근 문진표 및 해당 문진표의 높은 우선순위 구강 상태 조회
@@ -65,6 +66,7 @@ public class QuestionnaireCustomRepositoryImpl implements QuestionnaireCustomRep
                 .join(userOralStatus).on(questionnaire.questionnaireId.eq(userOralStatus.questionnaire.questionnaireId))
                 .where(
                         user.deleted.isNull(),
+                        whereAllDatePeriod(request.getAllDatePeriod()),
                         whereStartDate(request.getStartDate()),
                         whereEndDate(request.getEndDate())
                 )
@@ -83,6 +85,7 @@ public class QuestionnaireCustomRepositoryImpl implements QuestionnaireCustomRep
                 .join(user).on(questionnaire.userId.eq(user.userId))
                 .where(
                         user.deleted.isNull(),
+                        whereAllDatePeriod(request.getAllDatePeriod()),
                         whereStartDate(request.getStartDate()),
                         whereEndDate(request.getEndDate())
                 )
@@ -90,13 +93,37 @@ public class QuestionnaireCustomRepositoryImpl implements QuestionnaireCustomRep
     }
 
     /**
+     *  기간 설정 타입 필터링
+     */
+    private BooleanExpression whereAllDatePeriod(DatePeriodType type){
+
+        if (type != null) {
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DATE, 1);
+
+            // 내일 00시 00분 기준으로 시작
+            switch (type) {
+                case TODAY: cal.add(Calendar.DATE, -1); break;
+                case WEEK1: cal.add(Calendar.DATE, -7); break;
+                case MONTH1: cal.add(Calendar.MONTH, -1); break;
+                case MONTH3: cal.add(Calendar.MONTH, -3); break;
+                case YEAR1: cal.add(Calendar.YEAR, -1); break;
+                case ALL: return null;
+            }
+
+            Date startDate = cal.getTime();
+
+            return Expressions.stringTemplate("DATE_FORMAT({0}, {1})", questionnaire.created, "%Y-%m-%d").goe(DateFormatUtil.dateToString("yyyy-MM-dd", startDate));
+        }
+        return null;
+    }
+
+    /**
      *  기간 설정 '시작일' 필터링
      */
     private BooleanExpression whereStartDate(String date){
         return StringUtils.isNotBlank(date) ?
-                Expressions.stringTemplate("DATE_FORMAT({0}, {1})", oralCheck.created, "%Y-%m-%d").goe(date).or
-                        (Expressions.stringTemplate("DATE_FORMAT({0}, {1})", questionnaire.created, "%Y-%m-%d").goe(date))
-                : null;
+                Expressions.stringTemplate("DATE_FORMAT({0}, {1})", questionnaire.created, "%Y-%m-%d").goe(date) : null;
     }
 
     /**
@@ -104,9 +131,7 @@ public class QuestionnaireCustomRepositoryImpl implements QuestionnaireCustomRep
      */
     private BooleanExpression whereEndDate(String date){
         return StringUtils.isNotBlank(date) ?
-                Expressions.stringTemplate("DATE_FORMAT({0}, {1})", oralCheck.created, "%Y-%m-%d").loe(date).or
-                        (Expressions.stringTemplate("DATE_FORMAT({0}, {1})", questionnaire.created, "%Y-%m-%d").loe(date))
-                : null;
+                Expressions.stringTemplate("DATE_FORMAT({0}, {1})", questionnaire.created, "%Y-%m-%d").loe(date) : null;
     }
 
 }

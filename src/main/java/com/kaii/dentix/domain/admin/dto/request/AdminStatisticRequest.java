@@ -1,12 +1,9 @@
 package com.kaii.dentix.domain.admin.dto.request;
 
 import com.kaii.dentix.domain.type.DatePeriodType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Getter @Builder
+@Getter @Setter @Builder
 @AllArgsConstructor @NoArgsConstructor
 public class AdminStatisticRequest {
 
