@@ -86,7 +86,7 @@ public class OralCheckService {
         String uploadedUrl = awss3Service.upload(file, folderPath, true);
 
         // 업로드 경로가 없을 경우, 파일 저장 실패
-        if (StringUtils.isBlank(uploadedUrl)) throw new BadRequestApiException("파일 저장에 실패했습니다.");
+        if (StringUtils.isBlank(uploadedUrl)) throw new BadRequestApiException("구강 촬영 결과 저장에 실패했어요.\n관리자에게 문의해 주세요.");
 
         // 람다 AI 서버로 업로드 경로 전달 후, AI 분석 결과 받아옴
         OralCheckAnalysisResponse analysisData = aiModelService.getPyDentalAiModel(file);
@@ -115,14 +115,14 @@ public class OralCheckService {
         }
 
         if (oralCheck == null) {
-            throw new BadRequestApiException("양치 상태 체크 확인 결과 저장에 실패했습니다... 관리자에게 문의 바랍니다.");
+            throw new BadRequestApiException("구강 촬영 결과 저장에 실패했어요.\n관리자에게 문의해 주세요.");
         } else {
             // 분석 결과 상태가 '성공'일 경우
             if (oralCheck.getOralCheckAnalysisState() == OralCheckAnalysisState.SUCCESS) {
                 return new DataResponse<>(200, SUCCESS_MSG, new OralCheckPhotoDto(oralCheck.getOralCheckId()));
             } else {
                 // 분석 결과 상태가 '실패'일 경우
-                return new DataResponse<>(resultCode, "양치 상태 체크 확인을 실패했습니다. 재촬영 바랍니다.", null);
+                return new DataResponse<>(resultCode, "구강 촬영 인식에 실패했어요.\n가이드에 맞게 재촬영 부탁드려요.", null);
             }
         }
 
@@ -241,14 +241,7 @@ public class OralCheckService {
                 .oralCheckDownLeftScoreType(downLeftScoreType)
                 .build();
 
-        // INSERT
-        OralCheck inserted = oralCheckRepository.save(insertData);
-
-        if (inserted == null) {
-            throw new BadRequestApiException("양치 상태 체크 확인 결과 데이터 저장에 실패했습니다.");
-        } else {
-            return inserted;
-        }
+        return oralCheckRepository.save(insertData);
     }
 
     /**
@@ -266,13 +259,7 @@ public class OralCheckService {
                 .oralCheckResultJsonData(resultJsonData)
                 .build();
 
-        // INSERT
-        OralCheck inserted = oralCheckRepository.save(insertData);
-        if (inserted == null) {
-            throw new BadRequestApiException("양치 상태 체크 확인 실패 데이터 저장에 실패했습니다.");
-        } else {
-            return inserted;
-        }
+        return oralCheckRepository.save(insertData);
     }
 
     /**
