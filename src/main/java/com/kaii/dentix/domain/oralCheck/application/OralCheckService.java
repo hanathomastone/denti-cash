@@ -183,44 +183,29 @@ public class OralCheckService {
      * 플라그 사진 분석 결과 데이터 추출 및 저장 처리
      *
      * @param resource : 플라그 사진 분석 결과
-     * @return ToothColorings : 업데이트된 치면착색검사 정보
+     * @return OralCheck : 구강 촬영 정보
      * @throws JsonProcessingException : Json to String 시 예외
      */
     @Transactional
     public OralCheck registAnalysisSuccessData(Long userId, String filePath, OralCheckAnalysisResponse resource) throws JsonProcessingException {
         OralCheckAnalysisDivisionDto tDivision = resource.getPlaqueStats();
-        Float upRightGroupRatio = tDivision.getTopRight();
-        Float upLeftGroupRatio = tDivision.getTopLeft();
-        Float downRightGroupRatio = tDivision.getBtmRight();
-        Float downLeftGroupRatio = tDivision.getBtmLeft();
 
-        Float upRightRange = upRightGroupRatio != null ? upRightGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", upRightGroupRatio)) : 0; // 우상 비율
-        Float upLeftRange = upLeftGroupRatio != null ? upLeftGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", upLeftGroupRatio)) : 0; // 좌상 비율
-        Float downRightRange = downRightGroupRatio != null ? downRightGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", downRightGroupRatio)) : 0; // 우하 비율
-        Float downLeftRange = downLeftGroupRatio != null ? downLeftGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", downLeftGroupRatio)) : 0; // 좌하 비율
+        Float upRightRange = Float.parseFloat(String.format("%1f", tDivision.getTopRight())); // 우상 비율
+        Float upLeftRange = Float.parseFloat(String.format("%1f", tDivision.getTopLeft())); // 좌상 비율
+        Float downRightRange = Float.parseFloat(String.format("%1f", tDivision.getBtmRight())); // 우하 비율
+        Float downLeftRange = Float.parseFloat(String.format("%1f", tDivision.getBtmLeft())); // 좌하 비율
 
-        Float totalGroupRatio = (upRightRange + upLeftRange + downRightRange + downLeftRange) / 4;
-        Float totalRange = totalGroupRatio < 1 ? 0 : Float.parseFloat(String.format("%1f", totalGroupRatio)); // 전체 비율
+        Float totalGroupRatio = (tDivision.getTopRight() + tDivision.getTopLeft() + tDivision.getBtmRight() + tDivision.getBtmLeft()) / 4;
+        Float totalRange = Float.parseFloat(String.format("%1f", totalGroupRatio)); // 전체 비율
+
+        // 점수 유형
+        OralCheckResultType upRightScoreType = this.calcDivisionScoreType(upRightRange);
+        OralCheckResultType upLeftScoreType = this.calcDivisionScoreType(upLeftRange);
+        OralCheckResultType downRightScoreType = this.calcDivisionScoreType(downRightRange);
+        OralCheckResultType downLeftScoreType = this.calcDivisionScoreType(downLeftRange);
+        OralCheckResultType resultTotalType = this.calcDivisionScoreType(totalRange);
 
         String resultJsonData = objectMapper.writeValueAsString(resource); // 분석 결과 JSON data 전체
-
-        // 4등분 점수 유형
-        OralCheckResultType upRightScoreType = this.calcDivisionScoreType(upRightGroupRatio);
-        OralCheckResultType upLeftScoreType = this.calcDivisionScoreType(upLeftGroupRatio);
-        OralCheckResultType downRightScoreType = this.calcDivisionScoreType(downRightGroupRatio);
-        OralCheckResultType downLeftScoreType = this.calcDivisionScoreType(downLeftGroupRatio);
-
-        // 결과 종합 유형
-        int divisionBadCount = 0;
-        Float[] divisionRatio = {upRightGroupRatio, upLeftGroupRatio, downRightGroupRatio, downLeftGroupRatio};
-        for (Float ratio : divisionRatio) {
-            if (!(ratio < 10)) divisionBadCount++;
-        }
-
-        OralCheckResultType resultTotalType = divisionBadCount == 0 ? OralCheckResultType.HEALTHY
-                : divisionBadCount == 1 ? OralCheckResultType.GOOD
-                : divisionBadCount == 2 ? OralCheckResultType.ATTENTION
-                : OralCheckResultType.DANGER;
 
         // insert 데이터 set
         OralCheck insertData = OralCheck.builder()
