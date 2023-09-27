@@ -1,6 +1,6 @@
 package com.kaii.dentix.domain.oralCheck.dto;
 
-import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
+import com.kaii.dentix.domain.type.oral.OralCheckResultType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 public class OralCheckDailyChangeDto {
 
     private int oralCheckNumber;
-    private OralCheckResultTotalType oralCheckResultTotalType;
+    private OralCheckResultType oralCheckResultTotalType;
 }

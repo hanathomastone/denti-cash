@@ -1,7 +1,7 @@
 package com.kaii.dentix.domain.admin.dto.statistic;
 
 import com.kaii.dentix.domain.admin.dto.AdminUserSignUpCountDto;
-import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
+import com.kaii.dentix.domain.type.oral.OralCheckResultType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +13,7 @@ public class AdminUserStatisticResponse {
 
     private AdminUserSignUpCountDto userSignUpCount; // 전체 남녀 가입률
 
-    private OralCheckResultTotalType averageState; // 평균 구강 상태
+    private OralCheckResultType averageState; // 평균 구강 상태
 
     private int oralCheckCount; // 전체 구강검진 횟수
 

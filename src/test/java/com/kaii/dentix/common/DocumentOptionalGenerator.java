@@ -34,11 +34,7 @@ public class DocumentOptionalGenerator {
         return setFormat("초 단위 interval");
     }
 
-    public static Attributes.Attribute oralCheckResultTotalFormat() {
-        return setFormat("HEALTHY : 건강, GOOD : 양호, ATTENTION : 주의, DANGER : 위험");
-    }
-
-    public static Attributes.Attribute oralCheckDivisionScoreFormat() {
+    public static Attributes.Attribute oralCheckResultTypeFormat() {
         return setFormat("HEALTHY : 건강, GOOD : 양호, ATTENTION : 주의, DANGER : 위험");
     }
 

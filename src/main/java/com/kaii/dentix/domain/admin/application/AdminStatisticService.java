@@ -8,7 +8,7 @@ import com.kaii.dentix.domain.oralCheck.application.OralCheckService;
 import com.kaii.dentix.domain.oralCheck.dao.OralCheckCustomRepository;
 import com.kaii.dentix.domain.admin.dto.statistic.OralCheckResultTypeCount;
 import com.kaii.dentix.domain.questionnaire.dao.QuestionnaireCustomRepository;
-import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
+import com.kaii.dentix.domain.type.oral.OralCheckResultType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,7 +48,7 @@ public class AdminStatisticService {
             oralCheckAverage = Math.round((float) allOralCheckCount / allUserOralCheckCount);
         }
 
-        OralCheckResultTotalType averageState = oralCheckService.getState(userOralCheckList); // 전체 평균 구강 상태
+        OralCheckResultType averageState = oralCheckService.getState(userOralCheckList); // 전체 평균 구강 상태
 
         // 통계 3. 평균 문진표 유형
         List<QuestionnaireStatisticDto> questionnaireList = questionnaireCustomRepository.questionnaireList(request); // 모든 문진표 리스트

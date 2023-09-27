@@ -4,7 +4,7 @@ import com.kaii.dentix.domain.admin.dto.statistic.OralCheckResultTypeCount;
 import com.kaii.dentix.domain.admin.dto.request.AdminStatisticRequest;
 import com.kaii.dentix.domain.oralCheck.domain.QOralCheck;
 import com.kaii.dentix.domain.type.DatePeriodType;
-import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
+import com.kaii.dentix.domain.type.oral.OralCheckResultType;
 import com.kaii.dentix.domain.user.domain.QUser;
 import com.kaii.dentix.global.common.util.DateFormatUtil;
 import com.querydsl.core.types.Projections;
@@ -36,22 +36,22 @@ public class OralCheckCustomRepositoryImpl implements OralCheckCustomRepository 
     public OralCheckResultTypeCount userOralCheckList(AdminStatisticRequest request){
         return queryFactory.select(Projections.constructor(OralCheckResultTypeCount.class,
                 new CaseBuilder()
-                        .when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultTotalType.HEALTHY))
+                        .when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultType.HEALTHY))
                         .then(1)
                         .otherwise(0)
                         .sum(),
                 new CaseBuilder()
-                        .when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultTotalType.GOOD))
+                        .when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultType.GOOD))
                         .then(1)
                         .otherwise(0)
                         .sum(),
                 new CaseBuilder()
-                        .when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultTotalType.ATTENTION))
+                        .when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultType.ATTENTION))
                         .then(1)
                         .otherwise(0)
                         .sum(),
                 new CaseBuilder()
-                        .when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultTotalType.DANGER))
+                        .when(oralCheck.oralCheckResultTotalType.eq(OralCheckResultType.DANGER))
                         .then(1)
                         .otherwise(0)
                         .sum()

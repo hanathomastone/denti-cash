@@ -3,7 +3,7 @@ package com.kaii.dentix.domain.oralCheck.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.kaii.dentix.domain.questionnaire.dto.OralStatusTypeDto;
 import com.kaii.dentix.domain.type.OralSectionType;
-import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
+import com.kaii.dentix.domain.type.oral.OralCheckResultType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,7 +26,7 @@ public class OralCheckListDto {
     private Date date;
 
     private long identifier;
-    private OralCheckResultTotalType oralCheckResultTotalType;
+    private OralCheckResultType oralCheckResultTotalType;
     private Integer toothBrushingCount;
 
     @Builder.Default

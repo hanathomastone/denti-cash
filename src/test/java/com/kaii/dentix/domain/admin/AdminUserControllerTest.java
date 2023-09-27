@@ -11,7 +11,7 @@ import com.kaii.dentix.domain.admin.dto.request.AdminUserListRequest;
 import com.kaii.dentix.domain.admin.dto.request.AdminUserModifyRequest;
 import com.kaii.dentix.domain.type.GenderType;
 import com.kaii.dentix.domain.type.YnType;
-import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
+import com.kaii.dentix.domain.type.oral.OralCheckResultType;
 import com.kaii.dentix.global.common.dto.PagingDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -236,8 +236,8 @@ public class AdminUserControllerTest extends ControllerTest {
         AdminUserListDto userList = AdminUserListDto.builder()
                 .paging(new PagingDTO(1, 2, 15))
                 .userList(new ArrayList<>(){{
-                    add(new AdminUserInfoDto(1L, "dentix123", "김덴티", GenderType.M, "K", date, OralCheckResultTotalType.HEALTHY, date, YnType.Y, "01012345678"));
-                    add(new AdminUserInfoDto(2L, "test123", "홍길동", GenderType.W, null, null, OralCheckResultTotalType.HEALTHY, date, YnType.Y, null));
+                    add(new AdminUserInfoDto(1L, "dentix123", "김덴티", GenderType.M, "K", date, OralCheckResultType.HEALTHY, date, YnType.Y, "01012345678"));
+                    add(new AdminUserInfoDto(2L, "test123", "홍길동", GenderType.W, null, null, OralCheckResultType.HEALTHY, date, YnType.Y, null));
                 }})
                 .build();
 
@@ -263,7 +263,7 @@ public class AdminUserControllerTest extends ControllerTest {
                                 parameterWithName("page").description("요청 페이지"),
                                 parameterWithName("size").description("한 페이지에 가져올 목록 개수"),
                                 parameterWithName("userIdentifierOrName").optional().description("아이디 혹은 이름"),
-                                parameterWithName("oralCheckResultTotalType").optional().attributes(oralCheckResultTotalFormat()).description("구강 상태"),
+                                parameterWithName("oralCheckResultTotalType").optional().attributes(oralCheckResultTypeFormat()).description("구강 상태"),
                                 parameterWithName("oralStatus").optional().description("문진표 유형"),
                                 parameterWithName("userGender").optional().attributes(genderFormat()).description("사용자 성별"),
                                 parameterWithName("isVerify").optional().attributes(yesNoFormat()).description("사용자 인증 여부"),
@@ -286,7 +286,7 @@ public class AdminUserControllerTest extends ControllerTest {
                                 fieldWithPath("response.userList[].userGender").attributes(genderFormat()).description("사용자 성별"),
                                 fieldWithPath("response.userList[].oralStatus").type(JsonFieldType.STRING).optional().description("문진표 유형"),
                                 fieldWithPath("response.userList[].questionnaireDate").type(JsonFieldType.STRING).optional().attributes(dateFormat()).description("문진표 작성일"),
-                                fieldWithPath("response.userList[].oralCheckResultTotalType").type(JsonFieldType.STRING).optional().attributes(oralCheckResultTotalFormat()).description("구강검진 결과"),
+                                fieldWithPath("response.userList[].oralCheckResultTotalType").type(JsonFieldType.STRING).optional().attributes(oralCheckResultTypeFormat()).description("구강검진 결과"),
                                 fieldWithPath("response.userList[].oralCheckDate").type(JsonFieldType.STRING).optional().attributes(dateFormat()).description("구강검진 검사일"),
                                 fieldWithPath("response.userList[].isVerify").type(JsonFieldType.STRING).description("사용자 인증 여부"),
                                 fieldWithPath("response.userList[].patientPhoneNumber").type(JsonFieldType.STRING).optional().attributes(userNumberFormat()).description("환자 연락처")

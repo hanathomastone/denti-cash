@@ -9,8 +9,7 @@ import com.kaii.dentix.domain.questionnaire.dto.OralStatusTypeDto;
 import com.kaii.dentix.domain.toothBrushing.dto.ToothBrushingDto;
 import com.kaii.dentix.domain.type.OralDateStatusType;
 import com.kaii.dentix.domain.type.OralSectionType;
-import com.kaii.dentix.domain.type.oral.OralCheckDivisionScoreType;
-import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
+import com.kaii.dentix.domain.type.oral.OralCheckResultType;
 import com.kaii.dentix.global.common.response.DataResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -75,17 +74,17 @@ public class OralCheckControllerTest extends ControllerTest {
         Date date = new Date();
         return OralCheckResultDto.builder()
                 .userId(1L)
-                .oralCheckResultTotalType(OralCheckResultTotalType.DANGER)
+                .oralCheckResultTotalType(OralCheckResultType.DANGER)
                 .created(date)
                 .oralCheckTotalRange(55.0f)
                 .oralCheckUpRightRange(73.0f)
-                .oralCheckUpRightScoreType(OralCheckDivisionScoreType.DANGER)
+                .oralCheckUpRightScoreType(OralCheckResultType.DANGER)
                 .oralCheckUpLeftRange(70.0f)
-                .oralCheckUpLeftScoreType(OralCheckDivisionScoreType.DANGER)
+                .oralCheckUpLeftScoreType(OralCheckResultType.DANGER)
                 .oralCheckDownLeftRange(16.0f)
-                .oralCheckDownLeftScoreType(OralCheckDivisionScoreType.ATTENTION)
+                .oralCheckDownLeftScoreType(OralCheckResultType.ATTENTION)
                 .oralCheckDownRightRange(20.0f)
-                .oralCheckDownRightScoreType(OralCheckDivisionScoreType.ATTENTION)
+                .oralCheckDownRightScoreType(OralCheckResultType.ATTENTION)
                 .oralCheckCommentList(oralCheckCommentList)
                 .build();
     }
@@ -165,17 +164,17 @@ public class OralCheckControllerTest extends ControllerTest {
                                 fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
                                 fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
                                 fieldWithPath("response.userId").type(JsonFieldType.NUMBER).description("사용자 고유 번호"),
-                                fieldWithPath("response.oralCheckResultTotalType").type(JsonFieldType.STRING).attributes(oralCheckResultTotalFormat()).description("전체 구강 상태"),
+                                fieldWithPath("response.oralCheckResultTotalType").type(JsonFieldType.STRING).attributes(oralCheckResultTypeFormat()).description("전체 구강 상태"),
                                 fieldWithPath("response.created").type(JsonFieldType.STRING).attributes(dateTimeFormat()).description("구강 검진일"),
                                 fieldWithPath("response.oralCheckTotalRange").type(JsonFieldType.NUMBER).description("전체 평균 플라그 비율"),
                                 fieldWithPath("response.oralCheckUpRightRange").type(JsonFieldType.NUMBER).description("상악우측 플라그 비율"),
-                                fieldWithPath("response.oralCheckUpRightScoreType").type(JsonFieldType.STRING).attributes(oralCheckDivisionScoreFormat()).description("상악우측 상태"),
+                                fieldWithPath("response.oralCheckUpRightScoreType").type(JsonFieldType.STRING).attributes(oralCheckResultTypeFormat()).description("상악우측 상태"),
                                 fieldWithPath("response.oralCheckUpLeftRange").type(JsonFieldType.NUMBER).description("상악좌측 플라그 비율"),
-                                fieldWithPath("response.oralCheckUpLeftScoreType").type(JsonFieldType.STRING).attributes(oralCheckDivisionScoreFormat()).description("상악좌측 상태"),
+                                fieldWithPath("response.oralCheckUpLeftScoreType").type(JsonFieldType.STRING).attributes(oralCheckResultTypeFormat()).description("상악좌측 상태"),
                                 fieldWithPath("response.oralCheckDownLeftRange").type(JsonFieldType.NUMBER).description("하악좌측 플라그 비율"),
-                                fieldWithPath("response.oralCheckDownLeftScoreType").type(JsonFieldType.STRING).attributes(oralCheckDivisionScoreFormat()).description("하악좌측 상태"),
+                                fieldWithPath("response.oralCheckDownLeftScoreType").type(JsonFieldType.STRING).attributes(oralCheckResultTypeFormat()).description("하악좌측 상태"),
                                 fieldWithPath("response.oralCheckDownRightRange").type(JsonFieldType.NUMBER).description("하악우측 플라그 비율"),
-                                fieldWithPath("response.oralCheckDownRightScoreType").type(JsonFieldType.STRING).attributes(oralCheckDivisionScoreFormat()).description("하악우측 상태"),
+                                fieldWithPath("response.oralCheckDownRightScoreType").type(JsonFieldType.STRING).attributes(oralCheckResultTypeFormat()).description("하악우측 상태"),
                                 fieldWithPath("response.oralCheckCommentList").type(JsonFieldType.ARRAY).description("부위별 구강 상태 코멘트")
                         )
                 ));
@@ -223,7 +222,7 @@ public class OralCheckControllerTest extends ControllerTest {
                             .sectionType(OralSectionType.ORAL_CHECK)
                             .date(date)
                             .identifier(1)
-                            .oralCheckResultTotalType(OralCheckResultTotalType.DANGER)
+                            .oralCheckResultTotalType(OralCheckResultType.DANGER)
                             .build(),
                         OralCheckListDto.builder()
                             .sectionType(OralSectionType.TOOTH_BRUSHING)
@@ -290,7 +289,7 @@ public class OralCheckControllerTest extends ControllerTest {
                     fieldWithPath("response.dailyList[].detailList[].sectionType").type(JsonFieldType.STRING).attributes(oralSectionTypeFormat()).description("섹션 타입"),
                     fieldWithPath("response.dailyList[].detailList[].date").type(JsonFieldType.STRING).attributes(dateTimeFormat()).description("최근 시각"),
                     fieldWithPath("response.dailyList[].detailList[].identifier").type(JsonFieldType.NUMBER).description("고유번호"),
-                    fieldWithPath("response.dailyList[].detailList[].oralCheckResultTotalType").type(JsonFieldType.STRING).optional().attributes(oralCheckResultTotalFormat()).description("전체 구강 상태"),
+                    fieldWithPath("response.dailyList[].detailList[].oralCheckResultTotalType").type(JsonFieldType.STRING).optional().attributes(oralCheckResultTypeFormat()).description("전체 구강 상태"),
                     fieldWithPath("response.dailyList[].detailList[].toothBrushingCount").type(JsonFieldType.NUMBER).optional().description("양치 횟수"),
                     fieldWithPath("response.dailyList[].detailList[].oralStatusList").type(JsonFieldType.ARRAY).description("구강 상태 목록"),
                     fieldWithPath("response.dailyList[].detailList[].oralStatusList[].type").type(JsonFieldType.STRING).description("구강 상태 타입"),
@@ -319,17 +318,17 @@ public class OralCheckControllerTest extends ControllerTest {
             .toothBrushingAverage(1.5F)
             .oralStatus(new OralStatusTypeDto("A", "양치 관리형"))
             .questionnaireCreated(new Date())
-            .oralCheckResultTotalType(OralCheckResultTotalType.GOOD)
-            .oralCheckUpRightScoreType(OralCheckDivisionScoreType.HEALTHY)
-            .oralCheckUpLeftScoreType(OralCheckDivisionScoreType.GOOD)
-            .oralCheckDownLeftScoreType(OralCheckDivisionScoreType.ATTENTION)
-            .oralCheckDownRightScoreType(OralCheckDivisionScoreType.DANGER)
+            .oralCheckResultTotalType(OralCheckResultType.GOOD)
+            .oralCheckUpRightScoreType(OralCheckResultType.HEALTHY)
+            .oralCheckUpLeftScoreType(OralCheckResultType.GOOD)
+            .oralCheckDownLeftScoreType(OralCheckResultType.ATTENTION)
+            .oralCheckDownRightScoreType(OralCheckResultType.DANGER)
             .oralCheckDailyList(Arrays.asList(
-                new OralCheckDailyChangeDto(1, OralCheckResultTotalType.HEALTHY),
-                new OralCheckDailyChangeDto(2, OralCheckResultTotalType.GOOD),
-                new OralCheckDailyChangeDto(4, OralCheckResultTotalType.ATTENTION),
-                new OralCheckDailyChangeDto(8, OralCheckResultTotalType.DANGER),
-                new OralCheckDailyChangeDto(10, OralCheckResultTotalType.HEALTHY)
+                new OralCheckDailyChangeDto(1, OralCheckResultType.HEALTHY),
+                new OralCheckDailyChangeDto(2, OralCheckResultType.GOOD),
+                new OralCheckDailyChangeDto(4, OralCheckResultType.ATTENTION),
+                new OralCheckDailyChangeDto(8, OralCheckResultType.DANGER),
+                new OralCheckDailyChangeDto(10, OralCheckResultType.HEALTHY)
             ))
             .build();
 
@@ -369,14 +368,14 @@ public class OralCheckControllerTest extends ControllerTest {
                     fieldWithPath("response.oralStatus.type").type(JsonFieldType.STRING).description("구강 상태 타입"),
                     fieldWithPath("response.oralStatus.title").type(JsonFieldType.STRING).description("구강 상태 제목"),
                     fieldWithPath("response.questionnaireCreated").type(JsonFieldType.STRING).optional().attributes(dateTimeFormat()).description("최근 문진표 검사일"),
-                    fieldWithPath("response.oralCheckResultTotalType").type(JsonFieldType.STRING).optional().attributes(oralCheckResultTotalFormat()).description("최근 구강상태"),
-                    fieldWithPath("response.oralCheckUpRightScoreType").type(JsonFieldType.STRING).optional().attributes(oralCheckDivisionScoreFormat()).description("상악우측 상태"),
-                    fieldWithPath("response.oralCheckUpLeftScoreType").type(JsonFieldType.STRING).optional().attributes(oralCheckDivisionScoreFormat()).description("상악좌측 상태"),
-                    fieldWithPath("response.oralCheckDownLeftScoreType").type(JsonFieldType.STRING).optional().attributes(oralCheckDivisionScoreFormat()).description("하악좌측 상태"),
-                    fieldWithPath("response.oralCheckDownRightScoreType").type(JsonFieldType.STRING).optional().attributes(oralCheckDivisionScoreFormat()).description("하악우측 상태"),
+                    fieldWithPath("response.oralCheckResultTotalType").type(JsonFieldType.STRING).optional().attributes(oralCheckResultTypeFormat()).description("최근 구강상태"),
+                    fieldWithPath("response.oralCheckUpRightScoreType").type(JsonFieldType.STRING).optional().attributes(oralCheckResultTypeFormat()).description("상악우측 상태"),
+                    fieldWithPath("response.oralCheckUpLeftScoreType").type(JsonFieldType.STRING).optional().attributes(oralCheckResultTypeFormat()).description("상악좌측 상태"),
+                    fieldWithPath("response.oralCheckDownLeftScoreType").type(JsonFieldType.STRING).optional().attributes(oralCheckResultTypeFormat()).description("하악좌측 상태"),
+                    fieldWithPath("response.oralCheckDownRightScoreType").type(JsonFieldType.STRING).optional().attributes(oralCheckResultTypeFormat()).description("하악우측 상태"),
                     fieldWithPath("response.oralCheckDailyList").type(JsonFieldType.ARRAY).description("구강 상태 변화 추이"),
                     fieldWithPath("response.oralCheckDailyList[].oralCheckNumber").type(JsonFieldType.NUMBER).description("회차"),
-                    fieldWithPath("response.oralCheckDailyList[].oralCheckResultTotalType").attributes(oralCheckResultTotalFormat()).description("구강상태")
+                    fieldWithPath("response.oralCheckDailyList[].oralCheckResultTotalType").attributes(oralCheckResultTypeFormat()).description("구강상태")
                 )
             ));
 

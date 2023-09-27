@@ -3,7 +3,7 @@ package com.kaii.dentix.domain.admin.dto.request;
 import com.kaii.dentix.domain.type.DatePeriodType;
 import com.kaii.dentix.domain.type.GenderType;
 import com.kaii.dentix.domain.type.YnType;
-import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
+import com.kaii.dentix.domain.type.oral.OralCheckResultType;
 import com.kaii.dentix.global.common.dto.PageAndSizeRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,7 +16,7 @@ public class AdminUserListRequest extends PageAndSizeRequest {
 
     private String userIdentifierOrName; // 검색어 (아이디 혹은 이름)
 
-    private OralCheckResultTotalType oralCheckResultTotalType; // 구강 상태
+    private OralCheckResultType oralCheckResultTotalType; // 구강 상태
 
     private String oralStatus; // 문진표 유형
 

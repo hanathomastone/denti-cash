@@ -1,8 +1,7 @@
 package com.kaii.dentix.domain.oralCheck.domain;
 
 import com.kaii.dentix.domain.type.oral.OralCheckAnalysisState;
-import com.kaii.dentix.domain.type.oral.OralCheckDivisionScoreType;
-import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
+import com.kaii.dentix.domain.type.oral.OralCheckResultType;
 import com.kaii.dentix.global.common.entity.TimeEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -48,22 +47,22 @@ public class OralCheck extends TimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum")
-    private OralCheckResultTotalType oralCheckResultTotalType; // 종합 결과 유형
+    private OralCheckResultType oralCheckResultTotalType; // 종합 결과 유형
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum")
-    private OralCheckDivisionScoreType oralCheckUpRightScoreType; // 우상 점수 유형
+    private OralCheckResultType oralCheckUpRightScoreType; // 우상 점수 유형
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum")
-    private OralCheckDivisionScoreType oralCheckUpLeftScoreType; // 좌상 점수 유형
+    private OralCheckResultType oralCheckUpLeftScoreType; // 좌상 점수 유형
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum")
-    private OralCheckDivisionScoreType oralCheckDownRightScoreType; // 우하 점수 유형
+    private OralCheckResultType oralCheckDownRightScoreType; // 우하 점수 유형
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum")
-    private OralCheckDivisionScoreType oralCheckDownLeftScoreType; // 좌하 점수 유형
+    private OralCheckResultType oralCheckDownLeftScoreType; // 좌하 점수 유형
 
 }

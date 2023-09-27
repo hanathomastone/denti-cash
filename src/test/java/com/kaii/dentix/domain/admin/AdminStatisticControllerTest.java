@@ -10,7 +10,7 @@ import com.kaii.dentix.domain.admin.dto.statistic.AdminUserStatisticResponse;
 import com.kaii.dentix.domain.admin.dto.statistic.AllQuestionnaireResultTypeCount;
 import com.kaii.dentix.domain.admin.dto.statistic.OralCheckResultTypeCount;
 import com.kaii.dentix.domain.type.DatePeriodType;
-import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
+import com.kaii.dentix.domain.type.oral.OralCheckResultType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +71,7 @@ public class AdminStatisticControllerTest extends ControllerTest {
                         .countMan(20L)
                         .countWoman(10L)
                         .build())
-                .averageState(OralCheckResultTotalType.ATTENTION)
+                .averageState(OralCheckResultType.ATTENTION)
                 .oralCheckCount(100)
                 .oralCheckAverage(4)
                 .oralCheckResultTypeCount(OralCheckResultTypeCount.builder()
@@ -127,7 +127,7 @@ public class AdminStatisticControllerTest extends ControllerTest {
                                 fieldWithPath("response.userSignUpCount.countAll").type(JsonFieldType.NUMBER).description("전체 가입자 수"),
                                 fieldWithPath("response.userSignUpCount.countMan").type(JsonFieldType.NUMBER).description("남성 가입자 수"),
                                 fieldWithPath("response.userSignUpCount.countWoman").type(JsonFieldType.NUMBER).description("여성 가입자 수"),
-                                fieldWithPath("response.averageState").type(JsonFieldType.STRING).attributes(oralCheckResultTotalFormat()).description("평균 구강 상태"),
+                                fieldWithPath("response.averageState").type(JsonFieldType.STRING).attributes(oralCheckResultTypeFormat()).description("평균 구강 상태"),
                                 fieldWithPath("response.oralCheckCount").type(JsonFieldType.NUMBER).description("전체 구강검진 횟수"),
                                 fieldWithPath("response.oralCheckAverage").type(JsonFieldType.NUMBER).description("사용자당 평균 구강검진 횟수"),
                                 fieldWithPath("response.oralCheckResultTypeCount").type(JsonFieldType.OBJECT).description("구강검진 결과 타입별 횟수"),

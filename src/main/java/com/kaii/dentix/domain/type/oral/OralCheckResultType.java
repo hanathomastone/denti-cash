@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum OralCheckResultTotalType {
+public enum OralCheckResultType {
 
     // 구강 검사 결과 종합
 

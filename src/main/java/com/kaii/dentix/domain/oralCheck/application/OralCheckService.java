@@ -22,8 +22,7 @@ import com.kaii.dentix.domain.toothBrushing.dto.ToothBrushingDto;
 import com.kaii.dentix.domain.type.OralDateStatusType;
 import com.kaii.dentix.domain.type.OralSectionType;
 import com.kaii.dentix.domain.type.oral.OralCheckAnalysisState;
-import com.kaii.dentix.domain.type.oral.OralCheckDivisionScoreType;
-import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
+import com.kaii.dentix.domain.type.oral.OralCheckResultType;
 import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.domain.User;
 import com.kaii.dentix.domain.userOralStatus.dao.UserOralStatusRepository;
@@ -32,8 +31,8 @@ import com.kaii.dentix.global.common.aws.AWSS3Service;
 import com.kaii.dentix.global.common.error.exception.BadRequestApiException;
 import com.kaii.dentix.global.common.error.exception.NotFoundDataException;
 import com.kaii.dentix.global.common.response.DataResponse;
-import com.kaii.dentix.global.common.util.DateFormatUtil;
 import com.kaii.dentix.global.common.util.AiModelService;
+import com.kaii.dentix.global.common.util.DateFormatUtil;
 import com.kaii.dentix.global.common.util.Utils;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -134,11 +133,11 @@ public class OralCheckService {
      * @param divisionRange : 영역 비율
      * @return ToothColoringDivisionScoreType : 4등분 점수 유형 결과
      */
-    public OralCheckDivisionScoreType calcDivisionScoreType(Float divisionRange) {
-        return divisionRange < 1 ? OralCheckDivisionScoreType.HEALTHY
-                : divisionRange < 10 ? OralCheckDivisionScoreType.GOOD
-                : divisionRange < 30 ? OralCheckDivisionScoreType.ATTENTION
-                : OralCheckDivisionScoreType.DANGER;
+    public OralCheckResultType calcDivisionScoreType(Float divisionRange) {
+        return divisionRange < 1 ? OralCheckResultType.HEALTHY
+                : divisionRange < 10 ? OralCheckResultType.GOOD
+                : divisionRange < 30 ? OralCheckResultType.ATTENTION
+                : OralCheckResultType.DANGER;
     }
 
     /**
@@ -154,7 +153,7 @@ public class OralCheckService {
                         (oralCheck.getOralCheckUpLeftRange().equals(oralCheck.getOralCheckDownRightRange()) &&
                         (oralCheck.getOralCheckDownRightRange().equals(oralCheck.getOralCheckDownLeftRange())));
 
-        if (allEquals && oralCheck.getOralCheckResultTotalType().equals(OralCheckResultTotalType.HEALTHY)) { // 모든 부위의 플라그 비율이 동일하고 , '건강'인 경우
+        if (allEquals && oralCheck.getOralCheckResultTotalType().equals(OralCheckResultType.HEALTHY)) { // 모든 부위의 플라그 비율이 동일하고 , '건강'인 경우
             return divisionCommentTypeList; // 빈 배열 return
         } else {
 
@@ -206,10 +205,10 @@ public class OralCheckService {
         String resultJsonData = objectMapper.writeValueAsString(resource); // 분석 결과 JSON data 전체
 
         // 4등분 점수 유형
-        OralCheckDivisionScoreType upRightScoreType = this.calcDivisionScoreType(upRightGroupRatio);
-        OralCheckDivisionScoreType upLeftScoreType = this.calcDivisionScoreType(upLeftGroupRatio);
-        OralCheckDivisionScoreType downRightScoreType = this.calcDivisionScoreType(downRightGroupRatio);
-        OralCheckDivisionScoreType downLeftScoreType = this.calcDivisionScoreType(downLeftGroupRatio);
+        OralCheckResultType upRightScoreType = this.calcDivisionScoreType(upRightGroupRatio);
+        OralCheckResultType upLeftScoreType = this.calcDivisionScoreType(upLeftGroupRatio);
+        OralCheckResultType downRightScoreType = this.calcDivisionScoreType(downRightGroupRatio);
+        OralCheckResultType downLeftScoreType = this.calcDivisionScoreType(downLeftGroupRatio);
 
         // 결과 종합 유형
         int divisionBadCount = 0;
@@ -218,10 +217,10 @@ public class OralCheckService {
             if (!(ratio < 10)) divisionBadCount++;
         }
 
-        OralCheckResultTotalType resultTotalType = divisionBadCount == 0 ? OralCheckResultTotalType.HEALTHY
-                : divisionBadCount == 1 ? OralCheckResultTotalType.GOOD
-                : divisionBadCount == 2 ? OralCheckResultTotalType.ATTENTION
-                : OralCheckResultTotalType.DANGER;
+        OralCheckResultType resultTotalType = divisionBadCount == 0 ? OralCheckResultType.HEALTHY
+                : divisionBadCount == 1 ? OralCheckResultType.GOOD
+                : divisionBadCount == 2 ? OralCheckResultType.ATTENTION
+                : OralCheckResultType.DANGER;
 
         // insert 데이터 set
         OralCheck insertData = OralCheck.builder()
@@ -558,19 +557,19 @@ public class OralCheckService {
     /**
      *  전체 평균 구강 상태
      */
-    public OralCheckResultTotalType getState(OralCheckResultTypeCount oralCheckResultTypeCount){
+    public OralCheckResultType getState(OralCheckResultTypeCount oralCheckResultTypeCount){
         if (oralCheckResultTypeCount.getCountHealthy() >= oralCheckResultTypeCount.getCountGood() &&
                 oralCheckResultTypeCount.getCountHealthy() >= oralCheckResultTypeCount.getCountAttention() &&
                 oralCheckResultTypeCount.getCountHealthy() >= oralCheckResultTypeCount.getCountDanger())
-            return OralCheckResultTotalType.HEALTHY;
+            return OralCheckResultType.HEALTHY;
 
         if (oralCheckResultTypeCount.getCountGood() >= oralCheckResultTypeCount.getCountAttention() &&
                 oralCheckResultTypeCount.getCountGood() >= oralCheckResultTypeCount.getCountDanger())
-            return OralCheckResultTotalType.GOOD;
+            return OralCheckResultType.GOOD;
 
         if (oralCheckResultTypeCount.getCountAttention() >= oralCheckResultTypeCount.getCountDanger())
-            return OralCheckResultTotalType.ATTENTION;
+            return OralCheckResultType.ATTENTION;
 
-        return OralCheckResultTotalType.DANGER;
+        return OralCheckResultType.DANGER;
     }
 }

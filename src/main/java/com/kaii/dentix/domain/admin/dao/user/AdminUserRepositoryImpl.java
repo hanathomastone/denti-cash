@@ -9,7 +9,7 @@ import com.kaii.dentix.domain.patient.domain.QPatient;
 import com.kaii.dentix.domain.questionnaire.domain.QQuestionnaire;
 import com.kaii.dentix.domain.type.DatePeriodType;
 import com.kaii.dentix.domain.type.GenderType;
-import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
+import com.kaii.dentix.domain.type.oral.OralCheckResultType;
 import com.kaii.dentix.domain.user.domain.QUser;
 import com.kaii.dentix.domain.userOralStatus.domain.QUserOralStatus;
 import com.kaii.dentix.global.common.dto.PagingRequest;
@@ -149,7 +149,7 @@ public class AdminUserRepositoryImpl implements AdminUserCustomRepository {
     /**
      *  구강 상태 필터링
      */
-    private BooleanExpression whereOralCheckResult(OralCheckResultTotalType oralCheckResultTotalType){
+    private BooleanExpression whereOralCheckResult(OralCheckResultType oralCheckResultTotalType){
         return oralCheckResultTotalType == null ? null : oralCheck.oralCheckResultTotalType.eq(oralCheckResultTotalType);
     }
 

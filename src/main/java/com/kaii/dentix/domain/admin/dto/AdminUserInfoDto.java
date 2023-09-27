@@ -3,7 +3,7 @@ package com.kaii.dentix.domain.admin.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.kaii.dentix.domain.type.GenderType;
 import com.kaii.dentix.domain.type.YnType;
-import com.kaii.dentix.domain.type.oral.OralCheckResultTotalType;
+import com.kaii.dentix.domain.type.oral.OralCheckResultType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,7 +28,7 @@ public class AdminUserInfoDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private Date questionnaireDate; // 문진표 검사일
 
-    private OralCheckResultTotalType oralCheckResultTotalType; // 구강 상태 (구강 검진 결과)
+    private OralCheckResultType oralCheckResultTotalType; // 구강 상태 (구강 검진 결과)
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private Date oralCheckDate; // 구강 촬영일
