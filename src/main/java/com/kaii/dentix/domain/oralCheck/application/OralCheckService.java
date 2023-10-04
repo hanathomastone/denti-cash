@@ -190,13 +190,13 @@ public class OralCheckService {
     public OralCheck registAnalysisSuccessData(Long userId, String filePath, OralCheckAnalysisResponse resource) throws JsonProcessingException {
         OralCheckAnalysisDivisionDto tDivision = resource.getPlaqueStats();
 
-        Float upRightRange = Float.parseFloat(String.format("%1f", tDivision.getTopRight())); // 우상 비율
-        Float upLeftRange = Float.parseFloat(String.format("%1f", tDivision.getTopLeft())); // 좌상 비율
-        Float downRightRange = Float.parseFloat(String.format("%1f", tDivision.getBtmRight())); // 우하 비율
-        Float downLeftRange = Float.parseFloat(String.format("%1f", tDivision.getBtmLeft())); // 좌하 비율
+        Float upRightRange = Utils.getDeleteDecimalValue(tDivision.getTopRight(), 1); // 우상 비율
+        Float upLeftRange = Utils.getDeleteDecimalValue(tDivision.getTopLeft(), 1); // 좌상 비율
+        Float downRightRange = Utils.getDeleteDecimalValue(tDivision.getBtmRight(), 1); // 우하 비율
+        Float downLeftRange = Utils.getDeleteDecimalValue(tDivision.getBtmLeft(), 1); // 좌하 비율
 
         Float totalGroupRatio = (tDivision.getTopRight() + tDivision.getTopLeft() + tDivision.getBtmRight() + tDivision.getBtmLeft()) / 4;
-        Float totalRange = Float.parseFloat(String.format("%1f", totalGroupRatio)); // 전체 비율
+        Float totalRange = Utils.getDeleteDecimalValue(totalGroupRatio, 1); // 전체 비율
 
         // 점수 유형
         OralCheckResultType upRightScoreType = this.calcDivisionScoreType(upRightRange);
