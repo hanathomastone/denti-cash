@@ -20,7 +20,7 @@ public class OralCheckAnalysisResponse {
     @JsonProperty("status_msg")
     private String statusMsg; // 결과 메시지
 
-    @JsonProperty("plaque")
+    @JsonProperty("plaque_stats")
     private OralCheckAnalysisDivisionDto plaqueStats; // 4등분 목록
 
 }
