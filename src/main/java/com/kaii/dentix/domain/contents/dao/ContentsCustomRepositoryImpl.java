@@ -55,8 +55,9 @@ public class ContentsCustomRepositoryImpl implements ContentsCustomRepository {
     public List<Integer> getCustomizedContentsIdList(Long questionnaireId) {
 
         return queryFactory
-            .selectDistinct(oralStatusToContents.contents.contentsId)
-            .from(oralStatusToContents)
+            .selectDistinct(contents.contentsId)
+            .from(contents)
+            .join(oralStatusToContents).on(oralStatusToContents.contents.contentsId.eq(contents.contentsId))
             .join(userOralStatus).on(userOralStatus.oralStatus.oralStatusType.eq(oralStatusToContents.oralStatus.oralStatusType))
             .where(userOralStatus.questionnaire.questionnaireId.eq(questionnaireId))
             .fetch();

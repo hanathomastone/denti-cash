@@ -7,7 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Where;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -17,6 +19,7 @@ import java.util.List;
 @Getter @Builder
 @AllArgsConstructor @NoArgsConstructor
 @Table(name = "contents")
+@Where(clause = "deleted IS NULL")
 public class Contents extends TimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,5 +50,8 @@ public class Contents extends TimeEntity {
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "contentsId")
     private List<ContentsCard> contentsCards;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date deleted;
 
 }
