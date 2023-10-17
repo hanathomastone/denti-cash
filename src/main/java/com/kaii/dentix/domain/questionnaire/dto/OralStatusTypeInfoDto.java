@@ -11,4 +11,5 @@ public class OralStatusTypeInfoDto {
     private String type;
     private String title;
     private String description;
+    private String subDescription;
 }

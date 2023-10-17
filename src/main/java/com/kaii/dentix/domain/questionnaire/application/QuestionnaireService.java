@@ -118,6 +118,7 @@ public class QuestionnaireService {
                     .type(oralStatus.getOralStatusType())
                     .title(oralStatus.getOralStatusTitle())
                     .description(oralStatus.getOralStatusDescription())
+                    .subDescription(oralStatus.getOralStatusTitle() + "에 맞는 콘텐츠를 확인하신 후 올바른 구강 관리 습관을 지녀 보세요!")
                     .build();
             }).toList();
 

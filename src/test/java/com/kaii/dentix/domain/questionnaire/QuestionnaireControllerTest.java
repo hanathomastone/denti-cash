@@ -211,8 +211,8 @@ public class QuestionnaireControllerTest extends ControllerTest {
     @Test
     public void questionnaireResult() throws Exception{
         List<OralStatusTypeInfoDto> oralStatusList = Arrays.asList(
-            new OralStatusTypeInfoDto("A", "양치 관리형", "양치 관리형은 현재 질환이 있거나 질환이 생길 수 있는 상태로, 양치 관리가 필요한 사람을 뜻해요.\r\n구강 위생이 다소 불량하여 치아 관리에 대한 학습이 필요하고, 양치질 습관을 개선할 필요가 있어요. 현재 구강 상태를 정확하게 검진받아 볼 필요성이 있고, 질환이 발생하기 전에 관리할 필요가 있어요. 양치질의 목적은 입 속의 치태, 치석 등을 제거하거나 예방해서 구강 건강을 유지하는 것이지만 잘못된 양치 습관은 치아를 마모시킬 수 있고 치아 민감도를 높이는 문제가 발생할 수 있으므로 반드시 올바른 양치 관리 방법을 확인할 필요가 있어요."),
-            new OralStatusTypeInfoDto("B", "충치 관리형", "충치 관리형은 과거 충치 치료를 받았거나 충치가 발생할 가능성이 높은 생활 습관으로 충치 관리가 필요한 사람을 뜻해요. 충치는 음식물을 섭취한 후 남아있는 음식물 찌꺼기가 입 속에 있는 세균과 결합해, 분해되며 발생하는 산이 치아의 법랑질을 공격하며 생기는 손상 현상을 말해요. 충치를 예방하기 위해서는 올바른 양치법이 필요해요. 또한 물을 자주 마시도록 하며 자기 직전에는 음식물 섭취를 자제하는 것이 좋아요. 캐러멜과 젤리와 같은 끈적임이 많은 식품이나 단 음료는 섭취를 줄이시길 권장해요.")
+            new OralStatusTypeInfoDto("A", "양치 관리형", "양치 관리형은 현재 질환이 있거나 질환이 생길 수 있는 상태로, 양치 관리가 필요한 사람을 뜻해요.\r\n구강 위생이 다소 불량하여 치아 관리에 대한 학습이 필요하고, 양치질 습관을 개선할 필요가 있어요. 현재 구강 상태를 정확하게 검진받아 볼 필요성이 있고, 질환이 발생하기 전에 관리할 필요가 있어요. 양치질의 목적은 입 속의 치태, 치석 등을 제거하거나 예방해서 구강 건강을 유지하는 것이지만 잘못된 양치 습관은 치아를 마모시킬 수 있고 치아 민감도를 높이는 문제가 발생할 수 있으므로 반드시 올바른 양치 관리 방법을 확인할 필요가 있어요.", "양치 관리형에 맞는 콘텐츠를 확인하신 후 올바른 구강 관리 습관을 지녀 보세요!"),
+            new OralStatusTypeInfoDto("B", "충치 관리형", "충치 관리형은 과거 충치 치료를 받았거나 충치가 발생할 가능성이 높은 생활 습관으로 충치 관리가 필요한 사람을 뜻해요. 충치는 음식물을 섭취한 후 남아있는 음식물 찌꺼기가 입 속에 있는 세균과 결합해, 분해되며 발생하는 산이 치아의 법랑질을 공격하며 생기는 손상 현상을 말해요. 충치를 예방하기 위해서는 올바른 양치법이 필요해요. 또한 물을 자주 마시도록 하며 자기 직전에는 음식물 섭취를 자제하는 것이 좋아요. 캐러멜과 젤리와 같은 끈적임이 많은 식품이나 단 음료는 섭취를 줄이시길 권장해요.", "충치 관리형에 맞는 콘텐츠를 확인하신 후 올바른 구강 관리 습관을 지녀 보세요!")
         );
 
         List<ContentsCategoryDto> categories = Arrays.asList(
@@ -282,6 +282,7 @@ public class QuestionnaireControllerTest extends ControllerTest {
                     fieldWithPath("response.oralStatusList[].type").type(JsonFieldType.STRING).description("구강 상태 타입"),
                     fieldWithPath("response.oralStatusList[].title").type(JsonFieldType.STRING).description("구강 상태 제목"),
                     fieldWithPath("response.oralStatusList[].description").type(JsonFieldType.STRING).description("구강 상태 설명"),
+                    fieldWithPath("response.oralStatusList[].subDescription").type(JsonFieldType.STRING).description("구강 상태 부연 설명"),
                     fieldWithPath("response.categories").type(JsonFieldType.ARRAY).description("콘텐츠 카테고리 목록"),
                     fieldWithPath("response.categories[].id").type(JsonFieldType.NUMBER).description("콘텐츠 카테고리 고유 번호"),
                     fieldWithPath("response.categories[].name").type(JsonFieldType.STRING).description("콘텐츠 카테고리 이름"),
