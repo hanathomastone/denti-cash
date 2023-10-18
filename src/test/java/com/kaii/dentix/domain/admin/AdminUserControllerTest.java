@@ -137,7 +137,7 @@ public class AdminUserControllerTest extends ControllerTest {
                     fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
                     fieldWithPath("response.userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디"),
                     fieldWithPath("response.userName").type(JsonFieldType.STRING).description("사용자 이름"),
-                    fieldWithPath("response.userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별")
+                    fieldWithPath("response.userGender").type(JsonFieldType.STRING).optional().attributes(genderFormat()).description("사용자 성별")
                 )
             ));
 
@@ -176,7 +176,7 @@ public class AdminUserControllerTest extends ControllerTest {
                     fieldWithPath("userId").type(JsonFieldType.NUMBER).description("사용자 고유번호"),
                     fieldWithPath("userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디"),
                     fieldWithPath("userName").type(JsonFieldType.STRING).description("사용자 이름"),
-                    fieldWithPath("userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별")
+                    fieldWithPath("userGender").type(JsonFieldType.STRING).optional().attributes(genderFormat()).description("사용자 성별")
                 ),
                 responseFields(
                     fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
@@ -283,7 +283,7 @@ public class AdminUserControllerTest extends ControllerTest {
                                 fieldWithPath("response.userList[].userId").type(JsonFieldType.NUMBER).description("사용자 고유 번호"),
                                 fieldWithPath("response.userList[].userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디"),
                                 fieldWithPath("response.userList[].userName").type(JsonFieldType.STRING).description("사용자 이름"),
-                                fieldWithPath("response.userList[].userGender").attributes(genderFormat()).description("사용자 성별"),
+                                fieldWithPath("response.userList[].userGender").optional().attributes(genderFormat()).description("사용자 성별"),
                                 fieldWithPath("response.userList[].oralStatus").type(JsonFieldType.STRING).optional().description("문진표 유형"),
                                 fieldWithPath("response.userList[].questionnaireDate").type(JsonFieldType.STRING).optional().attributes(dateFormat()).description("문진표 작성일"),
                                 fieldWithPath("response.userList[].oralCheckResultTotalType").type(JsonFieldType.STRING).optional().attributes(oralCheckResultTypeFormat()).description("구강검진 결과"),

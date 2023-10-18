@@ -33,7 +33,6 @@ public class UserSignUpRequest {
     @Pattern(regexp = "^[ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z\\s]+$", message = "닉네임은 한글이나 영문으로만 입력해 주세요.")
     private String userName;
 
-    @NotNull(message = "성별은 필수입니다.")
     private GenderType userGender;
 
     @NotBlank(message = "비밀번호는 필수입니다.")

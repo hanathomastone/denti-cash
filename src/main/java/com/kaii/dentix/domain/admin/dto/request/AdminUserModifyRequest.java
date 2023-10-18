@@ -24,6 +24,5 @@ public class AdminUserModifyRequest {
     @Pattern(regexp = "^[ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z\\s]+$", message = "이름은 한글이나 영문으로만 입력해 주세요.")
     private String userName; // 사용자 이름
 
-    @NotNull(message = "성별은 필수입니다.")
     private GenderType userGender; // 사용자 성별
 }

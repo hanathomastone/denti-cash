@@ -30,7 +30,7 @@ public class User extends TimeEntity {
     private String userName;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "enum", nullable = false)
+    @Column(columnDefinition = "enum")
     private GenderType userGender;
 
     @Column(nullable = false)
@@ -111,7 +111,7 @@ public class User extends TimeEntity {
      */
     public void modifyInfo(String userName, GenderType userGender){
         this.userName = userName;
-        this.userGender = userGender;
+        this.userGender = userGender; // 미선택으로 원복 가능
     }
 
     /**
@@ -120,7 +120,9 @@ public class User extends TimeEntity {
     public void adminModifyInfo(String userLoginIdentifier, String userName, GenderType userGender) {
         this.userLoginIdentifier = userLoginIdentifier;
         this.userName = userName;
-        this.userGender = userGender;
+        if (userGender != null) {
+            this.userGender = userGender;
+        }
     }
 
     /**

@@ -197,7 +197,7 @@ public class UserLoginControllerTest extends ControllerTest{
                                 fieldWithPath("userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디"),
                                 fieldWithPath("userName").type(JsonFieldType.STRING).description("사용자 닉네임"),
                                 fieldWithPath("userPassword").type(JsonFieldType.STRING).description("사용자 비밀번호"),
-                                fieldWithPath("userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별"),
+                                fieldWithPath("userGender").type(JsonFieldType.STRING).optional().attributes(genderFormat()).description("사용자 성별"),
                                 fieldWithPath("findPwdQuestionId").type(JsonFieldType.NUMBER).description("사용자 비밀번호 찾기 질문"),
                                 fieldWithPath("findPwdAnswer").type(JsonFieldType.STRING).description("사용자 비밀번호 찾기 답변"),
                                 fieldWithPath("userDeviceModel").type(JsonFieldType.STRING).optional().description("사용자 기기 모델"),
@@ -215,7 +215,7 @@ public class UserLoginControllerTest extends ControllerTest{
                                 fieldWithPath("response.userId").type(JsonFieldType.NUMBER).description("사용자 고유 번호"),
                                 fieldWithPath("response.userLoginIdentifier").type(JsonFieldType.STRING).description("사용자 아이디"),
                                 fieldWithPath("response.userName").type(JsonFieldType.STRING).description("사용자 닉네임"),
-                                fieldWithPath("response.userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별")
+                                fieldWithPath("response.userGender").type(JsonFieldType.STRING).optional().attributes(genderFormat()).description("사용자 성별")
                         )
                 ));
 

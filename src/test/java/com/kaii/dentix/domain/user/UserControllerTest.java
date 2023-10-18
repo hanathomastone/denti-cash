@@ -342,14 +342,14 @@ public class UserControllerTest extends ControllerTest {
                         getDocumentResponse(),
                         requestFields(
                                 fieldWithPath("userName").type(JsonFieldType.STRING).description("사용자 이름"),
-                                fieldWithPath("userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별")
+                                fieldWithPath("userGender").type(JsonFieldType.STRING).optional().attributes(genderFormat()).description("사용자 성별")
                         ),
                         responseFields(
                                 fieldWithPath("rt").type(JsonFieldType.NUMBER).description("결과 코드"),
                                 fieldWithPath("rtMsg").type(JsonFieldType.STRING).description("결과 메세지"),
                                 fieldWithPath("response").type(JsonFieldType.OBJECT).description("결과 데이터"),
                                 fieldWithPath("response.userName").type(JsonFieldType.STRING).description("사용자 닉네임"),
-                                fieldWithPath("response.userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별")
+                                fieldWithPath("response.userGender").type(JsonFieldType.STRING).optional().attributes(genderFormat()).description("사용자 성별")
                         )
                 ));
 
@@ -508,7 +508,7 @@ public class UserControllerTest extends ControllerTest {
                                 fieldWithPath("response.userServiceAgreeLists[].serviceAgreeId").type(JsonFieldType.NUMBER).description("서비스 이용동의 고유 번호"),
                                 fieldWithPath("response.userServiceAgreeLists[].isUserServiceAgree").type(JsonFieldType.STRING).attributes(yesNoFormat()).description("사용자 서비스 이용동의 여부"),
                                 fieldWithPath("response.userServiceAgreeLists[].date").type(JsonFieldType.STRING).attributes(dateTimeFormat()).optional().description("사용자 서비스 이용동의 수정 시각"),
-                                fieldWithPath("response.userGender").type(JsonFieldType.STRING).attributes(genderFormat()).description("사용자 성별")
+                                fieldWithPath("response.userGender").type(JsonFieldType.STRING).optional().attributes(genderFormat()).description("사용자 성별")
 
                         )
                 ));
