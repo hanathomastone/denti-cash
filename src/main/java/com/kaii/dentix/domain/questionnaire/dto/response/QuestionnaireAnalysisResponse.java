@@ -24,4 +24,8 @@ public class QuestionnaireAnalysisResponse {
     @JsonProperty("contents_type")
     private List<String> contentsType; // 문진표 컨텐츠 AI 모델 결과 값
 
+    public QuestionnaireAnalysisResponse(List<String> contentsType) {
+        this.statusCode = 200;
+        this.contentsType = contentsType;
+    }
 }

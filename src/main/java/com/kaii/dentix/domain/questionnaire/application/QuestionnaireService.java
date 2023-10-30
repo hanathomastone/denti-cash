@@ -6,6 +6,8 @@ import com.kaii.dentix.domain.contents.application.ContentsService;
 import com.kaii.dentix.domain.contents.dao.ContentsCustomRepository;
 import com.kaii.dentix.domain.contents.dto.ContentsCategoryDto;
 import com.kaii.dentix.domain.contents.dto.ContentsDto;
+import com.kaii.dentix.domain.oralCheck.dto.OralCheckAnalysisDivisionDto;
+import com.kaii.dentix.domain.oralCheck.dto.resoponse.OralCheckAnalysisResponse;
 import com.kaii.dentix.domain.oralStatus.domain.OralStatus;
 import com.kaii.dentix.domain.oralStatus.jpa.OralStatusRepository;
 import com.kaii.dentix.domain.questionnaire.dao.QuestionnaireRepository;
@@ -18,9 +20,12 @@ import com.kaii.dentix.domain.user.domain.User;
 import com.kaii.dentix.global.common.error.exception.BadRequestApiException;
 import com.kaii.dentix.global.common.error.exception.FormValidationException;
 import com.kaii.dentix.global.common.error.exception.NotFoundDataException;
+import com.kaii.dentix.global.common.response.DataResponse;
 import com.kaii.dentix.global.common.util.AiModelService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +35,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class QuestionnaireService {
@@ -41,6 +47,9 @@ public class QuestionnaireService {
     private final ContentsCustomRepository contentsCustomRepository;
     private final OralStatusRepository oralStatusRepository;
     private final AiModelService aiModelService;
+
+    @Value("${spring.profiles.active}")
+    private String active;
 
     /**
      * 문진표 양식 조회
@@ -86,7 +95,29 @@ public class QuestionnaireService {
         });
 
         questionnaireForm.put("form", form);
-        QuestionnaireAnalysisResponse analysisData = aiModelService.getQuestionnaireAiModel(questionnaireForm);
+
+        QuestionnaireAnalysisResponse analysisData;
+        try {
+            analysisData = aiModelService.getQuestionnaireAiModel(questionnaireForm);
+        } catch (Exception e) {
+            if (active.equals("dev")) { // 개발서버의 경우 테스트 데이터 연동
+                log.warn("AI 모델 연동 실패로 테스트 데이터 연동됨 (문진표 제출)");
+                Random random = new Random();
+                int typeCount = random.nextInt(2) + 1;
+                String[] chars = new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"};
+                List<String> typeList = new ArrayList<>();
+                for (int i = 0; i < typeCount; i++) {
+                    int randomIndex = random.nextInt(chars.length);
+                    if (typeList.stream().anyMatch(type -> type.equals(chars[randomIndex]))) {
+                        i--; continue;
+                    }
+                    typeList.add(chars[randomIndex]);
+                }
+                analysisData = new QuestionnaireAnalysisResponse(typeList);
+            } else {
+                throw new BadRequestApiException("AI 모델 연동에 실패했어요.\n관리자에게 문의해 주세요.");
+            }
+        }
 
         List<OralStatus> oralStatusList = oralStatusRepository.findAllByOralStatusTypeInOrderByOralStatusPriority(analysisData.getContentsType());
         List<String> oralStatusTypeList = oralStatusList.subList(0, Math.min(2, oralStatusList.size())) // 최대 2개

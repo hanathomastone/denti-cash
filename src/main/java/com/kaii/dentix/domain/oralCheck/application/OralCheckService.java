@@ -37,6 +37,7 @@ import com.kaii.dentix.global.common.util.Utils;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +52,7 @@ import java.util.stream.Collectors;
 import static com.kaii.dentix.domain.type.oral.OralCheckDivisionCommentType.*;
 import static com.kaii.dentix.global.common.response.ResponseMessage.SUCCESS_MSG;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OralCheckService {
@@ -71,6 +73,9 @@ public class OralCheckService {
 
     private final ObjectMapper objectMapper;
 
+    @Value("${spring.profiles.active}")
+    private String active;
+
     @Value("${s3.folderPath.oralCheck}")
     private String folderPath;
 
@@ -87,8 +92,19 @@ public class OralCheckService {
         // 업로드 경로가 없을 경우, 파일 저장 실패
         if (StringUtils.isBlank(uploadedUrl)) throw new BadRequestApiException("구강 촬영 결과 저장에 실패했어요.\n관리자에게 문의해 주세요.");
 
-        // 람다 AI 서버로 업로드 경로 전달 후, AI 분석 결과 받아옴
-        OralCheckAnalysisResponse analysisData = aiModelService.getPyDentalAiModel(file);
+        // AI 서버로 촬영 결과 전달 후, AI 분석 결과 받아옴
+        OralCheckAnalysisResponse analysisData;
+        try {
+            analysisData = aiModelService.getPyDentalAiModel(file);
+        } catch (Exception e) {
+            if (active.equals("dev")) { // 개발서버의 경우 테스트 데이터 연동
+                log.warn("AI 모델 연동 실패로 테스트 데이터 연동됨 (구강 촬영)");
+                Random random = new Random();
+                analysisData = new OralCheckAnalysisResponse(new OralCheckAnalysisDivisionDto(random.nextFloat(50), random.nextFloat(50), random.nextFloat(50), random.nextFloat(50)));
+            } else {
+                return new DataResponse<>(411, "AI 모델 연동에 실패했어요.\n관리자에게 문의해 주세요.", null);
+            }
+        }
 
         OralCheck oralCheck = null;
 

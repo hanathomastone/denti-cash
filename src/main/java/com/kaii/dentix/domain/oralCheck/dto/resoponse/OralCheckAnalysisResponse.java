@@ -23,4 +23,8 @@ public class OralCheckAnalysisResponse {
     @JsonProperty("plaque_stats")
     private OralCheckAnalysisDivisionDto plaqueStats; // 4등분 목록
 
+    public OralCheckAnalysisResponse(OralCheckAnalysisDivisionDto plaqueStats) {
+        this.statusCode = 200;
+        this.plaqueStats = plaqueStats;
+    }
 }
