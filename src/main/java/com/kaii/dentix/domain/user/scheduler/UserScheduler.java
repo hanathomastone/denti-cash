@@ -40,9 +40,9 @@ public class UserScheduler {
 
     @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul") // 매일 자정
     public void setTestDataForAppStoreReview() throws ParseException {
-        if (!active.equals("prod")) return;
+        String loginIdentifier = active.equals("prod") ? "dtx1234" : "dentix123";
 
-        User user = userRepository.findByUserLoginIdentifier("dtx1234").orElse(null);
+        User user = userRepository.findByUserLoginIdentifier(loginIdentifier).orElse(null);
         if (user == null) return;
 
         List<OralCheck> oralCheckList = oralCheckRepository.findAllByUserIdOrderByCreatedDesc(user.getUserId());
@@ -75,8 +75,7 @@ public class UserScheduler {
             calendar.add(Calendar.DATE, i);
 
             Date targetDate = calendar.getTime();
-
-            if (targetDate.after(today)) break;
+            if (DateFormatUtil.dateToString(datePattern, targetDate).compareTo(todayString) >= 0) break;
 
             for (int j = 0; j < random.nextInt(4); j++) { // 0 ~ 3
                 calendar.setTime(targetDate);
