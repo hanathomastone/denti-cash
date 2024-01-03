@@ -24,6 +24,9 @@ public class OralStatus extends TimeEntity {
     private String oralStatusDescription;
 
     @Column(nullable = false)
+    private String oralStatusSubDescription;
+
+    @Column(nullable = false)
     private int oralStatusPriority;
 
     public OralStatus(String oralStatusType) {
