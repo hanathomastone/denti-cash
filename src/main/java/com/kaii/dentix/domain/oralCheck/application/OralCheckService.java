@@ -85,7 +85,7 @@ public class OralCheckService {
      *  구강검진 사진 촬영
      */
     @Transactional
-    @CacheEvict(value = "dashboard", key = "#userId + '_' + T(java.time.LocalDate).now()")
+    @CacheEvict(value = "dashboard", key = "@userService.getTokenUser(#p0).getUserId() + '_' + T(java.time.LocalDate).now()")
     public DataResponse<OralCheckPhotoDto> oralCheckPhoto(HttpServletRequest httpServletRequest, MultipartFile file) throws IOException, NoSuchAlgorithmException, InvalidKeyException, InterruptedException  {
         User user = userService.getTokenUser(httpServletRequest);
 
@@ -481,7 +481,7 @@ public class OralCheckService {
     /**
      * 대시보드 조회
      */
-    @Cacheable(value = "dashboard", key = "#userId + '_' + T(java.time.LocalDate).now()")
+    @Cacheable(value = "dashboard", key = "@userService.getTokenUser(#p0).getUserId() + '_' + T(java.time.LocalDate).now()")
     public DashboardDto dashboard(HttpServletRequest httpServletRequest) {
         User user = userService.getTokenUser(httpServletRequest);
 
