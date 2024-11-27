@@ -10,7 +10,8 @@ pipeline {
     SLACK_SUCCESS_COLOR = "#2C953C";
     SLACK_FAIL_COLOR = "#FF3232";
     IMAGE_NAME = 'dentix-api'
-    SSH_CONNECTION_CREDENTIAL = 'ai-voucher-ssh'
+    SSH_CONNECTION_CREDENTIAL_DEV = 'kaii-dep-ssh'
+    SSH_CONNECTION_CREDENTIAL_PROD = 'ai-voucher-ssh'
     IMAGE_STORAGE_CREDENTIAL = 'ncp-container-registry'
   }
 
@@ -27,7 +28,7 @@ pipeline {
           switch(BRANCH_NAME) {
             case 'dev' :
               env.IMAGE_STORAGE = 'dentix-dev.ncr.gov-ntruss.com'
-              env.SSH_CONNECTION = 'ncloud@175.106.90.242'
+              env.SSH_CONNECTION = 'ubuntu@54.180.249.23'
               break
             case 'prod' :
               env.IMAGE_STORAGE = 'dentix-prod.ncr.gov-ntruss.com'
@@ -107,8 +108,19 @@ pipeline {
         }
       }
       steps {
-        sshagent(credentials: [SSH_CONNECTION_CREDENTIAL]) {
-          sh "ssh -o StrictHostKeyChecking=no ${SSH_CONNECTION} 'IMAGE_NAME=${IMAGE_NAME} IMAGE_STORAGE=${IMAGE_STORAGE} BUILD_NUMBER=${BUILD_NUMBER} dentix-api/deploy.sh'"
+        script {
+            switch(BRANCH_NAME) {
+                case 'dev' :
+                    sshagent (credentials: [SSH_CONNECTION_CREDENTIAL_DEV]) {
+                        sh "ssh -o StrictHostKeyChecking=no ${SSH_CONNECTION} 'IMAGE_NAME=${IMAGE_NAME} IMAGE_STORAGE=${IMAGE_STORAGE} BUILD_NUMBER=${BUILD_NUMBER} dentix-api/deploy.sh'"
+                    }
+                    break
+                case 'prod' :
+                    sshagent (credentials: [SSH_CONNECTION_CREDENTIAL_PROD]) {가
+                        sh "ssh -o StrictHostKeyChecking=no ${SSH_CONNECTION} 'IMAGE_NAME=${IMAGE_NAME} IMAGE_STORAGE=${IMAGE_STORAGE} BUILD_NUMBER=${BUILD_NUMBER} dentix-api/deploy.sh'"
+                    }
+                    break
+                    }
         }
       }
     }
