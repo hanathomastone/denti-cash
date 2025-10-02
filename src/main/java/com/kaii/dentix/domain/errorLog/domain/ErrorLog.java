@@ -6,13 +6,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.checkerframework.checker.units.qual.C;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 
 import java.util.Date;
 
 @Entity
-@Table(name = "errorLog")
+@Table(name = "`errorLog`")
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,6 +23,7 @@ public class ErrorLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @Column(name = 'errorLogId')
     private Long errorLogId;
 
     private Long tokenUserId;

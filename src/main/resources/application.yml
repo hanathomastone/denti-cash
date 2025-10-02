@@ -2,7 +2,7 @@ spring:
   application:
     name: dentix-api
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE}
+    active: ${SPRING_PROFILES_ACTIVE:prod}
   config:
     import: "optional:configserver:https://config.kai-i.com/"
   cloud:
@@ -11,10 +11,34 @@ spring:
       profile: ${SPRING_PROFILES_ACTIVE}
       username: ${CONFIG_SERVER_USERNAME}
       password: ${CONFIG_SERVER_PASSWORD}
+  datasource:
+    url: jdbc:mysql://db-denti-cash.cr2mqeg6crjr.ap-northeast-2.rds.amazonaws.com:3306/denti_cash?serverTimezone=UTC&useSSL=false&characterEncoding=utf8
+    username: thomastone
+    password: dPqkd0923!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari: # connection-timeout :  pool에서 connect 얻을 때 최대 대기시간이며, 기본 30초임
+      poolName: SpringBootJPAHikariCP
+      minimum-idle: 3
+      maximum-pool-size: 20 # 최대 커넥션 풀 허용 개수
+      idle-timeout: 10000 # pool 에서 유휴 상태로 최대 유지시킬 수 있는 시간, minimum 이 maximum 보다 사이즈가 작을 때 동작함
+      max-lifetime: 60000 # 커넥션 최대 유지시간 55
+      connection-timeout: 10000
+      validation-timeout: 10000 #커넥션이 유효한지 검사할 때 대기 시간을 지정한다. 이 값초은 connectionTimeout보다 작아야 한다. 허용 가능한 최소 값은 250이다.
+      auto-commit: false # 커넥션 풀 auto commit 여부
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
 
 encrypt:
   key: ${CONFIG_SERVER_ENCRYPT_KEY}
-
+jwt:
+  accessTokenKey: "test-access-token"
+  refreshTokenKey: "test-refresh-token"
+  secret: "jwt"
+  expiration: 86400000
 ---
 spring:
   servlet:
@@ -28,3 +52,17 @@ server:
     encoding:
       charset: UTF-8
       force: true
+aiModel:
+  apiUrl:
+    oralCheck: 'ai-backend-gpu.kai-i.com/denti/api/plaque_navy'
+    questionnaire: 'ai-backend-gpu.kai-i.com/denti/api/questionnaire'
+s3:
+  accessKey: 'AKIASK5MCLDZKRFVXF7A'
+  secretKey: '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'
+  storage:
+    bucketName: denti-cash
+    regionName: ap-northeast-2
+    endPoint: 'https://denti-cash.s3.ap-northeast-2.amazonaws.com/test'
+  folderPath:
+    #    oralCheck: 'https://denti-dev.s3.ap-southeast-1.amazonaws.com/test/'
+    oralCheck: test/
