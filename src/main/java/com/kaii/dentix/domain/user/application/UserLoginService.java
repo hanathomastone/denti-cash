@@ -18,6 +18,10 @@ import com.kaii.dentix.domain.user.dto.request.*;
 import com.kaii.dentix.domain.user.event.UserModifyDeviceInfoEvent;
 import com.kaii.dentix.domain.userServiceAgreement.dao.UserServiceAgreementRepository;
 import com.kaii.dentix.domain.userServiceAgreement.domain.UserServiceAgreement;
+import com.kaii.dentix.domain.wallet.application.WalletService;
+import com.kaii.dentix.domain.wallet.dao.WalletRepository;
+import com.kaii.dentix.domain.wallet.domain.Wallet;
+import com.kaii.dentix.domain.wallet.infra.WalletApiClient;
 import com.kaii.dentix.global.common.error.exception.*;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,6 +31,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -35,11 +40,13 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserLoginService {
+    private final WalletRepository walletRepository;
+    private final WalletService walletService;
 
     private final PatientRepository patientRepository;
-
+    private final WalletApiClient walletApiClient;
     private final UserRepository userRepository;
-
+    private final UserService userService;
     private final ServiceAgreementService serviceAgreementService;
 
     private final UserServiceAgreementRepository userServiceAgreementRepository;
@@ -115,44 +122,51 @@ public class UserLoginService {
     }
 
 
-    /**
-     *  사용자 회원가입
-     */
     @Transactional
     public UserSignUpDto userSignUp(HttpServletRequest httpServletRequest, UserSignUpRequest request){
 
         if (request.getPatientId() != null) { // 인증된 회원인 경우
-            patientRepository.findById(request.getPatientId()).orElseThrow(() -> new NotFoundDataException("존재하지 않는 회원입니다."));
-            if (userRepository.findByPatientId(request.getPatientId()).isPresent()) throw new AlreadyDataException("이미 가입한 사용자입니다.");
+            patientRepository.findById(request.getPatientId())
+                    .orElseThrow(() -> new NotFoundDataException("존재하지 않는 회원입니다."));
+            if (userRepository.findByPatientId(request.getPatientId()).isPresent())
+                throw new AlreadyDataException("이미 가입한 사용자입니다.");
         }
 
         // 아이디 중복 확인
         this.loginIdCheck(request.getUserLoginIdentifier());
 
         // 올바르지 않은 findPwdQuestionId 인 경우
-        if (findPwdQuestionRepository.findById(request.getFindPwdQuestionId()).isEmpty()) throw new NotFoundDataException("존재하지 않는 질문입니다.");
+        if (findPwdQuestionRepository.findById(request.getFindPwdQuestionId()).isEmpty())
+            throw new NotFoundDataException("존재하지 않는 질문입니다.");
 
+        // ✅ User 저장
         User user = userRepository.save(User.builder()
-                    .userLoginIdentifier(request.getUserLoginIdentifier())
-                    .userName(request.getUserName())
-                    .userGender(request.getUserGender())
-                    .userPassword(passwordEncoder.encode(request.getUserPassword()))
-                    .findPwdQuestionId(request.getFindPwdQuestionId())
-                    .findPwdAnswer(request.getFindPwdAnswer())
-                    .patientId(request.getPatientId())
-                    .isVerify(request.getPatientId() == null ? YnType.N : YnType.Y)
+                .userLoginIdentifier(request.getUserLoginIdentifier())
+                .userName(request.getUserName())
+                .userGender(request.getUserGender())
+                .userPassword(passwordEncoder.encode(request.getUserPassword()))
+                .findPwdQuestionId(request.getFindPwdQuestionId())
+                .findPwdAnswer(request.getFindPwdAnswer())
+                .birth(request.getBirth())
+                .patientId(request.getPatientId())
+                .isVerify(request.getPatientId() == null ? YnType.N : YnType.Y)
                 .build());
 
         Long userId = user.getUserId();
 
+        // ✅ Wallet + PrivateKey 자동 생성 (외부 API 연동 포함)
+        walletService.createWalletForUser(user);
+
+        // ✅ 토큰 발급
         String accessToken = jwtTokenUtil.createToken(user, TokenType.AccessToken);
         String refreshToken = jwtTokenUtil.createToken(user, TokenType.RefreshToken);
 
         user.updateLogin(refreshToken);
 
-        // 서비스 이용 동의
+        // ✅ 서비스 이용 동의 저장
         this.userServiceAgreeCheckAndSave(request.getUserServiceAgreementRequest(), userId);
 
+        // ✅ 디바이스 이벤트 발행
         publisher.publishEvent(new UserModifyDeviceInfoEvent(
                 user.getUserId(),
                 httpServletRequest,
@@ -162,6 +176,7 @@ public class UserLoginService {
                 request.getUserDeviceToken()
         ));
 
+        // ✅ 결과 반환
         return UserSignUpDto.builder()
                 .patientId(request.getPatientId())
                 .userId(user.getUserId())
@@ -170,9 +185,9 @@ public class UserLoginService {
                 .userLoginIdentifier(request.getUserLoginIdentifier())
                 .userName(request.getUserName())
                 .userGender(request.getUserGender())
+                .birth(user.getBirth())
                 .build();
     }
-
     /**
      *  아이디 중복 확인
      */

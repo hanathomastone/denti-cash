@@ -2,12 +2,14 @@ package com.kaii.dentix.domain.user.domain;
 
 import com.kaii.dentix.domain.type.GenderType;
 import com.kaii.dentix.domain.type.YnType;
+import com.kaii.dentix.domain.wallet.domain.Wallet;
 import com.kaii.dentix.global.common.entity.TimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Where;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -39,6 +41,9 @@ public class User extends TimeEntity {
     @Column(nullable = false)
     private String findPwdAnswer;
 
+    @Column(nullable = false) // ✅ DB에서 NOT NULL 설정
+    private LocalDate birth;
+
     private String userRefreshToken;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -69,7 +74,8 @@ public class User extends TimeEntity {
 
     @Column(length = 10)
     private String userAppVersion;
-
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Wallet wallet;
 
     /**
      * RefreshToken, 최근 로그인 일자 업데이트

@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDate;
+
 @Getter @SuperBuilder
 @AllArgsConstructor
 public class UserSignUpDto extends TokenDto{
@@ -18,5 +20,7 @@ public class UserSignUpDto extends TokenDto{
     private String userName;
 
     private GenderType userGender;
+
+    private LocalDate birth;
 
 }

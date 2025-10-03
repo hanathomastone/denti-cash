@@ -1,4 +1,9 @@
 spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
   application:
     name: dentix-api
   profiles:
@@ -54,8 +59,8 @@ server:
       force: true
 aiModel:
   apiUrl:
-    oralCheck: 'ai-backend-gpu.kai-i.com/denti/api/plaque_navy'
-    questionnaire: 'ai-backend-gpu.kai-i.com/denti/api/questionnaire'
+    oralCheck: 'https://ai-backend-gpu.kai-i.com/denti/api/plaque_navy'
+    questionnaire: 'https://ai-backend-gpu.kai-i.com/denti/api/questionnaire'
 s3:
   accessKey: 'AKIASK5MCLDZKRFVXF7A'
   secretKey: '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'

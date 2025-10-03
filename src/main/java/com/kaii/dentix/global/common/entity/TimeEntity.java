@@ -17,7 +17,7 @@ public class TimeEntity {
 
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
-    @Column
+    @Column(updatable = false)
     private Date created;
 
     @Temporal(TemporalType.TIMESTAMP)

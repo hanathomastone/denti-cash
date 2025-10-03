@@ -27,6 +27,7 @@ import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.domain.User;
 import com.kaii.dentix.domain.userOralStatus.dao.UserOralStatusRepository;
 import com.kaii.dentix.domain.userOralStatus.domain.UserOralStatus;
+import com.kaii.dentix.domain.wallet.application.WalletService;
 import com.kaii.dentix.global.common.aws.AWSS3Service;
 import com.kaii.dentix.global.common.error.exception.BadRequestApiException;
 import com.kaii.dentix.global.common.error.exception.NotFoundDataException;
@@ -72,7 +73,7 @@ public class OralCheckService {
     private final QuestionnaireCustomRepository questionnaireCustomRepository;
     private final OralStatusRepository oralStatusRepository;
     private final UserOralStatusRepository userOralStatusRepository;
-
+    private final WalletService walletService;
     private final ObjectMapper objectMapper;
 
     @Value("${spring.profiles.active}")
@@ -105,6 +106,7 @@ public class OralCheckService {
                 Random random = new Random();
                 analysisData = new OralCheckAnalysisResponse(new OralCheckAnalysisDivisionDto(random.nextFloat(50), random.nextFloat(50), random.nextFloat(50), random.nextFloat(50)));
             } else {
+                log.error(e.getMessage());
                 return new DataResponse<>(411, "AI 모델 연동에 실패했어요.\n관리자에게 문의해 주세요.", null);
             }
         }
@@ -132,16 +134,26 @@ public class OralCheckService {
                 break;
         }
 
-        if (oralCheck == null) {
-            throw new BadRequestApiException("구강 촬영 결과 저장에 실패했어요.\n관리자에게 문의해 주세요.");
-        } else {
-            // 분석 결과 상태가 '성공'일 경우
-            if (oralCheck.getOralCheckAnalysisState() == OralCheckAnalysisState.SUCCESS) {
-                return new DataResponse<>(200, SUCCESS_MSG, new OralCheckPhotoDto(oralCheck.getOralCheckId()));
-            } else {
-                // 분석 결과 상태가 '실패'일 경우
-                return new DataResponse<>(resultCode, "구강 촬영 인식에 실패했어요.\n가이드에 맞게 재촬영 부탁드려요.", null);
+        if (oralCheck.getOralCheckAnalysisState() == OralCheckAnalysisState.SUCCESS) {
+
+            // ✅ 리워드 지급 시도
+            try {
+                walletService.giveReward(user.getUserId(), oralCheck.getOralCheckId(), oralCheck.getOralCheckResultTotalType());
+
+            } catch (IllegalStateException e) {
+                log.warn("이미 리워드 지급된 구강검진 ID: {}", oralCheck.getOralCheckId());
+            } catch (Exception e) {
+                log.error("리워드 지급 중 오류 발생", e);
             }
+
+            return new DataResponse<>(200, SUCCESS_MSG, new OralCheckPhotoDto(oralCheck.getOralCheckId()));
+
+        } else {
+            return new DataResponse<>(
+                    resultCode,
+                    "구강 촬영 인식에 실패했어요.\n가이드에 맞게 재촬영 부탁드려요.",
+                    null
+            );
         }
 
     }
