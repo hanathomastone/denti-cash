@@ -62,8 +62,11 @@ aiModel:
     oralCheck: 'https://ai-backend-gpu.kai-i.com/denti/api/plaque_navy'
     questionnaire: 'https://ai-backend-gpu.kai-i.com/denti/api/questionnaire'
 s3:
-  accessKey: 'AKIASK5MCLDZKRFVXF7A'
-  secretKey: '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'
+  accessKey: ${AWS_ACCESS_KEY_ID}
+  secretKey: ${AWS_SECRET_ACCESS_KEY}
+
+#  accessKey: 'AKIASK5MCLDZKRFVXF7A'
+#  secretKey: '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'
   storage:
     bucketName: denti-cash
     regionName: ap-northeast-2
