@@ -27,7 +27,7 @@ import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.domain.User;
 import com.kaii.dentix.domain.userOralStatus.dao.UserOralStatusRepository;
 import com.kaii.dentix.domain.userOralStatus.domain.UserOralStatus;
-import com.kaii.dentix.domain.wallet.application.WalletService;
+import com.kaii.dentix.domain.blockChain.wallet.application.WalletService;
 import com.kaii.dentix.global.common.aws.AWSS3Service;
 import com.kaii.dentix.global.common.error.exception.BadRequestApiException;
 import com.kaii.dentix.global.common.error.exception.NotFoundDataException;
@@ -136,15 +136,15 @@ public class OralCheckService {
 
         if (oralCheck.getOralCheckAnalysisState() == OralCheckAnalysisState.SUCCESS) {
 
-            // ✅ 리워드 지급 시도
-            try {
-                walletService.giveReward(user.getUserId(), oralCheck.getOralCheckId(), oralCheck.getOralCheckResultTotalType());
-
-            } catch (IllegalStateException e) {
-                log.warn("이미 리워드 지급된 구강검진 ID: {}", oralCheck.getOralCheckId());
-            } catch (Exception e) {
-                log.error("리워드 지급 중 오류 발생", e);
-            }
+//            // ✅ 리워드 지급 시도
+//            try {
+//                walletService.giveReward(user.getUserId(), oralCheck.getOralCheckId(), oralCheck.getOralCheckResultTotalType());
+//
+//            } catch (IllegalStateException e) {
+//                log.warn("이미 리워드 지급된 구강검진 ID: {}", oralCheck.getOralCheckId());
+//            } catch (Exception e) {
+//                log.error("리워드 지급 중 오류 발생", e);
+//            }
 
             return new DataResponse<>(200, SUCCESS_MSG, new OralCheckPhotoDto(oralCheck.getOralCheckId()));
 

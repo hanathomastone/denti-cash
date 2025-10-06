@@ -2,7 +2,7 @@ package com.kaii.dentix.domain.user.domain;
 
 import com.kaii.dentix.domain.type.GenderType;
 import com.kaii.dentix.domain.type.YnType;
-import com.kaii.dentix.domain.wallet.domain.Wallet;
+import com.kaii.dentix.domain.blockChain.wallet.domain.UserWallet;
 import com.kaii.dentix.global.common.entity.TimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -75,7 +75,7 @@ public class User extends TimeEntity {
     @Column(length = 10)
     private String userAppVersion;
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Wallet wallet;
+    private UserWallet userWallet;
 
     /**
      * RefreshToken, 최근 로그인 일자 업데이트

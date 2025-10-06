@@ -19,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminStatisticService {
 
-    private final AdminUserCustomRepository adminUserCustomRepository;
+//    private final AdminUserCustomRepository adminUserCustomRepository;
 
     private final OralCheckCustomRepository oralCheckCustomRepository;
 
@@ -34,7 +34,7 @@ public class AdminStatisticService {
     public AdminUserStatisticResponse userStatistic(AdminStatisticRequest request){
 
         // 통계 1. 전체 남녀 가입률
-        AdminUserSignUpCountDto userSignUpCount = adminUserCustomRepository.userSignUpCount(request);
+//        AdminUserSignUpCountDto userSignUpCount = adminUserCustomRepository.userSignUpCount(request);
 
         // 통계 2. 평균 구강검진
         OralCheckResultTypeCount userOralCheckList = oralCheckCustomRepository.userOralCheckList(request); // 구강검진 결과 타입별 횟수
@@ -102,7 +102,7 @@ public class AdminStatisticService {
         }
 
         return AdminUserStatisticResponse.builder()
-                .userSignUpCount(userSignUpCount)
+//                .userSignUpCount(userSignUpCount)
                 .averageState(averageState)
                 .oralCheckCount(allOralCheckCount)
                 .oralCheckAverage(oralCheckAverage)

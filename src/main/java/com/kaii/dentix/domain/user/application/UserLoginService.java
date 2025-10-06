@@ -2,6 +2,9 @@ package com.kaii.dentix.domain.user.application;
 
 import com.kaii.dentix.domain.admin.dao.AdminRepository;
 import com.kaii.dentix.domain.admin.domain.Admin;
+import com.kaii.dentix.domain.blockChain.token.dao.TokenContractRepository;
+import com.kaii.dentix.domain.blockChain.token.domain.TokenContract;
+import com.kaii.dentix.domain.blockChain.wallet.domain.UserWallet;
 import com.kaii.dentix.domain.findPwdQuestion.dao.FindPwdQuestionRepository;
 import com.kaii.dentix.domain.jwt.JwtTokenUtil;
 import com.kaii.dentix.domain.jwt.TokenType;
@@ -18,11 +21,13 @@ import com.kaii.dentix.domain.user.dto.request.*;
 import com.kaii.dentix.domain.user.event.UserModifyDeviceInfoEvent;
 import com.kaii.dentix.domain.userServiceAgreement.dao.UserServiceAgreementRepository;
 import com.kaii.dentix.domain.userServiceAgreement.domain.UserServiceAgreement;
-import com.kaii.dentix.domain.wallet.application.WalletService;
-import com.kaii.dentix.domain.wallet.dao.WalletRepository;
-import com.kaii.dentix.domain.wallet.domain.Wallet;
-import com.kaii.dentix.domain.wallet.infra.WalletApiClient;
+import com.kaii.dentix.domain.blockChain.wallet.application.WalletService;
+import com.kaii.dentix.domain.blockChain.wallet.dao.UserWalletRepository;
 import com.kaii.dentix.global.common.error.exception.*;
+import com.kaii.dentix.global.common.util.CryptoUtil;
+import com.kaii.dentix.global.flask.client.FlaskClient;
+import com.kaii.dentix.global.flask.dto.FlaskCreateWalletResponse;
+import com.kaii.dentix.global.flask.dto.FlaskPrivateKeyResponse;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +36,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -40,11 +44,11 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserLoginService {
-    private final WalletRepository walletRepository;
+    private final UserWalletRepository userWalletRepository;
     private final WalletService walletService;
 
     private final PatientRepository patientRepository;
-    private final WalletApiClient walletApiClient;
+    private final FlaskClient flaskClient;
     private final UserRepository userRepository;
     private final UserService userService;
     private final ServiceAgreementService serviceAgreementService;
@@ -60,7 +64,8 @@ public class UserLoginService {
     private final ApplicationEventPublisher publisher;
 
     private final AdminRepository adminRepository;
-
+    private final CryptoUtil cryptoUtil;
+    private final TokenContractRepository tokenContractRepository;
     /**
      * 사용자 서비스 이용동의 여부 확인 및 저장
      */
@@ -154,8 +159,6 @@ public class UserLoginService {
 
         Long userId = user.getUserId();
 
-        // ✅ Wallet + PrivateKey 자동 생성 (외부 API 연동 포함)
-        walletService.createWalletForUser(user);
 
         // ✅ 토큰 발급
         String accessToken = jwtTokenUtil.createToken(user, TokenType.AccessToken);
@@ -175,6 +178,37 @@ public class UserLoginService {
                 request.getUserOsVersion(),
                 request.getUserDeviceToken()
         ));
+
+        // ✅ 활성화된 컨트랙트 조회
+        TokenContract defaultContract = tokenContractRepository.findActiveContract()
+                .orElseThrow(() -> new RuntimeException("활성화된 토큰 컨트랙트가 없습니다."));
+
+        //지갑 생성 요청
+        FlaskCreateWalletResponse walletRes = flaskClient.createWallet();
+        if (walletRes.getAddress() == null)
+            throw new RuntimeException("Flask에서 address를 반환하지 않았습니다.");
+        String walletAddress = walletRes.getAddress();
+
+        // 3️⃣ UserWallet 임시 저장 (address만)
+        UserWallet wallet = UserWallet.builder()
+                .user(user)
+                .walletAddress(walletAddress)
+                .encryptedPrivateKey(null)
+                .balance(0L)
+                .contract(defaultContract)   // ✅ 추가
+                .active(true)
+                .build();
+//        userWalletRepository.save(wallet);
+
+        // 4️⃣ Flask - privateKey 조회
+        FlaskPrivateKeyResponse keyRes = flaskClient.getPrivateKey(walletAddress);
+        if (keyRes.getPrivate_key() == null)
+            throw new RuntimeException("privateKey 조회 실패");
+
+        // 5️⃣ privateKey 암호화 후 저장
+        String encryptedKey = cryptoUtil.encrypt(keyRes.getPrivate_key());
+        wallet.updateEncryptedPrivateKey(encryptedKey);
+        userWalletRepository.save(wallet);
 
         // ✅ 결과 반환
         return UserSignUpDto.builder()

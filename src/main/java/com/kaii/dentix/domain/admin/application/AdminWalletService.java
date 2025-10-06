@@ -1,94 +1,108 @@
 package com.kaii.dentix.domain.admin.application;
 
 import com.kaii.dentix.domain.admin.dao.AdminWalletRepository;
-import com.kaii.dentix.domain.admin.dao.AdminWalletTransactionRepository;
 import com.kaii.dentix.domain.admin.domain.AdminWallet;
-import com.kaii.dentix.domain.admin.domain.AdminWalletTransaction;
-import com.kaii.dentix.domain.admin.dto.AdminCreateTokenResponse;
-import com.kaii.dentix.domain.admin.dto.request.AdminTokenCreateRequest;
-import com.kaii.dentix.domain.type.TransactionType;
-import com.kaii.dentix.domain.wallet.infra.WalletApiClient;
-import com.kaii.dentix.global.common.response.DataResponse;
+import com.kaii.dentix.domain.blockChain.token.dao.TokenContractRepository;
+import com.kaii.dentix.domain.blockChain.token.dao.TokenLedgerRepository;
+import com.kaii.dentix.domain.blockChain.token.domain.TokenLedger;
+import com.kaii.dentix.domain.blockChain.token.dto.TokenTransferResponse;
+import com.kaii.dentix.domain.blockChain.token.type.TokenLedgerStatus;
+import com.kaii.dentix.domain.blockChain.token.type.TokenLedgerType;
+import com.kaii.dentix.domain.blockChain.wallet.dao.UserWalletRepository;
+import com.kaii.dentix.domain.blockChain.wallet.domain.UserWallet;
 import com.kaii.dentix.global.common.util.CryptoUtil;
-import org.springframework.transaction.annotation.Transactional;
+import com.kaii.dentix.global.flask.client.FlaskClient;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminWalletService {
 
+    private final FlaskClient flaskClient;
     private final AdminWalletRepository adminWalletRepository;
-    private final WalletApiClient walletApiClient;
-
-    private final AdminWalletTransactionRepository adminWalletTransactionRepository;
-
-    private static final String TOKEN_CREATE_URL = "http://220.149.235.79:5000/token/create";
-
-    @Transactional
-    public AdminWallet createAdminWallet() {
-        String address = walletApiClient.createWalletAddress();
-        String privateKey = walletApiClient.getPrivateKey(address);
-
-        adminWalletRepository.findByActiveTrue().ifPresent(AdminWallet::deactivate);
-
-        AdminWallet adminWallet = AdminWallet.builder()
-                .address(address)
-                .privateKey(CryptoUtil.encrypt(privateKey))
-                .active(true)
-                .build();
-
-        return adminWalletRepository.save(adminWallet);
-    }
-
-    @Transactional(readOnly = true)
-    public AdminWallet getActiveAdminWallet() {
-        return adminWalletRepository.findByActiveTrue()
-                .orElseThrow(() -> new RuntimeException("활성화된 관리자 지갑이 없습니다."));
-    }
+    private final TokenContractRepository tokenContractRepository;
+    private final UserWalletRepository userWalletRepository;
+    private final CryptoUtil cryptoUtil;
+    private final TokenLedgerRepository tokenLedgerRepository;
     /**
-     * 관리자 토큰 생성 (DataResponse 반환)
+     * ✅ Flask에서 모든 주소별 잔액 조회 후, 관리자 지갑 잔액 업데이트
      */
     @Transactional
-    public AdminCreateTokenResponse createToken(AdminTokenCreateRequest request, Long adminWalletId) {
-        RestTemplate restTemplate = new RestTemplate();
+    public void syncAllWalletBalances() {
+        // ✅ Flask 응답: [ [address, balance], ... ]
+        List<List<Object>> balanceList = flaskClient.getBalanceList();
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("token_name", request.getTokenName());
-        body.put("token_symbol", request.getTokenSymbol());
-        body.put("supply", request.getSupply());
+        for (List<Object> entry : balanceList) {
+            if (entry.size() < 2) {
+                log.warn("⚠️ 잘못된 데이터 형식: {}", entry);
+                continue;
+            }
 
-        Map<String, Object> flaskResponse = restTemplate.postForObject(
-                TOKEN_CREATE_URL, body, Map.class
-        );
+            String address = String.valueOf(entry.get(0));
+            Object balanceObj = entry.get(1);
 
-        String contractAddress = (String) flaskResponse.get("contract_address");
-        if (contractAddress == null || contractAddress.isEmpty()) {
-            throw new IllegalStateException("Flask 서버에서 contract_address를 반환하지 않았습니다.");
+            Long balance = 0L;
+            if (balanceObj instanceof Number) {
+                balance = ((Number) balanceObj).longValue();
+            } else if (balanceObj instanceof String) {
+                try {
+                    balance = Long.parseLong((String) balanceObj);
+                } catch (NumberFormatException ex) {
+                    log.warn("⚠️ 잘못된 balance 값: {}", balanceObj);
+                    continue;
+                }
+            }
+
+            final Long finalBalance = balance;
+            adminWalletRepository.findByAddress(address).ifPresent(wallet -> {
+                wallet.updateBalance(finalBalance);
+                log.info("✅ 잔액 동기화 완료: {} → {}", address, finalBalance);
+            });
         }
 
-        AdminWallet wallet = adminWalletRepository.findById(adminWalletId)
-                .orElseThrow(() -> new IllegalArgumentException("AdminWallet을 찾을 수 없습니다."));
-
-        AdminWalletTransaction transaction = AdminWalletTransaction.builder()
-                .adminWallet(wallet)
-                .transactionType(TransactionType.CHARGE)
-                .amount(request.getSupply())
-                .description("토큰 생성 (" + request.getTokenSymbol() + ")")
-                .contractAddress(contractAddress)
-                .build();
-
-        adminWalletTransactionRepository.save(transaction);
-        wallet.addBalance(request.getSupply());
-        adminWalletRepository.save(wallet);
-
-        return AdminCreateTokenResponse.builder()
-                .contractAddress(contractAddress)
-                .newBalance(wallet.getBalance())
-                .build();
+        log.info("✅ 전체 관리자 지갑 잔액 동기화 완료 ({}개)", balanceList.size());
     }
+    @Transactional
+    public void issueTokenManually(Long userId, Long amount, String reason) {
+        AdminWallet adminWallet = adminWalletRepository.findActiveWallet()
+                .orElseThrow(() -> new RuntimeException("활성화된 관리자 지갑이 없습니다."));
+
+        UserWallet userWallet = userWalletRepository.findByUser_UserId(userId)
+                .orElseThrow(() -> new RuntimeException("사용자 지갑이 존재하지 않습니다."));
+
+        String privateKey = cryptoUtil.decrypt(adminWallet.getEncryptedPrivateKey());
+        String contractAddr = adminWallet.getContract().getContractAddress();
+
+        TokenTransferResponse res = flaskClient.transferToken(
+                contractAddr,
+                adminWallet.getAddress(),
+                privateKey,
+                userWallet.getWalletAddress(),
+                amount
+        );
+
+        TokenLedger ledger = TokenLedger.builder()
+                .contract(adminWallet.getContract())
+                .fromAdminWallet(adminWallet)
+                .toUserWallet(userWallet)
+                .amount(BigDecimal.valueOf(amount))
+                .type(TokenLedgerType.MANUAL)
+                .status(TokenLedgerStatus.SUCCESS)
+                .message(reason)
+                .txHash("manual-" + System.currentTimeMillis())
+                .build();
+
+        tokenLedgerRepository.save(ledger);
+
+        log.info("✅ 수동 토큰 발급 완료: userId={}, amount={}, reason={}", userId, amount, reason);
+    }
+
 }
