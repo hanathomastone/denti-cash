@@ -5,16 +5,23 @@ import com.kaii.dentix.domain.type.TransactionPeriod;
 import com.kaii.dentix.domain.type.TransactionSort;
 import com.kaii.dentix.domain.type.TransactionTypeOption;
 import com.kaii.dentix.domain.type.oral.OralCheckResultType;
+import com.kaii.dentix.domain.wallet.dao.WalletRepository;
 import com.kaii.dentix.domain.wallet.domain.WalletTransaction;
 import com.kaii.dentix.domain.wallet.dto.WalletDto;
 import com.kaii.dentix.domain.wallet.dto.WalletTransactionDto;
+import com.kaii.dentix.domain.wallet.dto.WalletTransactionResponse;
+import com.kaii.dentix.global.common.response.DataResponse;
 import jdk.jfr.Registered;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.kaii.dentix.domain.wallet.application.WalletService;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -23,7 +30,7 @@ import java.util.List;
 public class WalletController {
 
     private final WalletService walletService;
-
+//    private final Wallet walletRepository;
     @PostMapping("/{userId}/charge")
     public ResponseEntity<WalletTransactionDto> charge(
             @PathVariable Long userId,
@@ -73,5 +80,39 @@ public class WalletController {
     ) {
         WalletTransaction tx = walletService.giveReward(userId, checkupId, result);
         return ResponseEntity.ok(WalletTransactionDto.from(tx));
+    }
+
+//    @GetMapping
+//    public Page<WalletTransactionResponse> getTransactions(
+//            @RequestParam(required = false) Long userId,
+//            @RequestParam(required = false) String type,
+//            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+//            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
+//            @RequestParam(defaultValue = "0") int page,
+//            @RequestParam(defaultValue = "10") int size
+//    ) {
+//        return walletService.getTransactions(userId, type, start, end, page, size);
+//    }
+
+    /**
+     * ✅ 사용자별 거래내역 조회 (페이징 + 필터)
+     */
+    @GetMapping
+    public DataResponse<Page<WalletTransactionResponse>> getTransactions(
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime startDate,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime endDate,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<WalletTransactionResponse> result = walletService.getTransactions(
+                userId, type, startDate, endDate, PageRequest.of(page, size)
+        );
+        return new DataResponse<>(result);
     }
 }

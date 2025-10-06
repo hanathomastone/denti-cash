@@ -11,6 +11,7 @@ import com.kaii.dentix.domain.type.oral.OralCheckResultType;
 import com.kaii.dentix.domain.userPrivateKey.dao.UserPrivateKeyRepository;
 import com.kaii.dentix.domain.userPrivateKey.domain.UserPrivateKey;
 import com.kaii.dentix.domain.wallet.dao.WalletTransactionRepository;
+import com.kaii.dentix.domain.wallet.dto.WalletTransactionResponse;
 import com.kaii.dentix.domain.wallet.infra.WalletApiClient;
 import com.kaii.dentix.global.common.util.CryptoUtil;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +41,7 @@ public class WalletService {
     private final OralCheckRepository oralCheckRepository;
     private final UserPrivateKeyRepository userPrivateKeyRepository;
     private final AdminWalletService adminWalletService;
-
+    private final WalletTransactionRepository transactionRepository;
     private static final String CONTRACT_ADDRESS = "0xYourTokenContractAddress"; // 환경 변수로 관리 권장
 
     @Transactional(readOnly = true)
@@ -178,6 +179,25 @@ public class WalletService {
                 .build();
 
         return walletTransactionRepository.save(tx);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<WalletTransactionResponse> getTransactions(Long userId, String type,
+                                                           LocalDateTime start, LocalDateTime end,
+                                                           Pageable pageable) {
+        Page<WalletTransaction> result = walletTransactionRepository.findTransactions(
+                userId, type, start, end, pageable
+        );
+
+        return result.map(tx -> WalletTransactionResponse.builder()
+                .transactionId(tx.getId())
+                .walletAddress(tx.getWallet().getAddress())
+                .userName(tx.getWallet().getUser().getUserName())
+                .transactionType(tx.getTransactionType())
+                .amount(tx.getAmount())
+                .description(tx.getDescription())
+//                .created(tx.getCreated())
+                .build());
     }
 
 }

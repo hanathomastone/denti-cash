@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdminWalletResponse {
+public class AdminCreateTokenResponse {
     private String contractAddress;
     private Long newBalance;
 }

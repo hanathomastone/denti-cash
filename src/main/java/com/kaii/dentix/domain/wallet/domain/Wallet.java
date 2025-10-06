@@ -21,8 +21,10 @@ public class Wallet extends TimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(name = "address", nullable = false, unique = true, length = 255)
     private String address;
+
     // 사용자 1:1 지갑
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false, unique = true)
@@ -37,7 +39,6 @@ public class Wallet extends TimeEntity {
 
     @OneToOne(mappedBy = "wallet", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserPrivateKey privateKey;
-
 
     @Column(name = "deleted_at")
     private java.time.LocalDateTime deletedAt;
@@ -97,5 +98,25 @@ public class Wallet extends TimeEntity {
 
         this.transactions.add(tx);
         return tx;
+    }
+
+    // ✅ 외부 동기화 or 관리 작업 시 자동 로그 생성
+    public void updateBalance(Long newBalance, String description) {
+        if (newBalance == null) return;
+
+        long diff = newBalance - this.balance;
+        if (diff == 0) return; // 변경 없음
+
+        TransactionType type = TransactionType.SYNC_BALANCE; // balance 동기화용 타입
+
+        WalletTransaction tx = WalletTransaction.builder()
+                .wallet(this)
+                .amount(Math.abs(diff))
+                .transactionType(type)
+                .description(description != null ? description : "자동 잔액 동기화")
+                .build();
+
+        this.transactions.add(tx);
+        this.balance = newBalance;
     }
 }

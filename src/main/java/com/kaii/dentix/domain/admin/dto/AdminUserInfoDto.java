@@ -36,5 +36,5 @@ public class AdminUserInfoDto {
     private YnType isVerify; // 사용자 인증 여부
 
     private String patientPhoneNumber; // 환자 연락처
-
+    private String walletAddress; //사용자 지갑 주소
 }

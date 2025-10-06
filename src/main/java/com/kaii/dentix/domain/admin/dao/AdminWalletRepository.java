@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface AdminWalletRepository extends JpaRepository<AdminWallet, Long> {
     Optional<AdminWallet> findByActiveTrue();
+    Optional<AdminWallet> findByAddress(String address);
+
 }

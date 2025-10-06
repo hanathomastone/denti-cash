@@ -30,4 +30,6 @@ public class AdminUserListRequest extends PageAndSizeRequest {
 
     private String endDate; // 기간 설정 종료일
 
+    private Boolean hasWallet; //지갑 주소 보유 여부 필터(true : 있음, false : 없음)
+
 }

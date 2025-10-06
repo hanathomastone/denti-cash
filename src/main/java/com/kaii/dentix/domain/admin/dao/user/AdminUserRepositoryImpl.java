@@ -29,7 +29,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-
+import com.kaii.dentix.domain.wallet.domain.QWallet;
 import java.util.*;
 
 @Repository
@@ -47,7 +47,7 @@ public class AdminUserRepositoryImpl implements AdminUserCustomRepository {
     private final QQuestionnaire questionnaire = QQuestionnaire.questionnaire;
 
     private final QPatient patient = QPatient.patient;
-
+    private final QWallet wallet = QWallet.wallet;
     /**
      *  사용자 목록 조회
      */
@@ -62,7 +62,7 @@ public class AdminUserRepositoryImpl implements AdminUserCustomRepository {
                         Expressions.stringTemplate("group_concat({0})", userOralStatus.oralStatus.oralStatusType),
                         questionnaire.created.as("questionnaireDate"),
                         oralCheck.oralCheckResultTotalType, oralCheck.created.as("oralCheckDate"), user.isVerify,
-                        patient.patientPhoneNumber
+                        patient.patientPhoneNumber, wallet.address
 
                 ))
                 .from(user)
@@ -78,6 +78,7 @@ public class AdminUserRepositoryImpl implements AdminUserCustomRepository {
                                 .where(oralCheck.userId.eq(user.userId))
                         )))
                 .leftJoin(patient).on(user.patientId.eq(patient.patientId))
+                .leftJoin(wallet).on(wallet.user.userId.eq(user.userId))
                 .where(whereSearch(request))
                 .groupBy(user.userId, questionnaire.questionnaireId, oralCheck.oralCheckId)
                 .orderBy(user.created.desc())
@@ -137,6 +138,9 @@ public class AdminUserRepositoryImpl implements AdminUserCustomRepository {
         if (request.getIsVerify() != null) {
             booleanBuilder.and(user.isVerify.eq(request.getIsVerify()));
         }
+
+        //지갑주소 유무 필터링
+        booleanBuilder.and(whereHasWallet(request.getHasWallet()));
 
         // 기간 설정
         booleanBuilder.and(whereAllDatePeriod(request.getAllDatePeriod()));
@@ -232,6 +236,23 @@ public class AdminUserRepositoryImpl implements AdminUserCustomRepository {
             return null;
         }
         return user.created.lt(date);
+    }
+
+    /**
+     * 지갑 주소 유무 필터링
+     */
+    private BooleanExpression whereHasWallet(Boolean hasWallet) {
+        if (hasWallet == null) {
+            return null;
+        }
+
+        if (hasWallet) {
+            // 주소가 존재하는 경우
+            return wallet.address.isNotNull();
+        } else {
+            // 주소가 존재하지 않는 경우
+            return wallet.address.isNull();
+        }
     }
 
 }

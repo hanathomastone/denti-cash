@@ -1,5 +1,5 @@
 package com.kaii.dentix.domain.type;
 
 public enum TransactionType {
-    CHARGE, USE, REWARD_CHECKUP
+    CHARGE, USE, REWARD_CHECKUP, SYNC_BALANCE
 }
