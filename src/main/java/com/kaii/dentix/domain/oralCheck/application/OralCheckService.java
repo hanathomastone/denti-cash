@@ -2,6 +2,7 @@ package com.kaii.dentix.domain.oralCheck.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kaii.dentix.domain.admin.application.AdminWalletService;
 import com.kaii.dentix.domain.admin.dto.statistic.OralCheckResultTypeCount;
 import com.kaii.dentix.domain.oralCheck.dao.OralCheckRepository;
 import com.kaii.dentix.domain.oralCheck.domain.OralCheck;
@@ -73,7 +74,7 @@ public class OralCheckService {
     private final QuestionnaireCustomRepository questionnaireCustomRepository;
     private final OralStatusRepository oralStatusRepository;
     private final UserOralStatusRepository userOralStatusRepository;
-    private final WalletService walletService;
+    private final AdminWalletService adminWalletService;
     private final ObjectMapper objectMapper;
 
     @Value("${spring.profiles.active}")
@@ -135,16 +136,34 @@ public class OralCheckService {
         }
 
         if (oralCheck.getOralCheckAnalysisState() == OralCheckAnalysisState.SUCCESS) {
+            try {
+                // 결과 유형 (예: HEALTHY, GOOD, CAUTION, RISK)
+                String resultType = oralCheck.getOralCheckResultTotalType().name();
 
-//            // ✅ 리워드 지급 시도
-//            try {
-//                walletService.giveReward(user.getUserId(), oralCheck.getOralCheckId(), oralCheck.getOralCheckResultTotalType());
-//
-//            } catch (IllegalStateException e) {
-//                log.warn("이미 리워드 지급된 구강검진 ID: {}", oralCheck.getOralCheckId());
-//            } catch (Exception e) {
-//                log.error("리워드 지급 중 오류 발생", e);
-//            }
+                // 보상 금액 매핑
+                int rewardAmount;
+                switch (resultType) {
+                    case "HEALTHY": rewardAmount = 10; break;
+                    case "GOOD": rewardAmount = 5; break;
+                    case "CAUTION": rewardAmount = 3; break;
+                    case "RISK": rewardAmount = 1; break;
+                    default: rewardAmount = 0; break;
+                }
+
+                if (rewardAmount > 0) {
+                    // ✅ 토큰 보상 지급
+                    adminWalletService.giveReward(user.getUserId(), oralCheck.getOralCheckId(), resultType, rewardAmount);
+                    log.info("🎉 구강검진 보상 지급 완료: userId={}, result={}, amount={}", user.getUserId(), resultType, rewardAmount);
+                } else {
+                    log.info("⚠️ 해당 결과({})는 보상 지급 대상이 아닙니다.", resultType);
+                }
+
+            } catch (IllegalStateException e) {
+                log.warn("이미 리워드 지급된 구강검진 ID: {}", oralCheck.getOralCheckId());
+            } catch (Exception e) {
+                log.error("❌ 리워드 지급 중 오류 발생", e);
+            }
+
 
             return new DataResponse<>(200, SUCCESS_MSG, new OralCheckPhotoDto(oralCheck.getOralCheckId()));
 

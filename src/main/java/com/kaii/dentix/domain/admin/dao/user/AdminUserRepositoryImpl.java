@@ -31,7 +31,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import com.kaii.dentix.domain.blockChain.wallet.domain.QUserWallet;
 import java.util.*;
-
+import static com.kaii.dentix.domain.blockChain.wallet.domain.QUserWallet.userWallet;
 @Repository
 @RequiredArgsConstructor
 public class AdminUserRepositoryImpl implements AdminUserCustomRepository {
@@ -47,7 +47,7 @@ public class AdminUserRepositoryImpl implements AdminUserCustomRepository {
     private final QQuestionnaire questionnaire = QQuestionnaire.questionnaire;
 
     private final QPatient patient = QPatient.patient;
-//    private final QUserWallet wallet = QUserWallet.wallet;
+    private final QUserWallet userWallet = QUserWallet.userWallet;
     /**s
      *  사용자 목록 조회
      */
@@ -58,13 +58,18 @@ public class AdminUserRepositoryImpl implements AdminUserCustomRepository {
 
         List<AdminUserInfoDto> result = queryFactory
                 .select(Projections.constructor(AdminUserInfoDto.class,
-                        user.userId, user.userLoginIdentifier, user.userName, user.userGender,
+                        user.userId,
+                        user.userLoginIdentifier,
+                        user.userName,
+                        user.userGender,
                         Expressions.stringTemplate("group_concat({0})", userOralStatus.oralStatus.oralStatusType),
                         questionnaire.created.as("questionnaireDate"),
-                        oralCheck.oralCheckResultTotalType, oralCheck.created.as("oralCheckDate"), user.isVerify,
-                        patient.patientPhoneNumber
-//                        , wallet.address
-
+                        oralCheck.oralCheckResultTotalType,
+                        oralCheck.created.as("oralCheckDate"),
+                        user.isVerify,
+                        patient.patientPhoneNumber,
+                        userWallet.address,
+                        userWallet.balance     // ✅ 보유 토큰
                 ))
                 .from(user)
                 .leftJoin(questionnaire).on(questionnaire.userId.eq(user.userId)
@@ -79,7 +84,7 @@ public class AdminUserRepositoryImpl implements AdminUserCustomRepository {
                                 .where(oralCheck.userId.eq(user.userId))
                         )))
                 .leftJoin(patient).on(user.patientId.eq(patient.patientId))
-//                .leftJoin(wallet).on(wallet.user.userId.eq(user.userId))
+                .leftJoin(userWallet).on(userWallet.user.userId.eq(user.userId))
                 .where(whereSearch(request))
                 .groupBy(user.userId, questionnaire.questionnaireId, oralCheck.oralCheckId)
                 .orderBy(user.created.desc())
@@ -118,8 +123,10 @@ public class AdminUserRepositoryImpl implements AdminUserCustomRepository {
 
         // 검색어 (아이디 혹은 이름)
         if (StringUtils.isNotBlank(request.getUserIdentifierOrName())) {
-            booleanBuilder.or(user.userLoginIdentifier.contains(request.getUserIdentifierOrName())
-                    .or(user.userName.contains(request.getUserIdentifierOrName())));
+            booleanBuilder.and(
+                    user.userLoginIdentifier.contains(request.getUserIdentifierOrName())
+                            .or(user.userName.contains(request.getUserIdentifierOrName()))
+            );
         }
 
         // 구강 상태
@@ -140,8 +147,8 @@ public class AdminUserRepositoryImpl implements AdminUserCustomRepository {
             booleanBuilder.and(user.isVerify.eq(request.getIsVerify()));
         }
 
-        //지갑주소 유무 필터링
-//        booleanBuilder.and(whereHasWallet(request.getHasWallet()));
+        // ✅ 지갑주소 유무 필터링
+        booleanBuilder.and(whereHasWallet(request.getHasWallet()));
 
         // 기간 설정
         booleanBuilder.and(whereAllDatePeriod(request.getAllDatePeriod()));
@@ -149,6 +156,25 @@ public class AdminUserRepositoryImpl implements AdminUserCustomRepository {
         booleanBuilder.and(whereEndDate(request.getEndDate()));
 
         return booleanBuilder;
+    }
+
+    /**
+     *  지갑 주소 유무 필터링
+     */
+    private BooleanExpression whereHasWallet(Boolean hasWallet) {
+        if (hasWallet == null) {
+            return null;
+        }
+
+        if (hasWallet) {
+            // 주소가 존재하는 사용자 (지갑 있음)
+            return userWallet.address.isNotNull()
+                    .and(userWallet.address.ne(""));
+        } else {
+            // 주소가 존재하지 않는 사용자 (지갑 없음)
+            return userWallet.address.isNull()
+                    .or(userWallet.address.eq(""));
+        }
     }
 
     /**
@@ -238,22 +264,5 @@ public class AdminUserRepositoryImpl implements AdminUserCustomRepository {
         }
         return user.created.lt(date);
     }
-
-//    /**
-//     * 지갑 주소 유무 필터링
-//     */
-//    private BooleanExpression whereHasWallet(Boolean hasWallet) {
-//        if (hasWallet == null) {
-//            return null;
-//        }
-//
-//        if (hasWallet) {
-//            // 주소가 존재하는 경우
-//            return wallet.address.isNotNull();
-//        } else {
-//            // 주소가 존재하지 않는 경우
-//            return wallet.address.isNull();
-//        }
-//    }
 
 }

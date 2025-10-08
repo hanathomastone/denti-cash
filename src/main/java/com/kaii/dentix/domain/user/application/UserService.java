@@ -1,5 +1,7 @@
 package com.kaii.dentix.domain.user.application;
 
+import com.kaii.dentix.domain.blockChain.wallet.dao.UserWalletRepository;
+import com.kaii.dentix.domain.blockChain.wallet.domain.UserWallet;
 import com.kaii.dentix.domain.findPwdQuestion.dao.FindPwdQuestionRepository;
 import com.kaii.dentix.domain.jwt.JwtTokenUtil;
 import com.kaii.dentix.domain.jwt.TokenType;
@@ -63,7 +65,7 @@ public class UserService {
 
     private final ServiceAgreementCustomRepository serviceAgreementCustomRepository;
 
-
+private final UserWalletRepository userWalletRepository;
     /**
      * 토큰에서 User 추출
      */
@@ -256,7 +258,8 @@ public class UserService {
 
         // 사용자 서비스 '선택' 이용 동의 여부 조회
         List<UserServiceAgreeList> serviceAgreementList = serviceAgreementCustomRepository.findAllByNotRequiredServiceAgreement(user.getUserId());
-
+        UserWallet userWallet = userWalletRepository.findByUser_UserId(user.getUserId())
+                .orElseThrow(() -> new RuntimeException("사용자 지갑이 존재하지 않습니다."));
         String patientPhoneNumber = null;
 
         if (user.getPatientId() != null){
@@ -270,6 +273,7 @@ public class UserService {
                 .patientPhoneNumber(patientPhoneNumber != null ? patientPhoneNumber : user.getIsVerify().equals(YnType.Y) ? "-" : null)
                 .userServiceAgreeLists(serviceAgreementList)
                 .userGender(user.getUserGender())
+                .tokenBalance(userWallet.getBalance())
                 .build();
     }
 

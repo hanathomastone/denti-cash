@@ -133,4 +133,18 @@ public class JwtTokenUtil {
                 return true;
         }
     }
+    /**
+     * ✅ HttpServletRequest에서 Access Token을 파싱하고 userId 추출
+     */
+    public Long getUserIdFromRequest(HttpServletRequest request) {
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new RuntimeException("Authorization 헤더가 존재하지 않거나 Bearer 토큰 형식이 아닙니다.");
+        }
+
+        String token = authHeader.substring(7); // "Bearer " 제거
+        return getUserId(token, TokenType.AccessToken);
+    }
+
 }

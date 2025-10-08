@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 
 @Getter @Builder
-@AllArgsConstructor @NoArgsConstructor
+@NoArgsConstructor
 public class AdminUserInfoDto {
 
     private Long userId; // 사용자 고유 번호
@@ -37,4 +37,24 @@ public class AdminUserInfoDto {
 
     private String patientPhoneNumber; // 환자 연락처
     private String walletAddress; //사용자 지갑 주소
+    private Long walletBalance;
+
+    public AdminUserInfoDto(Long userId, String userLoginIdentifier, String userName,
+                            GenderType userGender, String oralStatus, Date questionnaireDate,
+                            OralCheckResultType oralCheckResultTotalType, Date oralCheckDate,
+                            YnType isVerify, String patientPhoneNumber, String walletAddress,
+                            Long walletBalance) {
+        this.userId = userId;
+        this.userLoginIdentifier = userLoginIdentifier;
+        this.userName = userName;
+        this.userGender = userGender;
+        this.oralStatus = oralStatus;
+        this.questionnaireDate = questionnaireDate;
+        this.oralCheckResultTotalType = oralCheckResultTotalType;
+        this.oralCheckDate = oralCheckDate;
+        this.isVerify = isVerify;
+        this.patientPhoneNumber = patientPhoneNumber;
+        this.walletAddress = walletAddress;
+        this.walletBalance = walletBalance;
+    }
 }

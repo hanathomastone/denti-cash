@@ -5,66 +5,73 @@ import com.kaii.dentix.global.common.entity.TimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
-@Table(name = "adminWallet")
+@Table(name = "admin_wallet")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class AdminWallet extends TimeEntity {
+public class AdminWallet {
 
     @Id
-    @Column(name = "adminWalletId")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "admin_wallet_id")
+    private Long adminWalletId;
 
-    // ✅ 관리자 지갑 주소 (on-chain address)
     @Column(nullable = false, unique = true, length = 128)
     private String address;
 
-    // ✅ 암호화된 Private Key (복호화 금지, Flask로만 전달)
     @Column(nullable = false, length = 512)
-    private String encryptedPrivateKey;
+    private String privateKey;
 
-    // ✅ 연동된 토큰 컨트랙트 (어떤 ERC20 토큰인지)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "contractId", nullable = false, referencedColumnName = "contractId")
+    @JoinColumn(name = "contract_id", nullable = false)
     private TokenContract contract;
 
-    // ✅ on-chain 잔액 (Flask 동기화 시 갱신)
     @Column(nullable = false)
-    private Long balance;
+    private Long balance = 0L;
 
-    // ✅ 여러 개 중 하나만 활성화 가능
     @Column(nullable = false)
     private boolean active;
 
-    // ---------- Hooks ----------
-    @PrePersist
-    public void prePersist() {
-        if (balance == null) balance = 0L;
-        if (!active) active = false;
+
+    // ✅ 토큰 증가
+    public void addBalance(Long amount) {
+        if (amount == null || amount <= 0) {
+            throw new IllegalArgumentException("추가할 금액은 0보다 커야 합니다.");
+        }
+        this.balance = (this.balance == null ? 0L : this.balance) + amount;
     }
 
-    // ---------- 비즈니스 로직 ----------
+    // ✅ 토큰 차감
+    public void subtractBalance(Long amount) {
+        if (amount == null || amount <= 0) {
+            throw new IllegalArgumentException("차감할 금액은 0보다 커야 합니다.");
+        }
+        if (this.balance < amount) {
+            throw new IllegalArgumentException("잔액이 부족합니다.");
+        }
+        this.balance -= amount;
+    }
+
+    // ✅ 잔액 갱신용 (직접 설정)
+    public void updateBalance(Long newBalance) {
+        this.balance = newBalance;
+    }
+
+    /**
+     * 지갑 비활성화
+     */
     public void deactivate() {
         this.active = false;
     }
 
-    public void addBalance(Long amount) {
-        if (amount != null && amount > 0) {
-            this.balance += amount;
-        }
-    }
-
-    public void subtractBalance(Long amount) {
-        if (amount != null && amount > 0 && this.balance >= amount) {
-            this.balance -= amount;
-        }
-    }
-
-    // ✅ balance 외부 동기화용 (Flask → Spring)
-    public void updateBalance(Long onChainBalance) {
-        this.balance = onChainBalance;
+    /**
+     * 지갑 활성화
+     */
+    public void activate() {
+        this.active = true;
     }
 }

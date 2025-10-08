@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "tokenContract")
+@Table(name = "token_contract")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -13,11 +13,11 @@ public class TokenContract {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "contractId") // ✅ FK가 여기를 참조해야 함
+    @Column(name = "contract_id") // ✅ FK가 여기를 참조해야 함
     private Long id;
 
     // ✅ ERC20 컨트랙트 주소
-    @Column(nullable = false, unique = true, length = 128)
+    @Column(nullable = false, unique = true, length = 128, name="contract_address")
     private String contractAddress;
 
     @Column(nullable = false)

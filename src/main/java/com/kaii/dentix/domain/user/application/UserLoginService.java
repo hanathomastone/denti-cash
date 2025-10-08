@@ -64,7 +64,9 @@ public class UserLoginService {
     private final ApplicationEventPublisher publisher;
 
     private final AdminRepository adminRepository;
+
     private final CryptoUtil cryptoUtil;
+
     private final TokenContractRepository tokenContractRepository;
     /**
      * 사용자 서비스 이용동의 여부 확인 및 저장
@@ -180,8 +182,8 @@ public class UserLoginService {
         ));
 
         // ✅ 활성화된 컨트랙트 조회
-        TokenContract defaultContract = tokenContractRepository.findActiveContract()
-                .orElseThrow(() -> new RuntimeException("활성화된 토큰 컨트랙트가 없습니다."));
+//        TokenContract defaultContract = tokenContractRepository.findActiveContract()
+//                .orElseThrow(() -> new RuntimeException("활성화된 토큰 컨트랙트가 없습니다."));
 
         //지갑 생성 요청
         FlaskCreateWalletResponse walletRes = flaskClient.createWallet();
@@ -192,10 +194,10 @@ public class UserLoginService {
         // 3️⃣ UserWallet 임시 저장 (address만)
         UserWallet wallet = UserWallet.builder()
                 .user(user)
-                .walletAddress(walletAddress)
-                .encryptedPrivateKey(null)
+                .address(walletAddress)
+                .privateKey(null)
                 .balance(0L)
-                .contract(defaultContract)   // ✅ 추가
+//                .contract(defaultContract)   // ✅ 추가
                 .active(true)
                 .build();
 //        userWalletRepository.save(wallet);
@@ -206,8 +208,8 @@ public class UserLoginService {
             throw new RuntimeException("privateKey 조회 실패");
 
         // 5️⃣ privateKey 암호화 후 저장
-        String encryptedKey = cryptoUtil.encrypt(keyRes.getPrivate_key());
-        wallet.updateEncryptedPrivateKey(encryptedKey);
+        String userPrivateKey = keyRes.getPrivate_key();
+        wallet.updatePrivateKey(userPrivateKey);
         userWalletRepository.save(wallet);
 
         // ✅ 결과 반환

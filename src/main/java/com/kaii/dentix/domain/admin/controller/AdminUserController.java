@@ -5,10 +5,13 @@ import com.kaii.dentix.domain.admin.dto.AdminUserListDto;
 import com.kaii.dentix.domain.admin.dto.AdminUserModifyInfoDto;
 import com.kaii.dentix.domain.admin.dto.request.AdminUserListRequest;
 import com.kaii.dentix.domain.admin.dto.request.AdminUserModifyRequest;
+import com.kaii.dentix.domain.blockChain.wallet.application.WalletService;
+import com.kaii.dentix.domain.blockChain.wallet.dto.UserWalletResponse;
 import com.kaii.dentix.global.common.response.DataResponse;
 import com.kaii.dentix.global.common.response.SuccessResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,7 +21,13 @@ import org.springframework.web.bind.annotation.*;
 public class AdminUserController {
 
     private final AdminUserService adminUserService;
+    private final WalletService userWalletService;
 
+    @GetMapping("/{userId}/wallet")
+    public ResponseEntity<UserWalletResponse> getUserWallet(@PathVariable Long userId) {
+        UserWalletResponse response = userWalletService.getWalletByUserId(userId);
+        return ResponseEntity.ok(response);
+    }
     /**
      *  사용자 인증
      */

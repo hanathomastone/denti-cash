@@ -10,11 +10,8 @@ import lombok.*;
 
 import java.math.BigDecimal;
 
-/**
- * 블록체인 토큰 거래 내역 (리워드, 송금, 충전 등)
- */
 @Entity
-@Table(name = "tokenLedger")
+@Table(name = "token_ledger")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -22,48 +19,48 @@ import java.math.BigDecimal;
 public class TokenLedger extends TimeEntity {
 
     @Id
-    @Column(name = "tokenLedgerId")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "token_ledger_id")
     private Long id;
-
-    // ✅ 어떤 토큰 컨트랙트에서 발생한 거래인지
+    @Column(unique = true, nullable = true)
+    private String txHash;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "contractId", nullable = false)
+    @JoinColumn(name = "contract_id", nullable = false)
     private TokenContract contract;
 
-    // ✅ 송신자 (관리자 지갑 기준)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "fromAdminWalletId")
-    private AdminWallet fromAdminWallet;
+    @ManyToOne
+    @JoinColumn(name = "sender_admin_wallet_id")
+    private AdminWallet senderAdminWallet;
 
-    // ✅ 수신자 (사용자 지갑 기준)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "toUserWalletId")
-    private UserWallet toUserWallet;
+    @ManyToOne
+    @JoinColumn(name = "sender_user_wallet_id")
+    private UserWallet senderUserWallet;
 
-    // ✅ 트랜잭션 해시 (Flask로부터 받은 고유 txHash)
-    @Column(nullable = false, unique = true, length = 128)
-    private String txHash;
+    @ManyToOne
+    @JoinColumn(name = "receiver_admin_wallet_Id")
+    private AdminWallet receiverAdminWallet;
 
-    // ✅ 송금 금액
+    @ManyToOne
+    @JoinColumn(name = "receiver_user_wallet_Id")
+    private UserWallet receiverUserWallet;
+
     @Column(nullable = false, precision = 38, scale = 0)
-    private BigDecimal amount;
+    private Long amount;
 
-    // ✅ 거래 유형 (예: REWARD, CHARGE, TRANSFER)
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false)
     private TokenLedgerType type;
 
-    // ✅ 거래 상태 (예: PENDING, SUCCESS, FAILED)
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false)
     private TokenLedgerStatus status;
 
-    // ✅ 에러 메시지나 트랜잭션 메모
     @Column(length = 255)
     private String message;
 
-    // ✅ Flask 트랜잭션 수행 후 상태 업데이트용 메서드
+    @Column(length = 255)
+    private String memo;
+
     public void markSuccess(String message) {
         this.status = TokenLedgerStatus.SUCCESS;
         this.message = message;

@@ -236,8 +236,8 @@ public class AdminUserControllerTest extends ControllerTest {
         AdminUserListDto userList = AdminUserListDto.builder()
                 .paging(new PagingDTO(1, 2, 15))
                 .userList(new ArrayList<>(){{
-                    add(new AdminUserInfoDto(1L, "dentix123", "김덴티", GenderType.M, "K", date, OralCheckResultType.HEALTHY, date, YnType.Y, "01012345678"));
-                    add(new AdminUserInfoDto(2L, "test123", "홍길동", GenderType.W, null, null, OralCheckResultType.HEALTHY, date, YnType.Y, null));
+                    add(new AdminUserInfoDto(1L, "dentix123", "김덴티", GenderType.M, "K", date, OralCheckResultType.HEALTHY, date, YnType.Y, "01012345678","0xC51ad2A5891c39B4f46E80F15737A4B3B1315Ab1fca", 20L));
+                    add(new AdminUserInfoDto(2L, "test123", "홍길동", GenderType.W, null, null, OralCheckResultType.HEALTHY, date, YnType.Y, null,null,null));
                 }})
                 .build();
 

@@ -22,4 +22,6 @@ public class UserInfoDto {
 
     private GenderType userGender;
 
+    private Long tokenBalance;
+
 }
