@@ -7,6 +7,6 @@ import lombok.Data;
 // Flask 토큰 생성 응답
 @Data
 public class FlaskTokenCreateResponse {
-    @JsonProperty("contract_address")
+    @JsonProperty("contract address")
     private String contractAddress;
 }

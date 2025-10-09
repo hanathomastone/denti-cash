@@ -2,6 +2,7 @@ package com.kaii.dentix.domain.admin.application;
 
 import com.kaii.dentix.domain.admin.dao.AdminWalletRepository;
 import com.kaii.dentix.domain.admin.domain.AdminWallet;
+import com.kaii.dentix.domain.admin.dto.AdminWalletSummaryDto;
 import com.kaii.dentix.domain.admin.dto.statistic.AdminTokenTransferRequest;
 import com.kaii.dentix.domain.blockChain.token.dao.TokenContractRepository;
 import com.kaii.dentix.domain.blockChain.token.dao.TokenLedgerRepository;
@@ -25,6 +26,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -241,19 +244,12 @@ public class AdminWalletService {
      * 🪙 토큰 컨트랙트 생성
      */
     @Transactional
-    public TokenCreateResponseDto createTokenContract(AdminTokenCreateRequest request) {
+    public TokenCreateResponseDto createTokenContract(FlaskTokenCreateRequest request) {
         log.info("🪙 토큰 생성 시작: name={}, symbol={}, supply={}",
                 request.getTokenName(), request.getTokenSymbol(), request.getSupply());
 
         try {
-            // Flask 요청 DTO 생성
-            FlaskTokenCreateRequest flaskRequest = new FlaskTokenCreateRequest();
-            flaskRequest.setTokenName(request.getTokenName());
-            flaskRequest.setTokenSymbol(request.getTokenSymbol());
-            flaskRequest.setSupply(request.getSupply());
-
-            // Flask API 호출
-            FlaskTokenCreateResponse flaskResponse = flaskClient.createToken(flaskRequest);
+            FlaskTokenCreateResponse flaskResponse = flaskClient.createToken(request);
 
             log.info("✅ 토큰 생성 성공: contractAddress={}", flaskResponse.getContractAddress());
 
@@ -263,7 +259,6 @@ public class AdminWalletService {
                     request.getTokenSymbol(),
                     request.getSupply()
             );
-
         } catch (Exception e) {
             log.error("❌ 토큰 생성 실패", e);
             throw new RuntimeException("토큰 생성 실패: " + e.getMessage(), e);
@@ -427,6 +422,128 @@ public class AdminWalletService {
 
     public Page<TokenLedgerResponse> getLedgerList(AdminTokenLedgerListRequest request) {
         return tokenLedgerRepositoryCustom.findAllWithFilter(request);
+    }
+
+    // ✅ 관리자 거래내역 조회
+    @Transactional
+    public List<AdminTokenLedgerDto> getAdminLedgers(String type, String period) {
+        LocalDateTime fromDateTime = switch (period != null ? period.toUpperCase() : "") {
+            case "1D" -> LocalDateTime.now().minusDays(1);
+            case "3D" -> LocalDateTime.now().minusDays(3);
+            case "7D" -> LocalDateTime.now().minusDays(7);
+            default -> null;
+        };
+
+        Date fromDate = (fromDateTime != null)
+                ? Date.from(fromDateTime.atZone(ZoneId.systemDefault()).toInstant())
+                : null;
+
+        TokenLedgerType ledgerType = type != null ? TokenLedgerType.valueOf(type.toUpperCase()) : null;
+        List<TokenLedger> ledgers = tokenLedgerRepository.findAllByFilter(ledgerType, fromDate);
+        return ledgers.stream().map(AdminTokenLedgerDto::from).toList();
+    }
+
+    // ✅ 거래주소 기준 일괄 회수
+    @Transactional
+    public void reclaimTokensByContract(Long contractId) {
+        TokenContract contract = tokenContractRepository.findById(contractId)
+                .orElseThrow(() -> new RuntimeException("해당 계약이 존재하지 않습니다."));
+        AdminWallet adminWallet = adminWalletRepository.findByActiveTrue()
+                .orElseThrow(() -> new RuntimeException("활성화된 관리자 지갑이 없습니다."));
+
+        List<TokenLedger> rewards = tokenLedgerRepository
+                .findAllByContractAndType(contract, TokenLedgerType.REWARD);
+
+        for (TokenLedger ledger : rewards) {
+            UserWallet userWallet = ledger.getReceiverUserWallet();
+            Long amount = ledger.getAmount();
+
+            if (userWallet.getBalance() < amount) continue; // 이미 사용한 토큰 skip
+
+            userWallet.subtractBalance(amount);
+            adminWallet.addBalance(amount);
+
+            TokenLedger reclaimLedger = TokenLedger.builder()
+                    .contract(contract)
+                    .senderUserWallet(userWallet)
+                    .receiverAdminWallet(adminWallet)
+                    .amount(amount)
+                    .type(TokenLedgerType.RECLAIM)
+                    .status(TokenLedgerStatus.SUCCESS)
+                    .message("거래주소 일괄 회수")
+                    .build();
+            tokenLedgerRepository.save(reclaimLedger);
+        }
+    }
+
+    // ✅ 토큰 지급 (잔액 부족 시 자동 충전)
+    @Transactional
+    public void issueToken(Long userId, Long amount) {
+        AdminWallet activeWallet = adminWalletRepository.findByActiveTrue()
+                .orElseThrow(() -> new RuntimeException("활성화된 관리자 지갑이 없습니다."));
+
+        if (activeWallet.getBalance() < amount) {
+            log.warn("⚠️ 관리자 지갑 잔액 부족 → 자동 충전 시도");
+            rechargeFromOtherWallets(activeWallet, amount);
+        }
+
+        UserWallet userWallet = userWalletRepository.findByUser_UserId(userId)
+                .orElseThrow(() -> new RuntimeException("사용자 지갑이 존재하지 않습니다."));
+
+        activeWallet.subtractBalance(amount);
+        userWallet.addBalance(amount);
+
+        TokenLedger ledger = TokenLedger.builder()
+                .senderAdminWallet(activeWallet)
+                .receiverUserWallet(userWallet)
+                .amount(amount)
+                .type(TokenLedgerType.REWARD)
+                .status(TokenLedgerStatus.SUCCESS)
+                .message("AI 분석 리워드 지급")
+                .build();
+
+        tokenLedgerRepository.save(ledger);
+    }
+
+
+    // ✅ 잔액 부족 시 다른 관리자 지갑에서 충전
+    private void rechargeFromOtherWallets(AdminWallet targetWallet, Long requiredAmount) {
+        List<AdminWallet> others = adminWalletRepository.findAll().stream()
+                .filter(w -> !w.getAdminWalletId().equals(targetWallet.getAdminWalletId()))
+                .sorted((a, b) -> Long.compare(b.getBalance(), a.getBalance()))
+                .toList();
+
+        long remaining = requiredAmount - targetWallet.getBalance();
+
+        for (AdminWallet source : others) {
+            if (remaining <= 0) break;
+            long transferable = Math.min(source.getBalance(), remaining);
+
+            if (transferable > 0) {
+                source.subtractBalance(transferable);
+                targetWallet.addBalance(transferable);
+
+                TokenLedger transferLedger = TokenLedger.builder()
+                        .senderAdminWallet(source)
+                        .receiverAdminWallet(targetWallet)
+                        .amount(transferable)
+                        .type(TokenLedgerType.ADMIN_TRANSFER)
+                        .status(TokenLedgerStatus.SUCCESS)
+                        .message("자동 충전")
+                        .build();
+                tokenLedgerRepository.save(transferLedger);
+                remaining -= transferable;
+            }
+        }
+
+        if (remaining > 0) {
+            throw new RuntimeException("⚠️ 모든 관리자 지갑에서 충전 불가 — 잔액 부족");
+        }
+    }
+
+    @Transactional
+    public List<AdminWalletSummaryDto> getWalletSummaries() {
+        return adminWalletRepository.findWalletSummaries();
     }
 
 }

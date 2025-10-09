@@ -2,9 +2,7 @@ package com.kaii.dentix.domain.admin.dto;
 
 import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.domain.user.dto.TokenDto;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 @Getter @SuperBuilder

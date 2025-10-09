@@ -1,6 +1,7 @@
 package com.kaii.dentix.domain.admin.controller;
 
 import com.kaii.dentix.domain.admin.application.AdminWalletService;
+import com.kaii.dentix.domain.admin.dto.AdminWalletSummaryDto;
 import com.kaii.dentix.domain.admin.dto.statistic.AdminTokenTransferRequest;
 import com.kaii.dentix.domain.blockChain.token.dao.TokenLedgerRepositoryCustom;
 import com.kaii.dentix.domain.blockChain.token.dto.*;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -139,17 +141,14 @@ public class AdminWalletController {
      */
     @PostMapping("/token/create")
     public ResponseEntity<DataResponse<TokenCreateResponseDto>> createToken(
-            @Valid @RequestBody AdminTokenCreateRequest request) {
+            @Valid @RequestBody FlaskTokenCreateRequest request) {
 
         log.info("🪙 토큰 생성 요청: name={}, symbol={}, supply={}",
                 request.getTokenName(), request.getTokenSymbol(), request.getSupply());
 
         try {
             TokenCreateResponseDto response = adminWalletService.createTokenContract(request);
-
-            return ResponseEntity.ok(
-                    new DataResponse<>(200, "토큰 생성이 완료되었습니다.", response)
-            );
+            return ResponseEntity.ok(new DataResponse<>(200, "토큰 생성이 완료되었습니다.", response));
         } catch (Exception e) {
             log.error("❌ 토큰 생성 실패", e);
             throw new RuntimeException("토큰 생성 실패: " + e.getMessage());
@@ -187,5 +186,26 @@ public class AdminWalletController {
     ) {
         Page<TokenLedgerResponse> result = adminWalletService.getLedgerList(request);
         return ResponseEntity.ok(result);
+    }
+
+    // 거래내역 조회
+    @GetMapping("/ledgers")
+    public ResponseEntity<List<AdminTokenLedgerDto>> getAllLedgers(
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String period
+    ) {
+        return ResponseEntity.ok(adminWalletService.getAdminLedgers(type, period));
+    }
+
+    // 거래주소 일괄 회수
+    @PostMapping("/reclaim/{contractId}")
+    public ResponseEntity<String> reclaimAll(@PathVariable Long contractId) {
+        adminWalletService.reclaimTokensByContract(contractId);
+        return ResponseEntity.ok("✅ 회수 완료");
+    }
+    @GetMapping("/wallet-summary")
+    public ResponseEntity<DataResponse<List<AdminWalletSummaryDto>>> getWalletSummary() {
+        List<AdminWalletSummaryDto> result = adminWalletService.getWalletSummaries();
+        return ResponseEntity.ok(new DataResponse<>(200, "거래주소별 잔고 조회 성공", result));
     }
 }

@@ -1,5 +1,6 @@
 package com.kaii.dentix.global.flask.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaii.dentix.domain.blockChain.token.dao.TokenContractRepository;
 import com.kaii.dentix.domain.blockChain.token.domain.TokenContract;
 import com.kaii.dentix.domain.blockChain.token.dto.*;
@@ -9,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -134,24 +137,50 @@ public class FlaskClient {
      *   "contract_address": "0xabc..."
      * }
      */
-    // FlaskClient.java 내부
     public FlaskTokenCreateResponse createToken(FlaskTokenCreateRequest request) {
         String url = FLASK_BASE + "/token/create";
-        log.info("📤 Flask 토큰 생성: name={}, symbol={}, supply={}",
-                request.getTokenName(), request.getTokenSymbol(), request.getSupply());
+
+        Map<String, Object> body = Map.of(
+                "token_name", request.getTokenName(),
+                "token_symbol", request.getTokenSymbol(),
+                "supply", request.getSupply()
+        );
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+
+        log.info("📤 Flask 요청: {}", body);
 
         try {
-            ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
-            Map<String, Object> body = response.getBody();
+            ResponseEntity<String> response =
+                    restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
-            checkFlaskResponse(body, "토큰 생성");
+            log.info("✅ Flask 응답 상태: {}", response.getStatusCode());
+            log.info("✅ Flask 응답 본문: {}", response.getBody());
 
-            FlaskTokenCreateResponse result = new FlaskTokenCreateResponse();
-            result.setContractAddress(body.get("contract_address").toString());
-            return result;
+            String bodyText = response.getBody();
+
+            // ✅ JSON 응답인 경우만 매핑 시도
+            if (response.getStatusCode().is2xxSuccessful()
+                    && bodyText != null
+                    && bodyText.trim().startsWith("{")) {
+
+                ObjectMapper mapper = new ObjectMapper();
+                return mapper.readValue(bodyText, FlaskTokenCreateResponse.class);
+            }
+
+            // ✅ HTML or 비정상 응답인 경우
+            throw new RuntimeException(
+                    "Flask 서버 오류 (" + response.getStatusCode() + "):\n" + bodyText
+            );
+
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            log.error("❌ Flask HTTP 오류: {}", e.getResponseBodyAsString());
+            throw new RuntimeException("Flask 서버 오류: " + e.getResponseBodyAsString());
         } catch (Exception e) {
-            log.error("❌ Flask 토큰 생성 실패", e);
-            throw new RuntimeException("Flask 토큰 생성 실패: " + e.getMessage(), e);
+            log.error("❌ Flask 통신 실패", e);
+            throw new RuntimeException("Flask 통신 실패: " + e.getMessage());
         }
     }
     /**

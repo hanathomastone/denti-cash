@@ -7,5 +7,7 @@ public enum TokenLedgerType {
     TRANSFER,    // 사용자 간 송금
     MANUAL,      // 관리자 수동 지급
     RETRIEVE,    // 회수
-    USE          // 사용자 사용 (결제 등)
+    USE  ,
+    RECLAIM,// 사용자 사용 (결제 등)
+    ADMIN_TRANSFER
 }

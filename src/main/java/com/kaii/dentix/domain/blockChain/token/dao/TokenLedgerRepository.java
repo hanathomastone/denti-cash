@@ -1,5 +1,6 @@
 package com.kaii.dentix.domain.blockChain.token.dao;
 
+import com.kaii.dentix.domain.blockChain.token.domain.TokenContract;
 import com.kaii.dentix.domain.blockChain.token.domain.TokenLedger;
 import com.kaii.dentix.domain.blockChain.token.type.TokenLedgerType;
 import com.kaii.dentix.domain.blockChain.wallet.domain.UserWallet;
@@ -102,4 +103,20 @@ public interface TokenLedgerRepository extends JpaRepository<TokenLedger, Long> 
         );
     @Query("SELECT SUM(t.amount) FROM TokenLedger t WHERE t.type = :type")
     Optional<BigDecimal> sumAmountByType(TokenLedgerType type);
+
+
+
+    @Query("""
+    SELECT l FROM TokenLedger l
+    WHERE (:type IS NULL OR l.type = :type)
+      AND (:fromDate IS NULL OR l.created >= :fromDate)
+    ORDER BY l.created DESC
+""")
+    List<TokenLedger> findAllByFilter(
+            @Param("type") TokenLedgerType type,
+            @Param("fromDate") Date fromDate
+    );
+
+        List<TokenLedger> findAllByContractAndType(TokenContract contract, TokenLedgerType type);
+
 }
