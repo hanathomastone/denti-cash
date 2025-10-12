@@ -3,7 +3,6 @@ package com.kaii.dentix.domain.blockChain.token.controller;
 
 import com.kaii.dentix.domain.blockChain.token.application.TokenLedgerService;
 import com.kaii.dentix.domain.blockChain.token.dto.TokenLedgerDto;
-import com.kaii.dentix.domain.blockChain.token.dto.TokenLedgerSummaryDto;
 import com.kaii.dentix.domain.blockChain.token.dto.UserTokenSummaryDto;
 import com.kaii.dentix.domain.user.application.UserService;
 import com.kaii.dentix.domain.user.domain.User;
@@ -29,7 +28,7 @@ public class TokenLedgerController {
     private final UserService userService;
 
     /**
-     * 🪙 내 토큰 거래내역 조회
+     * 내 토큰 거래내역 조회
      */
     @GetMapping("/my")
     public ResponseEntity<DataResponse<List<TokenLedgerDto>>> getMyTokenHistory(HttpServletRequest request) {
@@ -40,8 +39,7 @@ public class TokenLedgerController {
 
 
     /**
-     * ✅ 사용자 잔여 토큰 조회 API
-     * 예: GET /api/token/balance?userId=5
+     * 사용자 잔여 토큰 조회 API
      */
     @GetMapping("/balance")
     public ResponseEntity<Map<String, Object>> getUserTokenBalance(@RequestParam Long userId) {
@@ -53,8 +51,7 @@ public class TokenLedgerController {
     }
 
     /**
-     * ✅ 사용자 토큰 요약 조회 (잔액 + 적립내역 + 사용내역)
-     * 예: /token/summary?userId=25
+     * 사용자 토큰 요약 조회 (잔액 + 적립내역 + 사용내역)
      */
     @GetMapping("/summary")
     public DataResponse<UserTokenSummaryDto> getUserTokenSummary(@RequestParam Long userId) {

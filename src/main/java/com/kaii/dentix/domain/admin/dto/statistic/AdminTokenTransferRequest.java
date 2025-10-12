@@ -8,9 +8,10 @@ import lombok.Setter;
 
 @Getter @Setter
 public class AdminTokenTransferRequest {
-    @NotNull
+//    @NotNull
     private Long userId;             // UI: 사용자 ID
-
+    @NotNull
+    private String userLoginIdentifier;
     @NotNull @Min(1)
     private Long amount;             // UI: 토큰 지급 수
 

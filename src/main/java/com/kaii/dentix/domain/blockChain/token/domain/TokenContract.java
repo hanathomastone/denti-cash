@@ -13,21 +13,34 @@ public class TokenContract {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "contract_id") // ✅ FK가 여기를 참조해야 함
+    @Column(name = "contract_id")
     private Long id;
 
-    // ✅ ERC20 컨트랙트 주소
-    @Column(nullable = false, unique = true, length = 128, name="contract_address")
+    //ERC20 컨트랙트 주소
+    @Column(nullable = false, unique = true, length = 128, name = "contract_address")
     private String contractAddress;
+    @Column(nullable = true, length = 100)
+    private String name;
+    private String tokenName;
+    private String tokenSymbol;
+    private Long supply;
 
     @Column(nullable = false)
-    private String name; // 예: DENTI Token
-
-
-    @Column(nullable = false)
-    private int decimals = 18;
-
-
+    private Integer decimals;
     @Column(nullable = false)
     private boolean active;
+
+    /**
+     * 비활성화
+     */
+    public void deactivate() {
+        this.active = false;
+    }
+
+    /**
+     * 활성화
+     */
+    public void activate() {
+        this.active = true;
+    }
 }

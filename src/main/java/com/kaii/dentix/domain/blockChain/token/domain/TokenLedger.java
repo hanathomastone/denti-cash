@@ -1,6 +1,7 @@
 package com.kaii.dentix.domain.blockChain.token.domain;
 
 import com.kaii.dentix.domain.admin.domain.AdminWallet;
+import com.kaii.dentix.domain.blockChain.token.type.TokenLedgerSourceType;
 import com.kaii.dentix.domain.blockChain.token.type.TokenLedgerStatus;
 import com.kaii.dentix.domain.blockChain.token.type.TokenLedgerType;
 import com.kaii.dentix.domain.blockChain.wallet.domain.UserWallet;
@@ -60,6 +61,10 @@ public class TokenLedger extends TimeEntity {
 
     @Column(length = 255)
     private String memo;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "source_type", nullable = false, length = 20)
+    private TokenLedgerSourceType sourceType;
 
     public void markSuccess(String message) {
         this.status = TokenLedgerStatus.SUCCESS;

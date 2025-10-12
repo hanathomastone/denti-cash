@@ -1,7 +1,6 @@
 package com.kaii.dentix.domain.blockChain.mission.controller;
 
 import com.kaii.dentix.domain.blockChain.mission.application.MissionService;
-import com.kaii.dentix.domain.blockChain.mission.domain.Mission;
 import com.kaii.dentix.domain.blockChain.mission.dto.MissionListResponseDto;
 import com.kaii.dentix.global.common.response.DataResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
-import java.util.List;
 @RestController
 @RequestMapping("/admin/missions")
 @RequiredArgsConstructor
@@ -23,7 +21,7 @@ public class MissionController {
 
     private final MissionService missionService;
 
-    /** 🔍 미션 검색 + 페이징 */
+    /** 미션 검색 + 페이징 */
     @GetMapping("/search")
     public ResponseEntity<DataResponse<Page<MissionListResponseDto>>> searchMissions(
             @RequestParam(required = false) String keyword,

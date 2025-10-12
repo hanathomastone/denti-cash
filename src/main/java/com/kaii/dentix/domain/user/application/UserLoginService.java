@@ -2,18 +2,17 @@ package com.kaii.dentix.domain.user.application;
 
 import com.kaii.dentix.domain.admin.dao.AdminRepository;
 import com.kaii.dentix.domain.admin.domain.Admin;
-import com.kaii.dentix.domain.blockChain.token.dao.TokenContractRepository;
-import com.kaii.dentix.domain.blockChain.token.domain.TokenContract;
+import com.kaii.dentix.domain.blockChain.wallet.dao.UserWalletRepository;
 import com.kaii.dentix.domain.blockChain.wallet.domain.UserWallet;
 import com.kaii.dentix.domain.findPwdQuestion.dao.FindPwdQuestionRepository;
 import com.kaii.dentix.domain.jwt.JwtTokenUtil;
 import com.kaii.dentix.domain.jwt.TokenType;
-import com.kaii.dentix.domain.serviceAgreement.dto.ServiceAgreementDto;
-import com.kaii.dentix.domain.type.UserRole;
-import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.domain.patient.dao.PatientRepository;
 import com.kaii.dentix.domain.patient.domain.Patient;
 import com.kaii.dentix.domain.serviceAgreement.application.ServiceAgreementService;
+import com.kaii.dentix.domain.serviceAgreement.dto.ServiceAgreementDto;
+import com.kaii.dentix.domain.type.UserRole;
+import com.kaii.dentix.domain.type.YnType;
 import com.kaii.dentix.domain.user.dao.UserRepository;
 import com.kaii.dentix.domain.user.domain.User;
 import com.kaii.dentix.domain.user.dto.*;
@@ -21,16 +20,14 @@ import com.kaii.dentix.domain.user.dto.request.*;
 import com.kaii.dentix.domain.user.event.UserModifyDeviceInfoEvent;
 import com.kaii.dentix.domain.userServiceAgreement.dao.UserServiceAgreementRepository;
 import com.kaii.dentix.domain.userServiceAgreement.domain.UserServiceAgreement;
-import com.kaii.dentix.domain.blockChain.wallet.application.WalletService;
-import com.kaii.dentix.domain.blockChain.wallet.dao.UserWalletRepository;
 import com.kaii.dentix.global.common.error.exception.*;
-import com.kaii.dentix.global.common.util.CryptoUtil;
 import com.kaii.dentix.global.flask.client.FlaskClient;
 import com.kaii.dentix.global.flask.dto.FlaskCreateWalletResponse;
 import com.kaii.dentix.global.flask.dto.FlaskPrivateKeyResponse;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -40,17 +37,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserLoginService {
     private final UserWalletRepository userWalletRepository;
-    private final WalletService walletService;
 
     private final PatientRepository patientRepository;
     private final FlaskClient flaskClient;
     private final UserRepository userRepository;
-    private final UserService userService;
     private final ServiceAgreementService serviceAgreementService;
 
     private final UserServiceAgreementRepository userServiceAgreementRepository;
@@ -65,9 +60,6 @@ public class UserLoginService {
 
     private final AdminRepository adminRepository;
 
-    private final CryptoUtil cryptoUtil;
-
-    private final TokenContractRepository tokenContractRepository;
     /**
      * 사용자 서비스 이용동의 여부 확인 및 저장
      */
@@ -92,7 +84,6 @@ public class UserLoginService {
                     .userServiceAgreeDate(now)
                     .build());
         });
-
     }
 
     /**
@@ -146,7 +137,7 @@ public class UserLoginService {
         if (findPwdQuestionRepository.findById(request.getFindPwdQuestionId()).isEmpty())
             throw new NotFoundDataException("존재하지 않는 질문입니다.");
 
-        // ✅ User 저장
+        //User 저장
         User user = userRepository.save(User.builder()
                 .userLoginIdentifier(request.getUserLoginIdentifier())
                 .userName(request.getUserName())
@@ -162,16 +153,16 @@ public class UserLoginService {
         Long userId = user.getUserId();
 
 
-        // ✅ 토큰 발급
+        //토큰 발급
         String accessToken = jwtTokenUtil.createToken(user, TokenType.AccessToken);
         String refreshToken = jwtTokenUtil.createToken(user, TokenType.RefreshToken);
 
         user.updateLogin(refreshToken);
 
-        // ✅ 서비스 이용 동의 저장
+        //서비스 이용 동의 저장
         this.userServiceAgreeCheckAndSave(request.getUserServiceAgreementRequest(), userId);
 
-        // ✅ 디바이스 이벤트 발행
+        //디바이스 이벤트 발행
         publisher.publishEvent(new UserModifyDeviceInfoEvent(
                 user.getUserId(),
                 httpServletRequest,
@@ -181,38 +172,34 @@ public class UserLoginService {
                 request.getUserDeviceToken()
         ));
 
-        // ✅ 활성화된 컨트랙트 조회
-//        TokenContract defaultContract = tokenContractRepository.findActiveContract()
-//                .orElseThrow(() -> new RuntimeException("활성화된 토큰 컨트랙트가 없습니다."));
-
         //지갑 생성 요청
         FlaskCreateWalletResponse walletRes = flaskClient.createWallet();
+        log.info(walletRes.toString());
         if (walletRes.getAddress() == null)
             throw new RuntimeException("Flask에서 address를 반환하지 않았습니다.");
         String walletAddress = walletRes.getAddress();
 
-        // 3️⃣ UserWallet 임시 저장 (address만)
+        //UserWallet 임시 저장 (address만)
         UserWallet wallet = UserWallet.builder()
                 .user(user)
                 .address(walletAddress)
                 .privateKey(null)
                 .balance(0L)
-//                .contract(defaultContract)   // ✅ 추가
                 .active(true)
                 .build();
-//        userWalletRepository.save(wallet);
 
-        // 4️⃣ Flask - privateKey 조회
+        // Flask - privateKey 조회
         FlaskPrivateKeyResponse keyRes = flaskClient.getPrivateKey(walletAddress);
         if (keyRes.getPrivate_key() == null)
             throw new RuntimeException("privateKey 조회 실패");
+        log.info("Flask privateKey 응답: {}", keyRes);
 
-        // 5️⃣ privateKey 암호화 후 저장
+        //privateKey 암호화 후 저장
         String userPrivateKey = keyRes.getPrivate_key();
         wallet.updatePrivateKey(userPrivateKey);
         userWalletRepository.save(wallet);
 
-        // ✅ 결과 반환
+        //결과 반환
         return UserSignUpDto.builder()
                 .patientId(request.getPatientId())
                 .userId(user.getUserId())
@@ -224,16 +211,15 @@ public class UserLoginService {
                 .birth(user.getBirth())
                 .build();
     }
+
     /**
      *  아이디 중복 확인
      */
     @Transactional(readOnly = true)
     public void loginIdCheck(String userLoginIdentifier){
-
         if (userRepository.findByUserLoginIdentifier(userLoginIdentifier).isPresent()){
             throw new AlreadyDataException("이미 사용 중인 아이디입니다.");
         }
-
     }
 
     /**
@@ -269,7 +255,6 @@ public class UserLoginService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
-
     }
 
     /**

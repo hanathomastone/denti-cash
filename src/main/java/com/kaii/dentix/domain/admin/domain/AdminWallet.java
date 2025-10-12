@@ -1,6 +1,7 @@
 package com.kaii.dentix.domain.admin.domain;
 
 import com.kaii.dentix.domain.blockChain.token.domain.TokenContract;
+import com.kaii.dentix.domain.blockChain.token.type.TokenLedgerSourceType;
 import com.kaii.dentix.global.common.entity.TimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,6 +21,11 @@ public class AdminWallet {
     @Column(name = "admin_wallet_id")
     private Long adminWalletId;
 
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 16)
+    private TokenLedgerSourceType sourceType;
+
     @Column(nullable = false, unique = true, length = 128)
     private String address;
 
@@ -36,8 +42,7 @@ public class AdminWallet {
     @Column(nullable = false)
     private boolean active;
 
-
-    // ✅ 토큰 증가
+    //토큰 증가
     public void addBalance(Long amount) {
         if (amount == null || amount <= 0) {
             throw new IllegalArgumentException("추가할 금액은 0보다 커야 합니다.");
@@ -45,7 +50,7 @@ public class AdminWallet {
         this.balance = (this.balance == null ? 0L : this.balance) + amount;
     }
 
-    // ✅ 토큰 차감
+    //토큰 차감
     public void subtractBalance(Long amount) {
         if (amount == null || amount <= 0) {
             throw new IllegalArgumentException("차감할 금액은 0보다 커야 합니다.");
@@ -56,7 +61,7 @@ public class AdminWallet {
         this.balance -= amount;
     }
 
-    // ✅ 잔액 갱신용 (직접 설정)
+    //잔액 갱신용 (직접 설정)
     public void updateBalance(Long newBalance) {
         this.balance = newBalance;
     }
@@ -73,5 +78,12 @@ public class AdminWallet {
      */
     public void activate() {
         this.active = true;
+    }
+
+    public void updateContract(TokenContract newContract) {
+        if (newContract == null) {
+            throw new IllegalArgumentException("새 컨트랙트 정보가 null입니다.");
+        }
+        this.contract = newContract;
     }
 }

@@ -11,7 +11,7 @@ import java.time.LocalDate;
 
 public interface MissionRepository extends JpaRepository<Mission, Long> {
 
-    /** 🔍 JPQL 기반 검색 + 페이징 */
+    /**JPQL 기반 검색 + 페이징 */
     @Query("""
         SELECT m FROM Mission m
         WHERE (:keyword IS NULL OR LOWER(m.name) LIKE LOWER(CONCAT('%', :keyword, '%')))

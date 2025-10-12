@@ -32,7 +32,7 @@ public class Mission extends TimeEntity {
     private Double tokenReward; // 지급 토큰 수
 
     @Column(nullable = false)
-    private Boolean active; // 활성화 여부
+    private boolean active; // 활성화 여부
 
     @Column(nullable = false)
     private LocalDate startDate;

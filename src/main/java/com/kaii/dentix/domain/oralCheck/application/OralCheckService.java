@@ -151,17 +151,17 @@ public class OralCheckService {
                 }
 
                 if (rewardAmount > 0) {
-                    // ✅ 토큰 보상 지급
+                    // 토큰 보상 지급
                     adminWalletService.giveReward(user.getUserId(), oralCheck.getOralCheckId(), resultType, rewardAmount);
-                    log.info("🎉 구강검진 보상 지급 완료: userId={}, result={}, amount={}", user.getUserId(), resultType, rewardAmount);
+                    log.info("구강검진 보상 지급 완료: userId={}, result={}, amount={}", user.getUserId(), resultType, rewardAmount);
                 } else {
-                    log.info("⚠️ 해당 결과({})는 보상 지급 대상이 아닙니다.", resultType);
+                    log.info("해당 결과({})는 보상 지급 대상이 아닙니다.", resultType);
                 }
 
             } catch (IllegalStateException e) {
                 log.warn("이미 리워드 지급된 구강검진 ID: {}", oralCheck.getOralCheckId());
             } catch (Exception e) {
-                log.error("❌ 리워드 지급 중 오류 발생", e);
+                log.error("리워드 지급 중 오류 발생", e);
             }
 
 

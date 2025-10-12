@@ -4,6 +4,7 @@ import com.kaii.dentix.domain.admin.domain.AdminWallet;
 import com.kaii.dentix.domain.admin.dto.AdminWalletSummaryDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,8 +22,6 @@ public interface AdminWalletRepository extends JpaRepository<AdminWallet, Long> 
      */
     Optional<AdminWallet> findByAddress(String address);
 
-
-
     List<AdminWallet> findAll();
 
     @Query("""
@@ -39,5 +38,6 @@ public interface AdminWalletRepository extends JpaRepository<AdminWallet, Long> 
         GROUP BY w.adminWalletId, w.address
     """)
     List<AdminWalletSummaryDto> findWalletSummaries();
+    List<AdminWallet> findAllByActiveTrue();
 }
 

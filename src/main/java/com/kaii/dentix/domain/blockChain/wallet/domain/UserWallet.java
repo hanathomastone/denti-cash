@@ -45,13 +45,13 @@ public class UserWallet extends TimeEntity {
         if (!active) active = true;
     }
 
-
     public void addBalance(Long amount) {
         if (amount != null && amount > 0) {
             this.balance += amount;
         }
     }
-    // ✅ 토큰 차감
+
+    //토큰 차감
     public void subtractBalance(Long amount) {
         if (amount == null || amount <= 0) {
             throw new IllegalArgumentException("차감할 금액은 0보다 커야 합니다.");
@@ -62,7 +62,7 @@ public class UserWallet extends TimeEntity {
         this.balance -= amount;
     }
 
-    // ✅ 잔액 갱신용 (직접 설정)
+    //잔액 갱신용 (직접 설정)
     public void updateBalance(Long newBalance) {
         this.balance = newBalance;
     }

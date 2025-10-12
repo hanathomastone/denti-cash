@@ -23,7 +23,6 @@ public class MissionListResponseDto {
     private Boolean active;
     private LocalDate startDate;
     private LocalDate endDate;
-    private LocalDateTime created;
 
     public static MissionListResponseDto from(Mission mission) {
         return MissionListResponseDto.builder()
@@ -35,7 +34,6 @@ public class MissionListResponseDto {
                 .active(mission.isActive())
                 .startDate(mission.getStartDate())
                 .endDate(mission.getEndDate())
-                .created(mission.getCreated())
                 .build();
     }
 }

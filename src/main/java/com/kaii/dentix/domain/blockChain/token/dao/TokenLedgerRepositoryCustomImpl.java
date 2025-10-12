@@ -37,7 +37,7 @@ public class TokenLedgerRepositoryCustomImpl implements TokenLedgerRepositoryCus
 
         BooleanBuilder where = new BooleanBuilder();
 
-        // ✅ 검색어 (아이디 or 이름)
+        //검색어 (아이디 or 이름)
         if (request.getUserIdentifierOrName() != null && !request.getUserIdentifierOrName().isBlank()) {
             where.and(
                     user.userLoginIdentifier.containsIgnoreCase(request.getUserIdentifierOrName())
@@ -45,7 +45,7 @@ public class TokenLedgerRepositoryCustomImpl implements TokenLedgerRepositoryCus
             );
         }
 
-        // ✅ 구분 (발급 / 회수)
+        //구분 (발급 / 회수)
         if ("발급".equals(request.getType())) {
             where.and(tokenLedger.type.in(
                     TokenLedgerType.ISSUE,
@@ -57,7 +57,7 @@ public class TokenLedgerRepositoryCustomImpl implements TokenLedgerRepositoryCus
             where.and(tokenLedger.type.eq(TokenLedgerType.RETRIEVE));
         }
 
-        // ✅ 기간 필터 (오늘, 1주일, 1개월, 3개월, 1년)
+        //기간 필터 (오늘, 1주일, 1개월, 3개월, 1년)
         if (request.getPeriod() != null && !"ALL".equalsIgnoreCase(request.getPeriod())) {
             LocalDate now = LocalDate.now();
             LocalDate from = switch (request.getPeriod()) {
@@ -71,7 +71,7 @@ public class TokenLedgerRepositoryCustomImpl implements TokenLedgerRepositoryCus
             where.and(tokenLedger.created.after(Date.from(from.atStartOfDay(ZoneId.systemDefault()).toInstant())));
         }
 
-        // ✅ 직접 입력 날짜 (startDate, endDate)
+        //직접 입력 날짜 (startDate, endDate)
         if (request.getStartDate() != null) {
             where.and(tokenLedger.created.goe(java.sql.Date.valueOf(request.getStartDate())));
         }
@@ -79,7 +79,7 @@ public class TokenLedgerRepositoryCustomImpl implements TokenLedgerRepositoryCus
             where.and(tokenLedger.created.loe(java.sql.Date.valueOf(request.getEndDate())));
         }
 
-        // ✅ 쿼리 실행
+        //쿼리 실행
         var query = queryFactory
                 .select(Projections.constructor(TokenLedgerResponse.class,
                         tokenLedger.id,
@@ -103,7 +103,7 @@ public class TokenLedgerRepositoryCustomImpl implements TokenLedgerRepositoryCus
 
         List<TokenLedgerResponse> result = query.fetch();
 
-        // ✅ count 쿼리
+        //count 쿼리
         long total = Optional.ofNullable(
                 queryFactory.select(tokenLedger.count())
                         .from(tokenLedger)
